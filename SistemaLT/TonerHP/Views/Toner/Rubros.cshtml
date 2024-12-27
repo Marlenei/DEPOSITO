@@ -1,0 +1,249 @@
+﻿
+@{
+    ViewBag.Title = "Rubros";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Rubros</h2>
+
+<ol class="breadcrumb mb-4 mt-4">
+    <li class="breadcrumb-item"><a href="index.html">Resumen</a></li>
+    <li class="breadcrumb-item active">Tipos</li>
+</ol>
+
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-users me-1"></i> Lista de Rubros
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-success" onclick="abrirModal(null)"> Agregar Rubro </button>
+            </div>
+        </div>
+
+        <hr />
+
+        <table id="tabla" class="display cell-border" style="width:100%">
+            <thead>
+                <tr>
+                    <th>ID Rubro</th>
+                    <th>Rubro</th>
+                    <th>Codigo</th>
+                    <th>Activo</th>
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Rubros</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body g-2">
+                <input id="txtid" type="hidden" value="0" />
+                <div class="row g-2" id="contenedor">
+
+                    <div class="col-sm-6">
+                        <label class="form-label">ID Rubro</label>
+
+                        <input type="text" class="form-control" id="txtid">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label">Rubro</label>
+
+                        <input type="text" class="form-control" id="cborubro">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label">Codigo</label>
+                        <input type="text" class="form-control" id="txtcodigoid">
+
+                    </div>
+
+
+                    <div class="col-sm-6">
+                        <label for="txtusuario" class="form-label">IdUsuario</label>
+                        <input type="text" class="form-control" id="txtusuario">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="cboactivo" class="form-label">Activo</label>
+                        <select id="cboactivo" class="form-select">
+                            <option value="1">Si</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                </div>
+
+                @*--------Mensaje de alerta----------*@
+                <div class="row mt-12">
+                    <div class="col-12">
+                        <div id="mensajeError" class="alert alert-danger" role="alert">
+                            Error
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+        var tabladata;
+        var filaSeleccionada;
+
+        tabladata = $('#tabla').DataTable({
+            responsive: true,
+            ordering: false,
+            "ajax": {
+                url: '@Url.Action("ListarRubros","Toner")',
+                type: "GET",
+                dataType: "json"
+            },
+            "columns": [
+                { "data": "IdRubro" },
+                { "data": "Rubro" },
+                { "data": "Codigo" },
+                
+                
+                {
+                    "data": "Activo", "render": function (data) {
+                        return data ? '<span class="badge text-bg-success">Si</span>' : '<span class="badge text-bg-danger">No</span>';
+                    }
+                },
+                {
+                    "defaultContent": '<button type="button" class="btn btn-primary btn-sm"> <i class="fas fa-pen"></i></button>' +
+                        '<button type="button" class="btn btn-danger btn-sm ms-2"> <i class="fas fa-trash"></i></button>',
+                    "orderable": false,
+                    "searchable": false,
+                    "width": "90px"
+                }
+
+         ]
+
+        });
+
+        function abrirModal(json) {
+                
+                $("#txtid").val(0);
+                $("#cborubro").val("");
+                $("#txtcodigoid").val("");
+                $("#txtusuario").val("");                        
+                $("#cboactivo").val(1);
+                $("#mensajeError").hide();
+
+
+                if (json != null) {
+                    $("#txtid").val(json.IdRubro);
+                    $("#cborubro").val(json.Rubro);
+                    $("#txtcodigoid").val(json.Codigo);
+                    $("#txtusuario").val(json.IdUsuario);
+                    $("#cboactivo").val(json.Activo == true ? 1:0 );
+
+                }
+                $("#FormModal").modal("show");
+
+            }
+
+ $("#tabla tbody").on("click", '.btn-editar', function () {
+     filaSeleccionada = $(this).closest("tr");
+     var data = tabladata.row(filaSeleccionada).data();
+     abrirModal(data)
+ })
+
+  function Guardar() {
+
+    var Rubros = {
+        IdRubro: $("#txtid").val(),
+      
+       oRubros: {
+            IdRubro: $("#cborubro option:selected").val(),
+            Rubro: $("#cborubro option:selected").text(),
+       },
+     
+       CodigoId: $("#txtcodigoid").val(),
+       IdUsuario: $("#txtusuario").val(),
+       Activo: $("#cboactivo").val() == 1 ? true : false,
+    }
+
+    jQuery.ajax({
+        url: '@Url.Action("GuardarRubros", "Toner")',
+        type: "POST",
+        data: JSON.stringify({ objeto: Rubros }),
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            $(".modal-body").LoadingOverlay("hide");
+            //PRODUCTO NUEVO
+            if (Rubros.IdRubro == 0) {
+                if (data.resultado != 0) {
+                    Rubros.IdRubro = data.resultado;
+                    tabladata.row.add(Rubros).draw(false);
+                    $("#FormModal").modal("hide");
+                } else {
+                    $("#mensajeError").text(data.mensaje);
+                    $("#mensajeError").show();
+                }
+            }
+                //PRODUCTO EDITAR
+            else {
+                if (data.resultado) {
+
+                    tabladata.row(filaSeleccionada).data(Rubros).draw(false);
+                    filaSeleccionada = null;
+                    $("#FormModal").modal("hide");
+                } else {
+                    $("#mensajeError").text(data.mensaje);
+                    $("#mensajeError").show();
+                }
+            }
+        },
+        error: function (error) {
+            $(".modal-body").LoadingOverlay("hide");
+            $("#mensajeError").text("Error Ajax");
+            $("#mensajeError").show();
+
+            console.log(error)
+        },
+        beforeSend: function () {
+            $(".modal-body").LoadingOverlay("show", {
+                imageResizeFactor: 2,
+                text: "Cargando...",
+                size:14
+            })
+
+        },
+    });
+}
+
+    </script>
+}
+
+
+    </script>
+

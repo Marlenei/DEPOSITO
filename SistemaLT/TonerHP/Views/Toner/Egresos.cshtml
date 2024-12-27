@@ -1,0 +1,350 @@
+﻿
+@{
+    ViewBag.Title = "Egresos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<ol class="breadcrumb mb-4 mt-4">
+    <li class="breadcrumb-item"><a href="index.html">Resumen</a></li>
+    <li class="breadcrumb-item active">Tipos</li>
+</ol>
+
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-users me-1"></i> Egresos
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-success" onclick="abrirModal(null)"> Ingresar stock </button>
+            </div>
+        </div>
+
+        <hr />
+        <div class="container">
+            <div class="table-responsive">
+                <table id="tabla" class="table table-bordered table-hover" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Detalle</th>
+                            <th>Cantidad</th>
+                            <th>Stock Actual</th>
+                            <th>Codigo ID</th>
+                            <th>Tipo Salida</th>
+                            
+                            <th>Fecha de Egreso</th>
+                            <th>Observaciones</th>
+                            <th>ID Usuario</th>
+                            <th>Codigo Area</th>
+                            <th>Codigo Sector</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody style="text-align:center">
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body g-2">
+                <input id="txtid" type="hidden" value="0" />
+                <div class="row g-2" id="contenedor">
+
+                    <div class="col-sm-6">
+                        <label class="form-label">Producto</label>
+                        <select id="cbodetalle" class="form-select"> </select>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                        <input type="text" class="form-control" id="txtcodigoid" >
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtcantidad" class="form-label">Cantidad</label>
+                        <input type="text" class="form-control" id="txtcantidad">
+                    </div>
+
+                  
+
+                    <div class="col-sm-6">
+                        <label for="txtobservaciones" class="form-label">Observaciones</label>
+                        <input type="text" class="form-control" id="txtobservaciones">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtusuario" class="form-label">IdUsuario</label>
+                        <input type="text" class="form-control" id="txtusuario" disabled>
+                    </div>
+
+
+                    <div class="col-sm-6">
+                        <label for="txttipoingreso" class="form-label">Tipo de Salida</label>
+                        <input type="text" class="form-control" id="txttipoingreso">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtfechaingreso" class="form-label">Fecha de Egreso</label>
+                        <input type="text" class="form-control" id="txtfechaingreso" readonly>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtcodigoarea" class="form-label">Codigo Area</label>
+                        <input type="text" class="form-control" id="txtcodigoarea">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtcodigosector" class="form-label">Codigo Sector</label>
+                        <input type="text" class="form-control" id="txtcodigosector">
+                    </div>
+
+
+
+
+                </div>
+
+                @*--------Mensaje de alerta----------*@
+                <div class="row mt-12">
+                    <div class="col-12">
+                        <div id="mensajeError" class="alert alert-danger" role="alert">
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+
+        var tabladata;
+        var filaSeleccionada;
+
+        tabladata = $("#tabla").DataTable({
+            responsive: true,
+            ordering: false,
+            "ajax": {
+                url: '@Url.Action("ListarEgresos", "Toner")',
+                type: "GET",
+                dataType: "json"
+            },
+            "columns": [
+                {
+                    "data": "oProductos", "render": function (data) {
+                        return data.Detalle
+                    }
+                },
+
+                { "data": "Cantidad" },
+                {
+                    "data": "oStockActual", "render": function (data) {
+                        return data.StockActual
+                    }
+                },
+                { "data": "CodigoId" },
+
+                { "data": "TipoSalida" },
+
+                {
+                    data: 'FechaEgreso',
+                    render: function (data) {
+                        console.log('FechaEgreso:', data); // Verifica el valor de data
+                        if (data) {
+                            // Extrae el número de milisegundos del formato /Date(1696181400000)/
+                            const timestamp = parseInt(data.replace(/\/Date\((\d+)\)\//, '$1'), 10);
+                            const fecha = new Date(timestamp);
+                            console.log('Objeto Date:', fecha); // Verifica el objeto Date
+                            if (!isNaN(fecha.getTime())) {
+                                return fecha.toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }); // Formato de fecha en español
+                            }
+                        }
+                        return 'Fecha no válida'; // Mensaje alternativo si la fecha no es válida
+                    }
+                },
+                { "data": "Observaciones" },
+                { "data": "IdUsuario" },
+                { "data": "CodigoArea" },
+                { "data": "CodigoSector" },
+                {
+                    "defaultContent": '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>',
+                    "orderable": false,
+                    "searchable": false,
+                    "width": "90px"
+                }
+
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json',
+            },
+        });
+
+
+
+            jQuery.ajax({
+            url: '@Url.Action("ListarProductos", "Toner")',
+            type: "GET",
+            data: null,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    //----DETALLE
+                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbodetalle");
+
+                    $.each(data.data, function (index, valor) {
+                        if (valor.Activo === true) {
+                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
+                        }
+
+                    });
+
+                    //---STOCKACTUAL
+                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbostockactual");
+
+                    $.each(data.data, function (index, valor) {
+                        if (valor.Activo === true) {
+
+                            $("<option>").attr({ "value": valor.IdProducto }).text( valor.StockActual).appendTo("#cbostockactual");
+                        }
+
+                    });
+
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+            });
+
+        function abrirModal(json) {
+            $("#txtid").val(0);
+            $("#cbodetalle").val("");
+            $("#txtcantidad").val("");
+            $("#cbostockactual").val("");
+            $("#txtcodigoid").val("");
+            $("#txttipoingreso").val("");
+            $('#txtfechaingreso').datepicker({
+                minDate: "-30D",
+                maxDate: 0
+            });
+            $("#txtobservaciones").val("");
+            $("#txtcodigoarea").val("");
+            $("#txtcodigosector").val("");
+            $("#txtusuario").val("");
+            $("#mensajeError").hide();
+
+            if (json != null) {
+                $("#txtid").val(json.IdEgreso);
+                $("#cbodetalle").val(json.oProductos.IdProducto);
+                $("#txtcantidad").val(json.Cantidad);
+                $("#cbostockactual").val(json.oStockActual.StockActual); // Asegúrate de que esto sea correcto
+                $("#txtcodigoid").val(json.CodigoId);
+                $("#txttipoingreso").val(json.TipoSalida);
+
+                // Formato de fecha
+                const fechaEgreso = new Date(json.FechaEgreso);
+                $('#txtfechaingreso').datepicker('setDate', fechaEgreso); // Establecer la fecha en el datepicker
+
+                $("#txtobservaciones").val(json.Observaciones);
+                $("#txtcodigoarea").val(json.CodigoArea);
+                $("#txtcodigosector").val(json.CodigoSector);
+                $("#txtusuario").val(json.IdUsuario);
+            }
+            $("#FormModal").modal("show");
+        }
+
+        $("#tabla tbody").on("click", '.btn-editar', function () {
+            filaSeleccionada = $(this).closest("tr");
+            var data = tabladata.row(filaSeleccionada).data();
+            abrirModal(data);
+        });
+
+       function Guardar() {
+    var Egresos = {
+        IdEgreso: $("#txtid").val(), // Asegúrate de que el nombre sea correcto
+        oProductos: {
+            IdProducto: $("#cbodetalle option:selected").val(),
+            Detalle: $("#cbodetalle option:selected").text(),
+        },
+        Cantidad: $("#txtcantidad").val(),
+        CodigoId: $("#txtcodigoid").val(),
+        TipoSalida: $("#txttipoingreso").val(),
+        FechaEgreso: $('#txtfechaingreso').val(), // Asegúrate de que esto sea correcto
+        Observaciones: $("#txtobservaciones").val(),
+        IdUsuario: $("#txtusuario").val(),
+        CodigoArea: $("#txtcodigoarea").val(), // Asegúrate de que el nombre sea correcto
+        CodigoSector: $("#txtcodigosector").val(), // Asegúrate de que el nombre sea correcto
+    };
+
+    jQuery.ajax({
+        url: '@Url.Action("GuardarEgresos", "Toner")',
+        type: "POST",
+        data: JSON.stringify({ objeto: Egresos }),
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            $(".modal-body").LoadingOverlay("hide");
+            // PRODUCTO NUEVO
+            if (Egresos.IdEgreso == 0) {
+                Egresos.IdEgreso = data.resultado;
+                tabladata.row.add(Egresos).draw(false);
+                $("#FormModal").modal("hide");
+            }
+            // PRODUCTO EDITAR
+            else {
+                if (data.resultado) {
+                    tabladata.row(filaSeleccionada).data(Egresos).draw(false); // Asegúrate de que el objeto que se pasa aquí sea el correcto
+                    filaSeleccionada = null;
+                    $("#FormModal").modal("hide");
+                } else {
+                    $("#mensajeError").text(data.mensaje);
+                    $("#mensajeError").show();
+                }
+            }
+        },
+        error: function (error) {
+            $(".modal-body").LoadingOverlay("hide");
+            $("#mensajeError").text("Error Ajax");
+            $("#mensajeError").show();
+            console.log(error);
+        },
+        beforeSend: function () {
+            $(".modal-body").LoadingOverlay("show", {
+                imageResizeFactor: 2,
+                text: "Cargando...",
+                size: 14
+            });
+        },
+    });
+}
+
+    </script>
+}

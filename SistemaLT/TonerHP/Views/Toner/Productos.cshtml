@@ -1,0 +1,319 @@
+﻿
+@{
+    ViewBag.Title = "Productos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<ol class="breadcrumb mb-4 mt-4">
+    <li class="breadcrumb-item"><a href="index.html">Resumen</a></li>
+    <li class="breadcrumb-item active">Tipos</li>
+</ol>
+
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-users me-1"></i> Lista de Productos
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-success" onclick="abrirModal(null)"> Nuevo producto </button>
+            </div>
+        </div>
+
+        <hr />
+
+        <table id="tabla" class="display cell-border" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Detalle</th>
+                    <th>Rubro</th>
+                    <th>Tipo</th>
+                    <th>Stock Minimo</th>
+                    <th>Stock Actual</th>
+                    <th>Codigo ID</th>
+                    <th>Activo</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body g-2" >
+                <input id="txtid" type="hidden" value="0" />
+                <div class="row g-2" id="contenedor">
+
+                    <div class="col-sm-6">
+                        <label for="txtdetalle" class="form-label">Detalle</label>
+                        <input type="text" class="form-control" id="txtdetalle">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label">Rubro</label>
+                        <select id="cborubro" class="form-control"> </select>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label">Tipo</label>
+                        <select id="cbotipo" class="form-control"> </select>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtstockminimo" class="form-label">Stock Minimo</label>
+                        <input type="text" class="form-control" id="txtstockminimo">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                        <input type="text" class="form-control" id="txtcodigoid">
+                    </div>
+
+
+                    <div class="col-sm-6">
+                        <label for="txtusuario" class="form-label">IdUsuario</label>
+                        <input type="text" class="form-control" id="txtusuario">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="cboactivo" class="form-label">Activo</label>
+                        <select id="cboactivo" class="form-select">
+                            <option value="1">Si</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                </div>
+
+@*--------Mensaje de alerta----------*@
+                <div class="row mt-12">
+                    <div class="col-12">
+                        <div id="mensajeError" class="alert alert-danger" role="alert">
+                            
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        var tabladata;
+        var filaSeleccionada
+
+        tabladata = $("#tabla").DataTable({
+            responsive: true,
+            ordering: false,
+            "ajax": {
+                url: '@Url.Action("ListarProductos", "Toner")',
+                type: "GET",
+                dataType: "json"
+            },
+            "columns": [
+                { "data": "Detalle" },
+                {
+                    "data": "oRubros", "render": function (data) {
+                        return data.Rubro
+                    }
+                },
+                {
+                    "data": "oTipos", "render": function (data) {
+                        return data.Tipo
+                    }
+                },
+                { "data": "StockMinimo" },
+                { "data": "StockActual" },
+                { "data": "CodigoId" },
+
+                {
+                    "data": "Activo", "render": function (valor) {
+                        if (valor) {
+
+                            return '<span class="badge text-bg-success">Si</span>'
+                        } else {
+                            return '<span class="badge text-bg-danger">No</span>'
+                        }
+                    }
+                },
+                {
+                    "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>' +
+                        '<button type="button" class="btn btn-danger btn-sm ms-2 btn-eliminar"> <i class="fas fa-trash"></i></button>',
+                    "orderable": false,
+                    "searchable": false,
+                    "widht": "90px"
+                }
+
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json',
+            },
+        });
+
+            jQuery.ajax({
+            url: '@Url.Action("ListarRubros", "Toner")',
+            type: "GET",
+            data: null,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cborubro");
+
+                    $.each(data.data, function (index, valor) {
+                        if (valor.Activo == true) {
+                            $("<option>").attr({ "value": valor.IdRubro }).text(valor.Rubro).appendTo("#cborubro");
+                        }
+                    })
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+            });
+
+
+            jQuery.ajax({
+            url: '@Url.Action("ListarTipos", "Toner")',
+            type: "GET",
+            data: null,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbotipo");
+
+                    $.each(data.data, function (index, valor) {
+                        if (valor.Activo == true) {
+                            $("<option>").attr({ "value": valor.IdTipo }).text(valor.Tipo).appendTo("#cbotipo");
+                        }
+                    })
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+            });
+
+
+        function abrirModal(json) {
+            $("#txtid").val(0);
+            $("#txttipo").val("");
+            $("#txtdetalle").val("");
+            $("#cborubro").val("");
+            $("#cbotipo").val("");
+            $("#txtstockminimo").val("");
+            $("#txtcodigoid").val("");
+            $("#txtusuario").val("");
+            $("#cboactivo").val(1);
+            $("#mensajeError").hide();
+
+
+            if (json != null) {
+                $("#txtid").val(json.IdProducto);
+                $("#txtdetalle").val(json.Detalle);
+                $("#cborubro").val(json.oRubros.IdRubro);
+                $("#cbotipo").val(json.oTipos.IdTipo);
+                $("#txtstockminimo").val(json.StockMinimo);
+                $("#txtcodigoid").val(json.CodigoId);
+                $("#txtusuario").val(json.IdUsuario);
+                $("#cboactivo").val(json.Activo == true ? 1 : 0);
+
+            }
+            $("#FormModal").modal("show");
+
+        }
+
+        $("#tabla tbody").on("click", '.btn-editar', function () {
+            filaSeleccionada = $(this).closest("tr");
+            var data = tabladata.row(filaSeleccionada).data();
+            abrirModal(data)
+        })
+
+        function Guardar() {
+
+            var Productos = {
+               IdProducto: $("#txtid").val(),
+               Detalle: $("#txtdetalle").val(),
+               oRubros: {
+                    IdRubro: $("#cborubro option:selected").val(),
+                    Rubro: $("#cborubro option:selected").text(),
+               },
+               oTipos: {
+                   IdTipo: $("#cbotipo option:selected").val(),
+                   Tipo: $("#cbotipo option:selected").text(),
+                },
+               StockMinimo: $("#txtstockminimo").val(),
+               StockActual: 0,
+               CodigoId: $("#txtcodigoid").val(),
+               IdUsuario: $("#txtusuario").val(),
+               Activo: $("#cboactivo").val() == 1 ? true : false,
+            }
+
+            jQuery.ajax({
+                url: '@Url.Action("GuardarProductos", "Toner")',
+                type: "POST",
+                data: JSON.stringify({ objeto: Productos }),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $(".modal-body").LoadingOverlay("hide");
+                    //PRODUCTO NUEVO
+                    if (Productos.IdProducto == 0) {
+                        if (data.resultado != 0) {
+                            Productos.IdProducto = data.resultado;
+                            tabladata.row.add(Productos).draw(false);
+                            $("#FormModal").modal("hide");
+                        } else {
+                            $("#mensajeError").text(data.mensaje);
+                            $("#mensajeError").show();
+                        }
+                    }
+                        //PRODUCTO EDITAR
+                    else {
+                        if (data.resultado) {
+
+                            tabladata.row(filaSeleccionada).data(Productos).draw(false);
+                            filaSeleccionada = null;
+                            $("#FormModal").modal("hide");
+                        } else {
+                            $("#mensajeError").text(data.mensaje);
+                            $("#mensajeError").show();
+                        }
+                    }
+                },
+                error: function (error) {
+                    $(".modal-body").LoadingOverlay("hide");
+                    $("#mensajeError").text("Error Ajax");
+                    $("#mensajeError").show();
+
+                    console.log(error)
+                },
+                beforeSend: function () {
+                    $(".modal-body").LoadingOverlay("show", {
+                        imageResizeFactor: 2,
+                        text: "Cargando...",
+                        size:14
+                    })
+
+                },
+            });
+        }
+
+    </script>
+}
