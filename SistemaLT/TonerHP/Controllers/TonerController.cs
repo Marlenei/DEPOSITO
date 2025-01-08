@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 using CapaEntidad;
 using CapaNegocio;
 using Newtonsoft.Json;
@@ -19,30 +20,73 @@ namespace TonerHP.Controllers
         // GET: Toner
         public ActionResult Proveedores()
         {
+            //var userAccessCode = Session["AccesCode"] as int?;
+            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
+            //{
+            //    return RedirectToAction("Index", "Home");
+            //}
+
             return View();
         }
 
         public ActionResult Tipos()
         {
+            //var userAccessCode = Session["AccesCode"] as int?;
+            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
+            //{
+            //    return RedirectToAction("Index", "Home");
+            //}
+
+            //var userAccessCode = Session["AccesCode"] as int?;
+
             return View();
         }
 
         public ActionResult Productos()
         {
+            //var userAccessCode = Session["AccesCode"] as int?;
+            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
+            //{
+            //    return RedirectToAction("Index", "Home");
+            //}
+
+            return View();
+        }
+        [Authorize]
+        public ActionResult Ingresos()
+        {
+            var permisos = Session["PermissionsCode"] as List<Permiso>;
+            var tieneAcceso = permisos.Any(p => p.Accesos == 24);
+            if (!tieneAcceso)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
 
-        public ActionResult Ingresos()
-        {
-            return View();
-        }
+        [Authorize]
         public ActionResult Egresos()
         {
+
+            var permisos = Session["PermissionsCode"] as List<Permiso>;
+            var tieneAcceso = permisos.Any(p => p.Accesos == 25);
+            if (!tieneAcceso)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
 
         public ActionResult Rubros()
         {
+            //var userAccessCode = Session["AccesCode"] as int?;
+            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
+            //{
+            //    return RedirectToAction("Index", "Home");
+            //}
+
             return View();
         }
         //INGRESOS
@@ -81,7 +125,24 @@ namespace TonerHP.Controllers
             oLista = new CN_Rubros().Listar();
             return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
         }
-        #endregion
+
+        [HttpPost]
+        public JsonResult GuardarRubros(Rubros objeto)
+        {
+            object resultado;
+            string mensaje = string.Empty;
+
+            if (objeto.IdRubro == 0)
+            {
+                resultado = new CN_Rubros().Registrar(objeto, out mensaje);
+            }
+            else
+            {
+                resultado = new CN_Rubros().Editar(objeto, out mensaje);
+            }
+            return Json(new { resultado = resultado, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
+        }
+            #endregion
 
         //PROVEEDORES
         #region PROVEEDORES
@@ -148,15 +209,6 @@ namespace TonerHP.Controllers
                 resultado = new CN_Tipos().Editar(objeto, out mensaje);
             }
             return Json(new { resultado = resultado, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpPost]
-        public JsonResult EliminarTipos(int id)
-        {
-            bool respuesta = false;
-            string mensaje = string.Empty;
-            respuesta = new CN_Tipos().Eliminar(id, out mensaje);
-            return Json(new { resultado = respuesta, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
         }
         #endregion
 
