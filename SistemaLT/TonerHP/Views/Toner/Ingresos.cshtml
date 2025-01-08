@@ -105,7 +105,7 @@
 
                     <div class="col-sm-6">
                         <label for="txtusuario" class="form-label">IdUsuario</label>
-                        <input type="text" class="form-control" id="txtusuario">
+                        <input type="text" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly >
                     </div>
                 </div>
                 @*-------------------------Mensaje de alerta-------------------------*@
@@ -129,63 +129,43 @@
 
 
 @section scripts{
-<script>
+    <script>
             var tabladata;
             var filaSeleccionada;
 
             tabladata = $("#tabla").DataTable({
             responsive: true,
             ordering: true,
-            order: [[0, 'desc']],
             "ajax": {
                 url: '@Url.Action("ListarIngresos", "Toner")',
                 type: "GET",
                 dataType: "json",
-                //success: function (data) {
-                //    console.log(data);
-                //}
             },
                 "columns": [
                     {
-                        "data": "IdIngreso", // Asegúrate de que este campo esté presente en tu modelo
-                        "orderable": true, // Permitir ordenamiento por este campo
-                        "visible": false // No mostrar esta columna en la tabla
+                        "data": "IdIngreso",
+                        "orderable": true,
+                        "visible": false
                     },
                     {
                         "data": "oProductos", "render": function (data) {
                             return data.Detalle
                         },
                     },
-                    //{
-                    //    "data": "oProductos", "render": function (data) {
-                    //        return data.StockActual
-                    //    },
-                    //},
                     {
                         "data": "oProveedores", "render": function (data) {
                             return data.RazonSocial
                         }
                     },
                         { "data": "Cantidad", },
-                    //{
-                    //    "data": "oStockActual", "render": function (data) {
-                    //        return data.StockActual
-                    //    }
-                    //},
                     { "data": "CodigoId" },
                     { "data": "TipoIngreso" },
                     {
                         "data": "FechaIngreso", "render": function (data) {
-
-
-                            var partes = data.split(' ')[0].split('/'); // Toma solo la parte de la fecha y divide por '/'
-
-                            // Asegúrate de que el formato sea DD/MM/YYYY
-                            var dia = parseInt(partes[0], 10); // Día
-                            var mes = parseInt(partes[1], 10) - 1; // Mes (0-11)
-                            var año = parseInt(partes[2], 10); // Año
-
-                            // Crea el objeto Date
+                            var partes = data.split(' ')[0].split('/');
+                            var dia = parseInt(partes[0], 10);
+                            var mes = parseInt(partes[1], 10) - 1;
+                            var año = parseInt(partes[2], 10);
                             var fecha = new Date(año, mes, dia);
                             return (fecha.getDate()) + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear();
                         },
@@ -242,14 +222,6 @@
                             }
 
                         });
-
-                        //STOCKACTUAL
-                        //$("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbostockactual");
-
-                        //$.each(data.data, function (index, valor) {
-                        //        $("<option>").attr({ "value": valor.IdProducto }).text(valor.StockActual).appendTo("#cbostockactual");
-                        //});
-
                     },
                     error: function (error) {
                         console.log(error)
@@ -269,29 +241,36 @@
                     maxDate: 0,
                 });
                 $("#txtobservaciones").val("");
-                $("#txtusuario").val("");
+                $("#txtusuario").val(@Session["AccesCode"]);
                 $("#mensajeError").hide();
 
 
                 if (json != null) {
-                    var fechaRegistro = new Date(json.FechaRegistro);
-                    var fechaActual = new Date();
-                    var diferenciaHoras = (fechaActual - fechaRegistro) / 3600000; // 3600000 es el número de milisegundos en una hora
+                    var fechaActMatch = json.FechaAct.match(/\/Date\((\d+)\)\//);
+                    var timestamp = parseInt(fechaActMatch[1], 10);
+                    var fechaRegistro = new Date(timestamp);
+                    console.log("Fecha reg", fechaRegistro);
 
-                    if (diferenciaHoras > 24) {
-                        // Mostrar mensaje de error
-                        alert("Ya no se puede actualizar/modificar este registro. Han pasado más de 24 horas desde su creación.");
-                    } else {
-                        $("#txtid").val(json.IdIngreso);
-                        $("#cbodetalle").val(json.oProductos.IdProducto);
-                        $("#cboproveedores").val(json.oProveedores.IdProveedor);
-                        $("#txtcantidad").val(json.Cantidad);
-                        $("#txtcodigoid").val(json.CodigoId);
-                        $("#txttipoingreso").val(json.TipoIngreso);
-                        $("#txtfechaingreso").val(json.FechaIngreso);
-                        $("#txtobservaciones").val(json.Observaciones);
-                        $("#txtusuario").val(json.IdUsuario);
+
+                    var fechaActual = new Date(); 
+
+                    var diferenciaDias = (fechaActual.getTime() - fechaRegistro.getTime()) / (1000 * 3600 * 24); // 1000 ms * 3600 s * 24 h
+
+                    if (diferenciaDias >= 1) { 
+                        alert("Ya no se puede actualizar/modificar este registro.");
+                        return;
                     }
+                    
+                    $("#txtid").val(json.IdIngreso);
+                    $("#cbodetalle").val(json.oProductos.IdProducto);
+                    $("#cboproveedores").val(json.oProveedores.IdProveedor);
+                    $("#txtcantidad").val(json.Cantidad);
+                    $("#txtcodigoid").val(json.CodigoId);
+                    $("#txttipoingreso").val(json.TipoIngreso);
+                    $("#txtfechaingreso").val(json.FechaIngreso).prop("readonly", true)
+                    $("#txtobservaciones").val(json.Observaciones);
+                    $("#txtusuario").val(json.IdUsuario);
+                    
 
                 }
                 $("#FormModal").modal("show");
@@ -376,7 +355,7 @@
                 });
             }
 
-</script>
+    </script>
 }
 
 

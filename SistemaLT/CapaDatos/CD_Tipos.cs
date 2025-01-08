@@ -8,9 +8,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-//PRUEBAAAAAAAAAAAAAAAAAAAAAA
-
-
 namespace CapaDatos
 {
     public class CD_Tipos

@@ -28,11 +28,9 @@
         <table id="tabla" class="display cell-border" style="width:100%">
             <thead>
                 <tr>
-                    <th>ID Rubro</th>
                     <th>Rubro</th>
                     <th>Codigo</th>
                     <th>Activo</th>
-
                     <th></th>
                 </tr>
             </thead>
@@ -60,12 +58,6 @@
                 <div class="row g-2" id="contenedor">
 
                     <div class="col-sm-6">
-                        <label class="form-label">ID Rubro</label>
-
-                        <input type="text" class="form-control" id="txtid">
-                    </div>
-
-                    <div class="col-sm-6">
                         <label class="form-label">Rubro</label>
 
                         <input type="text" class="form-control" id="cborubro">
@@ -80,7 +72,7 @@
 
                     <div class="col-sm-6">
                         <label for="txtusuario" class="form-label">IdUsuario</label>
-                        <input type="text" class="form-control" id="txtusuario">
+                        <input type="text" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
                     </div>
 
                     <div class="col-sm-6">
@@ -126,11 +118,10 @@
                 dataType: "json"
             },
             "columns": [
-                { "data": "IdRubro" },
                 { "data": "Rubro" },
                 { "data": "Codigo" },
-                
-                
+
+
                 {
                     "data": "Activo", "render": function (data) {
                         return data ? '<span class="badge text-bg-success">Si</span>' : '<span class="badge text-bg-danger">No</span>';
@@ -149,11 +140,11 @@
         });
 
         function abrirModal(json) {
-                
+
                 $("#txtid").val(0);
                 $("#cborubro").val("");
                 $("#txtcodigoid").val("");
-                $("#txtusuario").val("");                        
+                $("#txtusuario").val(@Session["AccesCode"]);
                 $("#cboactivo").val(1);
                 $("#mensajeError").hide();
 
@@ -180,12 +171,12 @@
 
     var Rubros = {
         IdRubro: $("#txtid").val(),
-      
+
        oRubros: {
             IdRubro: $("#cborubro option:selected").val(),
             Rubro: $("#cborubro option:selected").text(),
        },
-     
+
        CodigoId: $("#txtcodigoid").val(),
        IdUsuario: $("#txtusuario").val(),
        Activo: $("#cboactivo").val() == 1 ? true : false,
@@ -243,7 +234,3 @@
 
     </script>
 }
-
-
-    </script>
-

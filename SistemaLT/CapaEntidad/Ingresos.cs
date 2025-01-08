@@ -19,5 +19,7 @@ namespace CapaEntidad
         //public Productos oStockActual { get; set; }
         public char TipoIngreso { get; set; }
         public string FechaIngreso { get; set; }
+
+        public DateTime FechaAct { get; set; }
     }
 }

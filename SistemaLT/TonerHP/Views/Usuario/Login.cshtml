@@ -2,11 +2,6 @@
 @{
     Layout = null;
 }
-<<<<<<< HEAD
-
-=======
-@*PRUEBA DE CAMBIOS*@
->>>>>>> b265af2321636422da77fc594ef5084157934ee7
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,15 +20,27 @@
                         <div class="col-lg-5">
                             <div class="card shadow-lg border-0 rounded-lg mt-5" style=" background-color: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px);">
                                 <div class="card-header"><h3 class="text-center font-weight-light my-4">Login</h3></div>
-                                <div class="card-body" >
-                                    <form>
+                                <div class="card-body">
+                                    @if (!ViewData.ModelState.IsValid)
+                                    {
+                                        <div class="alert alert-danger">
+                                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                            {
+                                                <p>@error.ErrorMessage</p>
+                                            }
+                                        </div>
+                                    }
+                                    <form method="post" action="@Url.Action("Login", "Usuario")">
                                         <div class="form-floating mb-3">
-                                            <input class="form-control" id="inputEmail" type="email" placeholder="name@example.com" />
-                                            <label for="inputEmail">Usuario</label>
+                                            <input class="form-control" id="nameusuario" name="usuario" type="text" placeholder="Usuario" requerid />
+                                            <label for="nameusuario">Usuario</label>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input class="form-control" id="inputPassword" type="password" placeholder="Password" />
-                                            <label for="inputPassword">Contraseña</label>
+                                            <input class="form-control" id="namecontraseña" name="clave" type="password" placeholder="Contraseña" required />
+                                            <label for="nameusuario">Contraseña</label>
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-outline-dark">Ingresar</button>
                                         </div>
                                     </form>
                                 </div>
@@ -43,26 +50,7 @@
                 </div>
             </main>
         </div>
-        @*<div id="layoutAuthentication_footer">
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-        </div>*@
     </div>
-    @*
-        <li>@Html.ActionLink("Inicio", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-        <li>@Html.ActionLink("Acerca de", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-        <li>@Html.ActionLink("Contacto", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-        <li>@Html.ActionLink("Prueba", "Prueba", "Home", new { area = "" }, new { @class = "nav-link" })</li>*@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/complementos")
@@ -70,3 +58,8 @@
     @*@RenderSection("scripts", required: false)*@
 </body>
 </html>
+
+
+
+    
+}
