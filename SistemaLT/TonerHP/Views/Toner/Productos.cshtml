@@ -86,7 +86,7 @@
 
                     <div class="col-sm-6">
                         <label for="txtusuario" class="form-label">IdUsuario</label>
-                        <input type="text" class="form-control" id="txtusuario">
+                        <input type="text" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
                     </div>
 
                     <div class="col-sm-6">
@@ -219,7 +219,7 @@
             $("#cbotipo").val("");
             $("#txtstockminimo").val("");
             $("#txtcodigoid").val("");
-            $("#txtusuario").val("");
+            $("#txtusuario").val(@Session["AccesCode"]);
             $("#cboactivo").val(1);
             $("#mensajeError").hide();
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CapaEntidad;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,23 +9,17 @@ namespace TonerHP.Controllers
 {
     public class HomeController : Controller
     {
+        [Authorize]
         public ActionResult Index()
         {
+
+            var permisos = Session["PermissionsCode"] as List<Permiso> ?? new List<Permiso>();
+
+            ViewBag.TieneAccesoIngresos = permisos.Any(p => p.Accesos == 24);
+            ViewBag.TieneAccesoEgresos = permisos.Any(p => p.Accesos == 25);
             return View();
+
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
     }
 }

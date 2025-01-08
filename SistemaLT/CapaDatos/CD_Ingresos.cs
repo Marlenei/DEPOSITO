@@ -19,16 +19,6 @@ namespace CapaDatos
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
                     string query = "SELECT * FROM FT_IngresoToner()";
-                    //StringBuilder sb = new StringBuilder();
-                    //sb.AppendLine("SELECT i.IdIngreso,");
-                    //sb.AppendLine("p.IdProveedor, p.RazonSocial,");
-                    //sb.AppendLine("prod.IdProducto, prod.Detalle, prod.StockActual,");
-                    //sb.AppendLine("i.CodigoId,i.Cantidad,i.Observaciones,i.IdUsuario,i.TipoIngreso,i.FechaIngreso");
-                    //sb.AppendLine("FROM Tonner_Ingresos i ");
-                    //sb.AppendLine("inner join Tonner_Proveedor p on p.IdProveedor = i.IdProveedor");
-                    //sb.AppendLine("inner join Tonner_Productos prod on prod.IdProducto = i.IdProducto ");
-
-
                     SqlCommand cmd = new SqlCommand(query, oconexion);
                     cmd.CommandType = CommandType.Text;
                     oconexion.Open();
@@ -58,7 +48,8 @@ namespace CapaDatos
                                 Observaciones = rdr["Observaciones"].ToString(),
                                 TipoIngreso = Convert.ToChar(rdr["TipoIngreso"]),
                                 FechaIngreso = rdr["FechaIngreso"].ToString(),
-
+                                IdUsuario = Convert.ToInt32(rdr["IdUsuario"]),
+                                FechaAct = Convert.ToDateTime(rdr["FechayHoraAct"]),
                             });
                         }
                     }
@@ -85,7 +76,7 @@ namespace CapaDatos
                 cmd.Parameters.AddWithValue("Cantidad", obj.Cantidad);
                 cmd.Parameters.AddWithValue("IdUsuario", obj.IdUsuario);
                 cmd.Parameters.AddWithValue("TipoIngreso", obj.TipoIngreso);
-                //cmd.Parameters.AddWithValue("FechaIngreso", Convert.ToDateTime(obj.FechaIngreso));
+                cmd.Parameters.AddWithValue("FechaIngreso", Convert.ToDateTime(obj.FechaIngreso));
                 cmd.Parameters.Add("resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
                 //cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 100).Direction = ParameterDirection.Output;
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -100,11 +91,10 @@ namespace CapaDatos
             return idautogenerado;
         }
 
-        public bool Editar(Ingresos obj, out string Mensaje)
+        public bool Editar (Ingresos obj, out string Mensaje)
         {
             bool resultado = false;
             Mensaje = string.Empty;
-            DateTime fechaactual = DateTime.MinValue;
             try
             {
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
@@ -118,19 +108,17 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("Cantidad", obj.Cantidad);
                     cmd.Parameters.AddWithValue("IdUsuario", obj.IdUsuario);
                     cmd.Parameters.AddWithValue("TipoIngreso", obj.TipoIngreso);
-                    //cmd.Parameters.AddWithValue("FechaIngreso", Convert.ToDateTime(obj.FechaIngreso));
+                    cmd.Parameters.AddWithValue("FechaIngreso", Convert.ToDateTime(obj.FechaIngreso));
 
                     cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add("FechayHoraAct", SqlDbType.DateTime).Direction = ParameterDirection.Output;
+                    //cmd.Parameters.Add("FechayHoraAct", SqlDbType.DateTime).Direction = ParameterDirection.Output;
 
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     oconexion.Open();
 
                     cmd.ExecuteNonQuery();
-                    fechaactual = Convert.ToDateTime(cmd.Parameters["FechayHoraAct"].Value);
                     resultado = Convert.ToBoolean(cmd.Parameters["Resultado"].Value);
-
                 }
             }
             catch (Exception ex)
@@ -138,6 +126,7 @@ namespace CapaDatos
                 resultado = false;
                 Mensaje = ex.Message;
             }
+
             return resultado;
 
         }

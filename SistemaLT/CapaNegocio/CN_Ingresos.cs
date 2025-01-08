@@ -114,6 +114,7 @@ namespace CapaNegocio
 
             if (string.IsNullOrEmpty(Mensaje))
             {
+
                 return objCapaDato.Editar(obj, out Mensaje);
             }
             else
