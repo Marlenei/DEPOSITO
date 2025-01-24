@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Mi aplicación ASP.NET</title>
     @Styles.Render("~/Content/css")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @*@Scripts.Render("~/bundles/modernizr")*@
 </head>
 <body class="sb-nav-fixed">
@@ -48,11 +49,9 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                             Usuarios
                         </a>
-
-                        <div class="sb-sidenav-menu-heading">Mantenimiento</div>
-                        <a class="nav-link" href="@Url.Action("","")">
-                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                            Categorias
+                        <a class="nav-link" href="@Url.Action("SolicitudPedidos","Toner")")>
+                            <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                            Solicitud/Pedidos
                         </a>
                         <a class="nav-link" href="@Url.Action("","")">
                             <div class="sb-nav-link-icon"><i class="fas fa-bookmark"></i></div>
