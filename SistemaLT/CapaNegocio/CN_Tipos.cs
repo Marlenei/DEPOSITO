@@ -16,6 +16,11 @@ namespace CapaNegocio
             return objCapaDato.Listar();
         }
 
+        public List<Tipos> ListarporIDRubro(int IdRubro)
+        {
+            return objCapaDato.ListarTipoporRubro(IdRubro);
+        }
+
         public int Registrar(Tipos obj, out string Mensaje)
         {
             Mensaje = string.Empty;

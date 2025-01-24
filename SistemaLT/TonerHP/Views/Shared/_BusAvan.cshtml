@@ -1,0 +1,57 @@
+﻿@{ ViewData["Title"] = "Filtrado de PRoductos"; }
+
+
+<div class="modal fade" id="ModalBus" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body g-2">
+                <div class="col-sm-6">
+                    <label class="form-label">Rubro</label>
+                    <select id="cborubro" class="form-select" onchange="this.form.submit()">
+                        @foreach (var rubro in ViewBag.Rubros)
+                        {
+                            <option value=" @rubro.IdRubro" @(ViewBag.SelectedRubro = rubro.IdRubro ? "selected" : "")> @rubro.Rubro </option>
+                        }
+                    </select>
+
+                </div>
+
+                <div class="col-sm-6">
+                    <label class="form-label">Tipo</label>
+                    <select id="cbotipo" type="text" class="form-select" onchange="this.form.submit()">
+                        @if (ViewBag.Tipos != null)
+                        {
+                            foreach (var tipo in ViewBag.Tipos)
+                            {
+                                <option value="@tipo.IdTipo" @(ViewBag.SelectedTipo == tipo.IdTipo ? "selected" : "")>@tipo.Tipo</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-sm-6">
+                    <label class="form-label">Codigo ID</label>
+                    <select id="cbocodigo" class="form-select"> </select>
+                </div>
+
+                <div class="col-sm-6">
+                    <label class="form-label">Producto</label>
+                    <select id="cbodetalle" class="form-select" onchange="this.form.submit()">
+                        @if (ViewBag.Productos != null)
+                        {
+                            foreach (var productos in ViewBag.Productos)
+                            {
+                                <option value="@productos.IdProductos"> @productos.Detalle </option>
+                            }
+                        }
+
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

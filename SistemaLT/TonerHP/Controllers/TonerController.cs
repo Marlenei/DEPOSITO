@@ -15,8 +15,34 @@ namespace TonerHP.Controllers
 {
     public class TonerController : Controller
     {
+        public ActionResult _BusAvan(int? idRubro, int? idTipo)
+        {
+            List<Rubros> rubrosList = new CN_Rubros().Listar();
+            ViewBag.Rubros = rubrosList;
 
+            if (idRubro.HasValue)
+            {
+                ViewBag.Tipos = ListarTiposPorRubro(idRubro.Value);
+            }
+            else
+            {
+                ViewBag.Tipos = new List<Tipos>();
+            }
 
+            if (idTipo.HasValue)
+            {
+                ViewBag.Productos = ListarProductosPorTipo(idTipo.Value);
+            }
+            else
+            {
+                ViewBag.Productos = new List<Productos>();
+            }
+
+            ViewBag.SelectedRubro = idRubro;
+            ViewBag.SelectedTipo = idTipo;
+
+            return PartialView("_BusAvan");
+        }
         // GET: Toner
         public ActionResult Proveedores()
         {
@@ -193,6 +219,10 @@ namespace TonerHP.Controllers
             return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
         }
 
+        public List<Tipos> ListarTiposPorRubro(int idRubro)
+        {
+            return new CN_Tipos().ListarporIDRubro(idRubro);
+        }
 
         [HttpPost]
         public JsonResult GuardarTipos(Tipos objeto)
@@ -221,6 +251,11 @@ namespace TonerHP.Controllers
             List<Productos> oLista = new List<Productos>();
             oLista = new CN_Productos().Listar();
             return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
+        }
+
+        public List<Productos> ListarProductosPorTipo(int idTipo)
+        {
+            return new CN_Productos().ListarporIDTipos(idTipo); // Asegúrate de tener este método
         }
 
         [HttpPost]
