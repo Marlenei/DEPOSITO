@@ -353,6 +353,8 @@
     <Content Include="Content\fontawesome.css" />
     <Content Include="Content\fontawesome.min.css" />
     <Content Include="Content\images\fondohospi.png" />
+    <Content Include="Content\images\imagen index.png" />
+    <Content Include="Content\images\stock.png" />
     <Content Include="Content\images\ui-bg_diagonals-thick_15_0b3e6f_40x40.png" />
     <Content Include="Content\images\ui-bg_dots-medium_30_0b58a2_4x4.png" />
     <Content Include="Content\images\ui-bg_dots-small_20_333333_2x2.png" />
@@ -373,6 +375,7 @@
     <Content Include="Content\regular.min.css" />
     <Content Include="Content\solid.css" />
     <Content Include="Content\solid.min.css" />
+    <Content Include="Content\style.css" />
     <Content Include="Content\svg-with-js.css" />
     <Content Include="Content\svg-with-js.min.css" />
     <Content Include="Content\sweetalert.css" />
@@ -412,7 +415,9 @@
     <Content Include="Content\bootstrap-grid.rtl.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="Content\images\3d-delivery-list-icon-png.webp" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
+    <Content Include="Scripts\Dark-light.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap4.js" />
@@ -556,6 +561,8 @@
     <Content Include="Views\Toner\Tipos.cshtml" />
     <Content Include="Views\Toner\Rubros.cshtml" />
     <Content Include="Views\Usuario\Login.cshtml" />
+    <Content Include="Views\Shared\_BusAvan.cshtml" />
+    <Content Include="Views\Shared\_BusquedaAvan.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

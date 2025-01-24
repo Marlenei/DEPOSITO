@@ -1,0 +1,31 @@
+﻿body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.dark-mode .bg-dark {
+    background-color: #1a1a1a !important;
+}
+
+.dark-mode .text-muted {
+    color: #b0b0b0 !important;
+}
+
+.dark-mode .table {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+    .dark-mode .table th,
+    .dark-mode .table td {
+        border-color: #444444;
+    }
+
+.dark-mode .modal-content {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+.dark-mode .modal-header {
+    background-color: #333333;
+}

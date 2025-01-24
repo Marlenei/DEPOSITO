@@ -38,8 +38,8 @@ namespace TonerHP
                       "~/Content/DataTables/css/responsive.dataTables.css",
                       "~/Content/images",
                       "~/Content/sweetalert.css",
-                      "~/Content/jquery-ui.min.css"
-
+                      "~/Content/jquery-ui.min.css",
+                      "~/Content/bootstrap.css"
                       ));
         }
     }
