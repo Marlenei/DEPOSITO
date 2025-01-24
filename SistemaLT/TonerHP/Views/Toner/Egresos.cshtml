@@ -3,13 +3,6 @@
     ViewBag.Title = "Egresos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<ol class="breadcrumb mb-4 mt-4">
-    <li class="breadcrumb-item"><a href="index.html">Resumen</a></li>
-    <li class="breadcrumb-item active">Tipos</li>
-</ol>
-
-
 <div class="card">
     <div class="card-header">
         <i class="fas fa-users me-1"></i> Egresos
@@ -32,7 +25,6 @@
                             <th>Stock Actual</th>
                             <th>Codigo ID</th>
                             <th>Tipo Salida</th>
-                            
                             <th>Fecha de Egreso</th>
                             <th>Observaciones</th>
                             <th>ID Usuario</th>
@@ -97,7 +89,7 @@
 
                     <div class="col-sm-6">
                         <label for="txtusuario" class="form-label">IdUsuario</label>
-                        <input type="text" class="form-control" id="txtusuario" disabled>
+                        <input type="text" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
                     </div>
 
 
@@ -188,7 +180,7 @@
                                 return fecha.toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }); // Formato de fecha en español
                             }
                         }
-                        return 'Fecha no válida'; // Mensaje alternativo si la fecha no es válida
+                        return 'Fecha no válida'; 
                     }
                 },
                 { "data": "Observaciones" },
@@ -258,21 +250,18 @@
             $("#txtobservaciones").val("");
             $("#txtcodigoarea").val("");
             $("#txtcodigosector").val("");
-            $("#txtusuario").val("");
+            $("#txtusuario").val(@Session["AccesCode"]);
             $("#mensajeError").hide();
 
             if (json != null) {
                 $("#txtid").val(json.IdEgreso);
                 $("#cbodetalle").val(json.oProductos.IdProducto);
                 $("#txtcantidad").val(json.Cantidad);
-                $("#cbostockactual").val(json.oStockActual.StockActual); // Asegúrate de que esto sea correcto
+                $("#cbostockactual").val(json.oStockActual.StockActual); 
                 $("#txtcodigoid").val(json.CodigoId);
                 $("#txttipoingreso").val(json.TipoSalida);
-
-                // Formato de fecha
                 const fechaEgreso = new Date(json.FechaEgreso);
-                $('#txtfechaingreso').datepicker('setDate', fechaEgreso); // Establecer la fecha en el datepicker
-
+                $('#txtfechaingreso').datepicker('setDate', fechaEgreso); 
                 $("#txtobservaciones").val(json.Observaciones);
                 $("#txtcodigoarea").val(json.CodigoArea);
                 $("#txtcodigosector").val(json.CodigoSector);
@@ -288,62 +277,62 @@
         });
 
        function Guardar() {
-    var Egresos = {
-        IdEgreso: $("#txtid").val(), // Asegúrate de que el nombre sea correcto
-        oProductos: {
-            IdProducto: $("#cbodetalle option:selected").val(),
-            Detalle: $("#cbodetalle option:selected").text(),
-        },
-        Cantidad: $("#txtcantidad").val(),
-        CodigoId: $("#txtcodigoid").val(),
-        TipoSalida: $("#txttipoingreso").val(),
-        FechaEgreso: $('#txtfechaingreso').val(), // Asegúrate de que esto sea correcto
-        Observaciones: $("#txtobservaciones").val(),
-        IdUsuario: $("#txtusuario").val(),
-        CodigoArea: $("#txtcodigoarea").val(), // Asegúrate de que el nombre sea correcto
-        CodigoSector: $("#txtcodigosector").val(), // Asegúrate de que el nombre sea correcto
-    };
+            var Egresos = {
+                IdEgreso: $("#txtid").val(), 
+                oProductos: {
+                    IdProducto: $("#cbodetalle option:selected").val(),
+                    Detalle: $("#cbodetalle option:selected").text(),
+                },
+                Cantidad: $("#txtcantidad").val(),
+                CodigoId: $("#txtcodigoid").val(),
+                TipoSalida: $("#txttipoingreso").val(),
+                FechaEgreso: $('#txtfechaingreso').val(), 
+                Observaciones: $("#txtobservaciones").val(),
+                IdUsuario: $("#txtusuario").val(),
+                CodigoArea: $("#txtcodigoarea").val(), 
+                CodigoSector: $("#txtcodigosector").val(), 
+            };
 
-    jQuery.ajax({
-        url: '@Url.Action("GuardarEgresos", "Toner")',
-        type: "POST",
-        data: JSON.stringify({ objeto: Egresos }),
-        dataType: "json",
-        contentType: "application/json; charset=utf-8",
-        success: function (data) {
-            $(".modal-body").LoadingOverlay("hide");
-            // PRODUCTO NUEVO
-            if (Egresos.IdEgreso == 0) {
-                Egresos.IdEgreso = data.resultado;
-                tabladata.row.add(Egresos).draw(false);
-                $("#FormModal").modal("hide");
-            }
-            // PRODUCTO EDITAR
-            else {
-                if (data.resultado) {
-                    tabladata.row(filaSeleccionada).data(Egresos).draw(false); // Asegúrate de que el objeto que se pasa aquí sea el correcto
-                    filaSeleccionada = null;
-                    $("#FormModal").modal("hide");
-                } else {
-                    $("#mensajeError").text(data.mensaje);
+            jQuery.ajax({
+                url: '@Url.Action("GuardarEgresos", "Toner")',
+                type: "POST",
+                data: JSON.stringify({ objeto: Egresos }),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $(".modal-body").LoadingOverlay("hide");
+                    // EGRESO NUEVO
+                    if (Egresos.IdEgreso == 0) {
+                        Egresos.IdEgreso = data.resultado;
+                        tabladata.row.add(Egresos).draw(false);
+                        $("#FormModal").modal("hide");
+                    }
+                    // EGRESO EDITAR
+                    else {
+                        if (data.resultado) {
+                            tabladata.row(filaSeleccionada).data(Egresos).draw(false);
+                            filaSeleccionada = null;
+                            $("#FormModal").modal("hide");
+                        } else {
+                            $("#mensajeError").text(data.mensaje);
+                            $("#mensajeError").show();
+                        }
+                    }
+                },
+                error: function (error) {
+                    $(".modal-body").LoadingOverlay("hide");
+                    $("#mensajeError").text("Error Ajax");
                     $("#mensajeError").show();
-                }
-            }
-        },
-        error: function (error) {
-            $(".modal-body").LoadingOverlay("hide");
-            $("#mensajeError").text("Error Ajax");
-            $("#mensajeError").show();
-            console.log(error);
-        },
-        beforeSend: function () {
-            $(".modal-body").LoadingOverlay("show", {
-                imageResizeFactor: 2,
-                text: "Cargando...",
-                size: 14
+                    console.log(error);
+                },
+                beforeSend: function () {
+                    $(".modal-body").LoadingOverlay("show", {
+                        imageResizeFactor: 2,
+                        text: "Cargando...",
+                        size: 14
+                    });
+                },
             });
-        },
-    });
 }
 
     </script>

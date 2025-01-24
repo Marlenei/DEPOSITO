@@ -39,8 +39,7 @@ namespace TonerHP
                       "~/Content/images",
                       "~/Content/sweetalert.css",
                       "~/Content/jquery-ui.min.css",
-                      "~/Content/DataTables/css/jquery.dataTables.min.css"
-
+                      "~/Content/bootstrap.css"
                       ));
         }
     }

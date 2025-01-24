@@ -8,9 +8,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-//PRUEBAAAAAAAAAAAAAAAAAAAAAA
-
-
 namespace CapaDatos
 {
     public class CD_Tipos
@@ -54,6 +51,42 @@ namespace CapaDatos
             }
             return lista;
         }
+
+
+        public List<Tipos> ListarTipoporRubro(int IdRubro)
+        {
+            List<Tipos> lista = new List<Tipos>();
+            try
+            {
+                using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
+                {
+                    string query = "SELECT * FROM Tonner_Tipos WHERE IdRubro = @IdRubro";
+                    SqlCommand cmd = new SqlCommand(query, oconexion);
+                    cmd.Parameters.AddWithValue("@IdRubro", IdRubro);
+                    cmd.CommandType = CommandType.Text;
+                    oconexion.Open();
+                    using (SqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            lista.Add(new Tipos()
+                            {
+                                IdTipo = Convert.ToInt32(rdr["IdTipo"]),
+                                Tipo = rdr["Tipo"].ToString(),
+                            });
+                        }
+                    }
+
+                }
+            }
+            catch
+            {
+                lista = new List<Tipos>();
+            }
+            return lista;
+        }
+
+
         public int Registrar(Tipos obj)
         {
             string Mensaje;

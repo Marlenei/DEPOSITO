@@ -62,10 +62,6 @@ namespace CapaNegocio
             {
                 Mensaje = "Cantidad debe ser un número positivo.";
             }
-            else if (obj.IdUsuario == 0)
-            {
-                Mensaje = "Ingresar usuario";
-            }
 
             if (string.IsNullOrEmpty(Mensaje))
             {
@@ -114,6 +110,7 @@ namespace CapaNegocio
 
             if (string.IsNullOrEmpty(Mensaje))
             {
+
                 return objCapaDato.Editar(obj, out Mensaje);
             }
             else
@@ -123,5 +120,7 @@ namespace CapaNegocio
 
 
         }
+        
+
     }
 }

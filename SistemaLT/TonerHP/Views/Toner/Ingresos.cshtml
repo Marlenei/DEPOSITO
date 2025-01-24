@@ -1,15 +1,7 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Ingresos";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<ol class="breadcrumb mb-4 mt-4">
-    <li class="breadcrumb-item"><a href="index.html">Resumen</a></li>
-    <li class="breadcrumb-item active">Tipos</li>
-</ol>
-
-
 <div class="card">
     <div class="card-header">
         <i class="fas fa-users me-1"></i> Ingresos
@@ -26,14 +18,14 @@
         <table id="tabla" class="display cell-border" style="width:100%">
             <thead>
                 <tr>
-                    <th>IdIngreso</th>
                     <th>Detalle</th>
                     <th>Proveedor</th>
-                    <th>Cantidad Ingresada</th>
-                    @*<th>Stock Actual</th>*@
+                    <th>Cantidad</th>
                     <th>Codigo ID</th>
+                    <th>N° de Exp.</th>
                     <th>Tipo de Ingreso</th>
                     <th>Fecha de ingreso</th>
+                    <th>Ultima modificacion</th>
                     <th>Observaciones</th>
                     <th>Usuario</th>
                     <th></th>
@@ -50,64 +42,71 @@
 </div>
 
 <!-------------------- MODAL CREATE ----------------------->
+
 <div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body g-2">
                 <input id="txtid" type="hidden" value="" />
-                <input id="cbostockactual" type="hidden" />
-
+                <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
                 <div class="row g-2" id="contenedor">
-
                     <div class="col-sm-6">
                         <label class="form-label">Producto</label>
                         <select id="cbodetalle" class="form-select"> </select>
                     </div>
 
-                    <div class="col-sm-6">
-                        <label class="form-label">Razon social</label>
-                        <select id="cboproveedores" class="form-select"> </select>
+                    <div id="contenedor" class="col-sm-6">
+                        <button class="btn btn-success" data-bs-target="#ModalBus" data-bs-toggle="modal" onclick="abrirModalBus()">Abrir Modal</button>
                     </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">Stock Actual</label>
+                            <input id="cbostockactual" type="text" class="form-control" style="display: none;" readonly />
+                        </div>
 
-                    <div class="col-sm-6">
-                        <label for="txtcantidad" class="form-label">Cantidad</label>
-                        <input type="number" class="form-control" id="txtcantidad" min="0" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-                    </div>
 
-                    <div class="col-sm-6">
-                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
-                        <input type="text" class="form-control" id="txtcodigoid">
-                    </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">Razon social</label>
+                            <select id="cboproveedores" class="form-select"> </select>
+                        </div>
 
-                    <div class="col-sm-6">
-                        <label class="form-label">Tipo de Ingreso</label>
-                        <select id="txttipoingreso" class="form-select">
-                            @*<option selected>Seleccionar...</option>*@
-                            <option value="C">Compra</option>
-                            <option value="D">Devolucion</option>
-                            <option value="O">Otro</option>
-                        </select>
-                    </div>
+                        <div class="col-sm-6">
+                            <label for="txtcantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="txtcantidad" min="0" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                        </div>
 
-                    <div class="col-sm-6">
-                        <label for="txtfechaingreso" class="form-label">Fecha de Ingreso</label>
-                        <input type="text" class="form-control" id="txtfechaingreso" readonly>
-                    </div>
+                        <div class="col-sm-6">
+                            <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                            <input type="text" class="form-control" id="txtcodigoid">
+                        </div>
 
-                    <div class="col-sm-6">
-                        <label for="txtobservaciones" class="form-label">Observaciones</label>
-                        <input type="text" class="form-control" id="txtobservaciones">
-                    </div>
+                        <div class="col-sm-6">
+                            <label for="txtexpediente" class="form-label">N° de Expediente</label>
+                            <input type="text" class="form-control" id="txtexpediente">
+                        </div>
 
-                    <div class="col-sm-6">
-                        <label for="txtusuario" class="form-label">IdUsuario</label>
-                        <input type="text" class="form-control" id="txtusuario">
+                        <div class="col-sm-6">
+                            <label class="form-label">Tipo de Ingreso</label>
+                            <select id="txttipoingreso" class="form-select">
+                                <option value="C">Compra</option>
+                                <option value="D">Devolucion</option>
+                                <option value="O">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label for="txtfechaingreso" class="form-label">Fecha de Ingreso</label>
+                            <input type="text" class="form-control" id="txtfechaingreso" readonly>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label for="txtobservaciones" class="form-label">Observaciones</label>
+                            <input type="text" class="form-control" id="txtobservaciones">
+                        </div>
                     </div>
-                </div>
                 @*-------------------------Mensaje de alerta-------------------------*@
                 <div class="row mt-12">
                     <div class="col-12">
@@ -122,76 +121,96 @@
                 <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
             </div>
         </div>
-    </div>
+     </div>
 </div>
 
+<!-----------------Modal secundario------------------------>
+@*<div class="modal fade" id="ModalBus" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body g-2">
+                <div class="col-sm-6">
+                    <label class="form-label">Rubro</label>
+                    <select id="cborubro" class="form-select"> </select>
+                </div>
 
+                <div class="col-sm-6">
+                    <label class="form-label">Tipo</label>
+                    <select id="cbotipo" type="text" class="form-select"> </select>
+                </div>
+
+                <div class="col-sm-6">
+                    <label class="form-label">Codigo ID</label>
+                    <select id="cbocodigo" class="form-select"> </select>
+                </div>
+
+                <div class="col-sm-6">
+                    <label class="form-label">Producto</label>
+                    <select id="cbodetalle" class="form-select"> </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>*@
 
 
 @section scripts{
-<script>
-            var tabladata;
-            var filaSeleccionada;
+    <script>
+        var tabladata;
+        var filaSeleccionada;
+        var productos = {};
+
+        $(document).ready(function () {
 
             tabladata = $("#tabla").DataTable({
-            responsive: true,
-            ordering: true,
-            order: [[0, 'desc']],
-            "ajax": {
-                url: '@Url.Action("ListarIngresos", "Toner")',
-                type: "GET",
-                dataType: "json",
-                //success: function (data) {
-                //    console.log(data);
-                //}
-            },
+                responsive: true,
+                ordering: false,
+                "ajax": {
+                    url: '@Url.Action("ListarIngresos", "Toner")',
+                    type: "GET",
+                    dataType: "json",
+                },
                 "columns": [
-                    {
-                        "data": "IdIngreso", // Asegúrate de que este campo esté presente en tu modelo
-                        "orderable": true, // Permitir ordenamiento por este campo
-                        "visible": false // No mostrar esta columna en la tabla
-                    },
                     {
                         "data": "oProductos", "render": function (data) {
                             return data.Detalle
                         },
                     },
-                    //{
-                    //    "data": "oProductos", "render": function (data) {
-                    //        return data.StockActual
-                    //    },
-                    //},
                     {
                         "data": "oProveedores", "render": function (data) {
                             return data.RazonSocial
                         }
                     },
-                        { "data": "Cantidad", },
-                    //{
-                    //    "data": "oStockActual", "render": function (data) {
-                    //        return data.StockActual
-                    //    }
-                    //},
+                    { "data": "Cantidad", },
                     { "data": "CodigoId" },
+                    { "data": "NroExpediente" },
                     { "data": "TipoIngreso" },
                     {
                         "data": "FechaIngreso", "render": function (data) {
-
-
-                            var partes = data.split(' ')[0].split('/'); // Toma solo la parte de la fecha y divide por '/'
-
-                            // Asegúrate de que el formato sea DD/MM/YYYY
-                            var dia = parseInt(partes[0], 10); // Día
-                            var mes = parseInt(partes[1], 10) - 1; // Mes (0-11)
-                            var año = parseInt(partes[2], 10); // Año
-
-                            // Crea el objeto Date
+                            var partes = data.split(' ')[0].split('/');
+                            var dia = parseInt(partes[0], 10);
+                            var mes = parseInt(partes[1], 10) - 1;
+                            var año = parseInt(partes[2], 10);
+                            var fecha = new Date(año, mes, dia);
+                            return (fecha.getDate()) + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear();
+                        },
+                    },
+                    {
+                        "data": "FechaAct1", "render": function (data) {
+                            var partes = data.split(' ')[0].split('/');
+                            var dia = parseInt(partes[0], 10);
+                            var mes = parseInt(partes[1], 10) - 1;
+                            var año = parseInt(partes[2], 10);
                             var fecha = new Date(año, mes, dia);
                             return (fecha.getDate()) + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear();
                         },
                     },
                     { "data": "Observaciones" },
-                    { "data": "IdUsuario"},
+                    { "data": "IdUsuario" },
                     {
                         "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>',
                         "orderable": false,
@@ -204,179 +223,211 @@
                     url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json',
                 },
             });
+        });
 
-                jQuery.ajax({
+
+            jQuery.ajax({
                 url: '@Url.Action("ListarProveedores", "Toner")',
                 type: "GET",
                 data: null,
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                    success: function (data) {
-                        $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cboproveedores");
+                success: function (data) {
+                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cboproveedores");
 
-                        $.each(data.data, function (index, valor) {
-                            if (valor.Activo === true) {
-                                $("<option>").attr({ "value": valor.IdProveedor }).text(valor.RazonSocial).appendTo("#cboproveedores");
-                            }
-                        });
-                    },
-                    error: function (error) {
-                        console.log(error)
-                    },
-                });
+                    $.each(data.data, function (index, valor) {
+                        if (valor.Activo === true) {
+                            $("<option>").attr({ "value": valor.IdProveedor }).text(valor.RazonSocial).appendTo("#cboproveedores");
+                        }
+                    });
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+            });
 
 
-                jQuery.ajax({
+            jQuery.ajax({
                 url: '@Url.Action("ListarProductos", "Toner")',
                 type: "GET",
                 data: null,
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                    success: function (data) {
-                        //----DETALLE
-                        $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbodetalle");
+                success: function (data) {
+                    //----DETALLE
+                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbodetalle");
 
-                        $.each(data.data, function (index, valor) {
-                            if (valor.Activo === true) {
-                                $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
-                            }
+                    $.each(data.data, function (index, valor) {
+                        if (valor.Activo === true) {
+                            productos[valor.IdProducto] = valor.StockActual;
+                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
+                        }
 
-                        });
+                    });
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+            });
 
-                        //STOCKACTUAL
-                        //$("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbostockactual");
+        function abrirModalBus() {
+            $("#BusModal").modal("show");
+        }
 
-                        //$.each(data.data, function (index, valor) {
-                        //        $("<option>").attr({ "value": valor.IdProducto }).text(valor.StockActual).appendTo("#cbostockactual");
-                        //});
-
-                    },
-                    error: function (error) {
-                        console.log(error)
-                    },
-                });
+        function abrirModal(json) {
 
 
-            function abrirModal(json) {
                 $("#txtid").val(0);
                 $("#cbodetalle").val("");
+                $("#cbostockactual").val("").hide();
                 $("#cboproveedores").val("");
                 $("#txtcantidad").val("");
                 $("#txtcodigoid").val("");
+                $("#txtexpediente").val("");
                 $("#txttipoingreso").val("");
+                $('#txtfechaingreso').val(new Date().toLocaleDateString('es-AR'));
                 $('#txtfechaingreso').datepicker({
                     minDate: "-30D",
                     maxDate: 0,
+
                 });
                 $("#txtobservaciones").val("");
-                $("#txtusuario").val("");
+                $("#txtusuario").val(@Session["AccesCode"]);
                 $("#mensajeError").hide();
+
+                $("#cbodetalle").change(function () {
+                    var idProducto = $(this).val();
+                    var stockActual = obtenerStockPorId(idProducto);
+
+                    if (stockActual !== undefined) {
+                        $("#cbostockactual").val(stockActual);
+                        $("#cbostockactual").show();
+                    }
+                });
+
+
+                function obtenerStockPorId(idProducto) {
+                    return productos[idProducto];
+                }
 
 
                 if (json != null) {
-                    var fechaRegistro = new Date(json.FechaRegistro);
+                    var fechaActMatch = json.FechaAct.match(/\/Date\((\d+)\)\//);
+                    var timestamp = parseInt(fechaActMatch[1], 10);
+                    var fechaRegistro = new Date(timestamp);
                     var fechaActual = new Date();
-                    var diferenciaHoras = (fechaActual - fechaRegistro) / 3600000; // 3600000 es el número de milisegundos en una hora
+                    var diferenciaDias = (fechaActual.getTime() - fechaRegistro.getTime()) / (1000 * 3600 * 24); // 1000 ms * 3600 s * 24 h
 
-                    if (diferenciaHoras > 24) {
-                        // Mostrar mensaje de error
-                        alert("Ya no se puede actualizar/modificar este registro. Han pasado más de 24 horas desde su creación.");
-                    } else {
-                        $("#txtid").val(json.IdIngreso);
-                        $("#cbodetalle").val(json.oProductos.IdProducto);
-                        $("#cboproveedores").val(json.oProveedores.IdProveedor);
-                        $("#txtcantidad").val(json.Cantidad);
-                        $("#txtcodigoid").val(json.CodigoId);
-                        $("#txttipoingreso").val(json.TipoIngreso);
-                        $("#txtfechaingreso").val(json.FechaIngreso);
-                        $("#txtobservaciones").val(json.Observaciones);
-                        $("#txtusuario").val(json.IdUsuario);
+                    if (diferenciaDias >= 1) {
+                        alert("Ya no se puede actualizar/modificar este registro.");
+                        return;
                     }
 
-                }
-                $("#FormModal").modal("show");
+                    $("#txtid").val(json.IdIngreso);
+                    $("#cbodetalle").val(json.oProductos.IdProducto);
+                    $("#cboproveedores").val(json.oProveedores.IdProveedor);
+                    $("#txtcantidad").val(json.Cantidad);
+                    $("#txtcodigoid").val(json.CodigoId);
+                    $("#txtexpediente").val(json.NroExpediente);
+                    $("#txttipoingreso").val(json.TipoIngreso);
+                    $("#txtfechaingreso").val(json.FechaIngreso).prop("readonly", true)
+                    $("#txtobservaciones").val(json.Observaciones);
+                    $("#txtusuario").val(json.IdUsuario);
 
-            }
+
+                }
+
+            $("#FormModal").modal("show");
+
+        }
 
             $("#tabla tbody").on("click", '.btn-editar', function () {
                 filaSeleccionada = $(this).closest("tr");
                 var data = tabladata.row(filaSeleccionada).data();
                 abrirModal(data)
-            })
+            });
 
             function Guardar() {
 
-                var Ingresos = {
-                   IdIngreso: $("#txtid").val(),
-                   oProductos: {
-                       IdProducto: $("#cbodetalle option:selected").val(),
-                       Detalle: $("#cbodetalle option:selected").text(),
-                   },
-                   oProveedores: {
-                       IdProveedor: $("#cboproveedores option:selected").val(),
-                       RazonSocial: $("#cboproveedores option:selected").text(),
-                    },
-                    Cantidad: $("#txtcantidad").val(),
-                    //oStockActual: $("#cbostockactual").val(""),
-                    CodigoId: $("#txtcodigoid").val(),
-                    TipoIngreso: $("#txttipoingreso option:selected").val(),
-                    FechaIngreso: $("#txtfechaingreso").val(),
-                    Observaciones: $("#txtobservaciones").val(),
-                    IdUsuario: $("#txtusuario").val(),
-                }
+                    var Ingresos = {
+                        IdIngreso: $("#txtid").val(),
+                        oProductos: {
+                            IdProducto: $("#cbodetalle option:selected").val(),
+                            Detalle: $("#cbodetalle option:selected").text(),
+                        },
+                        oProveedores: {
+                            IdProveedor: $("#cboproveedores option:selected").val(),
+                            RazonSocial: $("#cboproveedores option:selected").text(),
+                        },
+                        Cantidad: $("#txtcantidad").val(),
+                        CodigoId: $("#txtcodigoid").val(),
+                        NroExpediente: $("#txtexpediente").val(),
+                        TipoIngreso: $("#txttipoingreso option:selected").val(),
+                        FechaIngreso: $("#txtfechaingreso").val(),
+                        Observaciones: $("#txtobservaciones").val(),
+                        IdUsuario: $("#txtusuario").val(),
+                    }
 
-                jQuery.ajax({
-                    url: '@Url.Action("GuardarIngreso", "Toner")',
-                    type: "POST",
-                    data: JSON.stringify({ objeto: Ingresos }),
-                    dataType: "json",
-                    contentType: "application/json; charset=utf-8",
-                    success: function (data) {
-                        $(".modal-body").LoadingOverlay("hide");
-                        //INGRESO NUEVO
-                        if (Ingresos.IdIngreso == 0) {
-                            if (data.resultado != 0) {
-                                Ingresos.IdIngreso = data.resultado;
-                                tabladata.ajax.reload();
-                                tabladata.row.add(Ingresos).draw(false);
-                                $("#FormModal").modal("hide");
-                            } else {
-                                $("#mensajeError").text(data.mensaje);
-                                $("#mensajeError").show();
+                    jQuery.ajax({
+                        url: '@Url.Action("GuardarIngreso", "Toner")',
+                        type: "POST",
+                        data: JSON.stringify({ objeto: Ingresos }),
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            $(".modal-body").LoadingOverlay("hide");
+                            //INGRESO NUEVO
+                            if (Ingresos.IdIngreso == 0) {
+                                if (data.resultado != 0) {
+                                    Ingresos.IdIngreso = data.resultado;
+                                    tabladata.ajax.reload();
+                                    tabladata.row.add(Ingresos).draw(false);
+                                    $("#FormModal").modal("hide");
+                                    swal({
+                                        title: "Numero de gestion:",
+                                        text: data.resultado,
+                                        type: "success",
+                                        confirmButtonClass: "btn-primary",
+                                        confirmButtonText: "Si",
+                                    });
+                                } else {
+                                    $("#mensajeError").text(data.mensaje);
+                                    $("#mensajeError").show();
+                                }
                             }
-                        }
-                        //INGRESO EDITAR
-                        else {
-                            if (data.resultado) {
-                                tabladata.ajax.reload();
-                                tabladata.row(filaSeleccionada).data(Ingresos).draw(false);
-                                filaSeleccionada = null;
-                                $("#FormModal").modal("hide");
-                            } else {
-                                $("#mensajeError").text(data.mensaje);
-                                $("#mensajeError").show();
+                            //INGRESO EDITAR
+                            else {
+                                if (data.resultado) {
+                                    tabladata.ajax.reload();
+                                    tabladata.row(filaSeleccionada).data(Ingresos).draw(false);
+                                    filaSeleccionada = null;
+                                    $("#FormModal").modal("hide");
+                                } else {
+                                    $("#mensajeError").text(data.mensaje);
+                                    $("#mensajeError").show();
+                                }
                             }
-                        }
-                    },
-                    error: function (error) {
-                        $(".modal-body").LoadingOverlay("hide");
-                        $("#mensajeError").text("Error Ajax");
-                        $("#mensajeError").show();
+                        },
+                        error: function (error) {
+                            $(".modal-body").LoadingOverlay("hide");
+                            $("#mensajeError").text("Error Ajax");
+                            $("#mensajeError").show();
 
-                        console.log(error)
-                    },
-                    beforeSend: function () {
-                        $(".modal-body").LoadingOverlay("show", {
-                            imageResizeFactor: 2,
-                            text: "Cargando...",
-                            size:14
-                        })
+                            console.log(error)
+                        },
+                        beforeSend: function () {
+                            $(".modal-body").LoadingOverlay("show", {
+                                imageResizeFactor: 2,
+                                text: "Cargando...",
+                                size: 14
+                            })
 
-                    },
-                });
+                        },
+                    });
+
             }
 
-</script>
+    </script>
 }
 
 

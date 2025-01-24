@@ -48,6 +48,7 @@
     <Compile Include="CN_Rubros.cs" />
     <Compile Include="CN_SolicitudPedidos.cs" />
     <Compile Include="CN_Tipos.cs" />
+    <Compile Include="CN_Usuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -59,6 +60,9 @@
       <Project>{c847100a-8a3c-441c-bf95-2f68c03d3ac9}</Project>
       <Name>CapaEntidad</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
