@@ -58,7 +58,38 @@ namespace CapaDatos
             return lista;
         }
 
+        public List<Productos> ListarProductosporTipos(int IdTipos)
+        {
+            List<Productos> lista = new List<Productos>();
+            try
+            {
+                using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
+                {
+                    string query = "SELECT * FROM Tonner_Productos WHERE IdTipos = @IdTipos";
+                    SqlCommand cmd = new SqlCommand(query, oconexion);
+                    cmd.Parameters.AddWithValue("@IdTipos", IdTipos);
+                    cmd.CommandType = CommandType.Text;
+                    oconexion.Open();
+                    using (SqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            lista.Add(new Productos()
+                            {
+                                IdProducto = Convert.ToInt32(rdr["IdProductos"]),
+                                Detalle = rdr["Detalle"].ToString(),
+                            });
+                        }
+                    }
 
+                }
+            }
+            catch
+            {
+                lista = new List<Productos>();
+            }
+            return lista;
+        }
         public int Registrar(Productos obj)
         {
             string Mensaje;
