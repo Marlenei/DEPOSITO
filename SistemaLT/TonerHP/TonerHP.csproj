@@ -563,6 +563,7 @@
     <Content Include="Views\Usuario\Login.cshtml" />
     <Content Include="Views\Shared\_BusAvan.cshtml" />
     <Content Include="Views\Shared\_BusquedaAvan.cshtml" />
+    <Content Include="Views\Toner\SolicitudPedidos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -574,6 +575,10 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CapaDatos\CapaDatos.csproj">
+      <Project>{FEB34A52-AEF4-46B4-BB4E-78406F96157F}</Project>
+      <Name>CapaDatos</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CapaEntidad\CapaEntidad.csproj">
       <Project>{c847100a-8a3c-441c-bf95-2f68c03d3ac9}</Project>
       <Name>CapaEntidad</Name>

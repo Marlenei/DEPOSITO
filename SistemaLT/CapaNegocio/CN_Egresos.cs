@@ -91,5 +91,9 @@ namespace CapaNegocio
 
         }
 
+        public object Registrar(SolicitudPedidos objeto, out string mensaje)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

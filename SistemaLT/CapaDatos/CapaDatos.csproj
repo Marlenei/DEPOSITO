@@ -85,6 +85,7 @@
     <Compile Include="CD_Productos.cs" />
     <Compile Include="CD_Proveedores.cs" />
     <Compile Include="CD_Rubros.cs" />
+    <Compile Include="CD_SolicitudPedidos.cs" />
     <Compile Include="CD_Tipos.cs" />
     <Compile Include="CD_Usuario.cs" />
     <Compile Include="Conexion.cs" />
