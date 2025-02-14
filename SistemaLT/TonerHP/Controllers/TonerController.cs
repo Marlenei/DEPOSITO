@@ -16,35 +16,13 @@ namespace TonerHP.Controllers
 {
     public class TonerController : Controller
     {
-        public ActionResult _BusAvan(int? idRubro, int? idTipo)
+        // GET: Toner
+
+        public ActionResult _BusAvan()
         {
-            List<Rubros> rubrosList = new CN_Rubros().Listar();
-            ViewBag.Rubros = rubrosList;
-
-            if (idRubro.HasValue)
-            {
-                ViewBag.Tipos = ListarTiposPorRubro(idRubro.Value);
-            }
-            else
-            {
-                ViewBag.Tipos = new List<Tipos>();
-            }
-
-            if (idTipo.HasValue)
-            {
-                ViewBag.Productos = ListarProductosPorTipo(idTipo.Value);
-            }
-            else
-            {
-                ViewBag.Productos = new List<Productos>();
-            }
-
-            ViewBag.SelectedRubro = idRubro;
-            ViewBag.SelectedTipo = idTipo;
-
             return PartialView("_BusAvan");
         }
-        // GET: Toner
+
         public ActionResult Proveedores()
         {
             //var userAccessCode = Session["AccesCode"] as int?;
@@ -234,10 +212,11 @@ namespace TonerHP.Controllers
             oLista = new CN_Tipos().Listar();
             return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
         }
-
-        public List<Tipos> ListarTiposPorRubro(int idRubro)
+        [HttpGet]
+        public JsonResult ListarTiposPorRubro(int idRubro)
         {
-            return new CN_Tipos().ListarporIDRubro(idRubro);
+            var tipos = new CN_Tipos().ListarporIDRubro(idRubro);
+            return Json(tipos, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -268,11 +247,22 @@ namespace TonerHP.Controllers
             oLista = new CN_Productos().Listar();
             return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
         }
-
-        public List<Productos> ListarProductosPorTipo(int idTipo)
+        
+        [HttpGet]
+        public JsonResult ListarProductosPorTipo(int idTipo)
         {
-            return new CN_Productos().ListarporIDTipos(idTipo); // Asegúrate de tener este método
+            var productos = new CN_Productos().ListarporIDTipos(idTipo);
+            return Json(productos, JsonRequestBehavior.AllowGet);
         }
+
+        [HttpGet]
+        public JsonResult ListarProductosporCI(string idCodigo)
+        {
+            var productos = new CN_Productos().ListarProductosporCI(idCodigo);
+            return Json(productos, JsonRequestBehavior.AllowGet);
+        }
+
+
 
         [HttpPost]
 
