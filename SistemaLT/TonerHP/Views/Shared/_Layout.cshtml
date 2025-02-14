@@ -8,6 +8,7 @@
     @Styles.Render("~/Content/css")
 </head>
 <body class="sb-nav-fixed bg-dark ">
+    <script src="~/Scripts/functions.js"></script>
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
         <ul class="navbar-nav ms-auto me-0 me-md-3 my-2 my-md-0">
@@ -32,10 +33,7 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                             Ingresos/Entradas
                         </a>
-                        <a class="nav-link" href="@Url.Action("","")" )>
-                            <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                            Solicitud/Pedidos
-                        <a class="nav-link" href="@Url.Action("SolicitudPedidos","Toner")")>
+                        <a class="nav-link" href="@Url.Action("SolicitudPedidos","Toner")" )>
                             <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                             Solicitud/Pedidos
                         </a>
@@ -71,14 +69,14 @@
                 </div>
             </main>
             <footer class="py-4 bg-dark mt-auto">
-                    <div class="container-fluid px-4">
-                        <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-white">Diseñado por Area de Sistemas de Hospital Pediatrico Dr. Avelino L. Castelan</div>
-                            <div class="text-white">Libreria e Insumos Informaticos </div>
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-white">Diseñado por Area de Sistemas de Hospital Pediatrico Dr. Avelino L. Castelan</div>
+                        <div class="text-white">Libreria e Insumos Informaticos </div>
 
-                        </div>
                     </div>
-                </footer>
+                </div>
+            </footer>
         </div>
     </div>
 
