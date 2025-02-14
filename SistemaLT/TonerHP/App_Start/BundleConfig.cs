@@ -15,10 +15,15 @@ namespace TonerHP
                         "~/Scripts/DataTables/jquery.dataTables.js",
                         "~/Scripts/DataTables/jdataTables.responsive.js",
                         "~/Scripts/loadingoverlay/loadingoverlay.min.js",
-                        "~/Scripts/sweetalert.min.js",
+                        "~/Scripts/sweetalert2.min.js",
                         "~/Scripts/Datepicker.js",
                         "~/Scripts/jquery-ui.js",
-                        "~/Scripts/scripts.js"
+                        "~/Scripts/moment.js",
+                        "~/Scripts/scripts.js",
+                        "~/Scripts/select2.min.js",
+                        "~/Scripts/daterangepicker.min.js"
+
+
                         ));
 
             //bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
@@ -37,9 +42,11 @@ namespace TonerHP
                       "~/Content/DataTables/css/jquery.dataTables.css",
                       "~/Content/DataTables/css/responsive.dataTables.css",
                       "~/Content/images",
-                      "~/Content/sweetalert.css",
+                      "~/Content/sweetalert2.min.css",
                       "~/Content/jquery-ui.min.css",
-                      "~/Content/bootstrap.css"
+                      "~/Content/bootstrap.css",
+                      "~/Content/select2.min.css",
+                      "~/Content/daterangepicker.css"
                       ));
         }
     }

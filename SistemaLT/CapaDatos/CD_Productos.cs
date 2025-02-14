@@ -58,16 +58,16 @@ namespace CapaDatos
             return lista;
         }
 
-        public List<Productos> ListarProductosporTipos(int IdTipos)
+        public List<Productos> ListarProductosporTipos(int idTipo)
         {
             List<Productos> lista = new List<Productos>();
             try
             {
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
-                    string query = "SELECT * FROM Tonner_Productos WHERE IdTipos = @IdTipos";
+                    string query = "SELECT * FROM Tonner_Productos WHERE IdTipo = @IdTipo";
                     SqlCommand cmd = new SqlCommand(query, oconexion);
-                    cmd.Parameters.AddWithValue("@IdTipos", IdTipos);
+                    cmd.Parameters.AddWithValue("@IdTipo", idTipo);
                     cmd.CommandType = CommandType.Text;
                     oconexion.Open();
                     using (SqlDataReader rdr = cmd.ExecuteReader())
@@ -76,8 +76,10 @@ namespace CapaDatos
                         {
                             lista.Add(new Productos()
                             {
-                                IdProducto = Convert.ToInt32(rdr["IdProductos"]),
+                                IdProducto = Convert.ToInt32(rdr["IdProducto"]),
                                 Detalle = rdr["Detalle"].ToString(),
+                                StockActual = Convert.ToInt32(rdr["StockActual"]),
+                                Activo = Convert.ToBoolean(rdr["Activo"]),
                             });
                         }
                     }
@@ -90,6 +92,42 @@ namespace CapaDatos
             }
             return lista;
         }
+
+        public List<Productos> ListarProductosporCI(string idCodigo)
+        {
+            List<Productos> lista = new List<Productos>();
+            try
+            {
+                using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
+                {
+                    string query = "SELECT * FROM Tonner_Productos WHERE CodigoId = @IdCodigo";
+                    SqlCommand cmd = new SqlCommand(query, oconexion);
+                    cmd.Parameters.AddWithValue("@IdCodigo", idCodigo);
+                    cmd.CommandType = CommandType.Text;
+                    oconexion.Open();
+                    using (SqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            lista.Add(new Productos()
+                            {
+                                IdProducto = Convert.ToInt32(rdr["IdProducto"]),
+                                Detalle = rdr["Detalle"].ToString(),
+                                StockActual = Convert.ToInt32(rdr["StockActual"]),
+                                Activo = Convert.ToBoolean(rdr["Activo"]),
+                            });
+                        }
+                    }
+
+                }
+            }
+            catch
+            {
+                lista = new List<Productos>();
+            }
+            return lista;
+        }
+
         public int Registrar(Productos obj)
         {
             string Mensaje;
