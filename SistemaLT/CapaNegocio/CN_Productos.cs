@@ -16,9 +16,14 @@ namespace CapaNegocio
             return objCapaDato.Listar();
         }
 
-        public List<Productos> ListarporIDTipos(int IdTipo)
+        public List<Productos> ListarporIDTipos(int idTipo)
         {
-            return objCapaDato.ListarProductosporTipos(IdTipo);
+            return objCapaDato.ListarProductosporTipos(idTipo);
+        }
+
+        public List<Productos> ListarProductosporCI(string idCodigo)
+        {
+            return objCapaDato.ListarProductosporCI(idCodigo);
         }
 
         public int Registrar(Productos obj, out string Mensaje)

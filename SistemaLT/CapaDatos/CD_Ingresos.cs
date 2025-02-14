@@ -19,17 +19,8 @@ namespace CapaDatos
             {
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendLine("SELECT i.IdIngreso,");
-                    sb.AppendLine("p.IdProducto, p.Detalle, p.StockActual,");
-                    sb.AppendLine("pv.IdProveedor, pv.RazonSocial,");
-                    sb.AppendLine("i.CodigoId, i.Cantidad, i.FechaIngreso, i.Observaciones, i.IdUsuario, i.TipoIngreso, i.FechayHoraAct, i.NroExpediente");
-                    sb.AppendLine("FROM Tonner_Ingresos i");
-                    sb.AppendLine("inner join Tonner_Productos p on p.IdProducto = i.IdProducto");
-                    sb.AppendLine("inner join Tonner_Proveedor pv on pv.IdProveedor = i.IdProveedor");
-                    sb.AppendLine("ORDER BY i.IdIngreso DESC;");
-                    SqlCommand cmd = new SqlCommand(sb.ToString(), oconexion);
-                    cmd.CommandType = CommandType.Text;
+                    SqlCommand cmd = new SqlCommand("ListarIngresos", oconexion);
+                    cmd.CommandType = CommandType.StoredProcedure;
                     oconexion.Open();
                     using (SqlDataReader rdr = cmd.ExecuteReader())
                     {
@@ -53,7 +44,7 @@ namespace CapaDatos
                                 Observaciones = rdr["Observaciones"].ToString(),
                                 TipoIngreso = Convert.ToChar(rdr["TipoIngreso"]),
                                 FechaIngreso = rdr["FechaIngreso"].ToString(),
-                                IdUsuario = Convert.ToInt32(rdr["IdUsuario"]),
+                                NombreyApellido = rdr["NombreyApellido"].ToString(),
                                 FechaAct1 = rdr["FechayHoraAct"].ToString(),
                                 FechaAct = Convert.ToDateTime(rdr["FechayHoraAct"]),
                             });
@@ -115,10 +106,10 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("IdUsuario", obj.IdUsuario);
                     cmd.Parameters.AddWithValue("TipoIngreso", obj.TipoIngreso);
                     cmd.Parameters.AddWithValue("FechaIngreso", Convert.ToDateTime(obj.FechaIngreso));
-                    cmd.Parameters.AddWithValue("NroExpediente", obj.NroExpediente);
+                    cmd.Parameters.AddWithValue("NroExpediente", (object)obj.NroExpediente ?? DBNull.Value);
 
                     cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
-                    //cmd.Parameters.Add("FechayHoraAct", SqlDbType.DateTime).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add("FechayHoraAct", SqlDbType.DateTime).Direction = ParameterDirection.Output;
 
                     cmd.CommandType = CommandType.StoredProcedure;
 

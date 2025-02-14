@@ -53,7 +53,7 @@ namespace CapaDatos
         }
 
 
-        public List<Tipos> ListarTipoporRubro(int IdRubro)
+        public List<Tipos> ListarTipoporRubro(int idRubro)
         {
             List<Tipos> lista = new List<Tipos>();
             try
@@ -62,7 +62,7 @@ namespace CapaDatos
                 {
                     string query = "SELECT * FROM Tonner_Tipos WHERE IdRubro = @IdRubro";
                     SqlCommand cmd = new SqlCommand(query, oconexion);
-                    cmd.Parameters.AddWithValue("@IdRubro", IdRubro);
+                    cmd.Parameters.AddWithValue("@IdRubro", idRubro);
                     cmd.CommandType = CommandType.Text;
                     oconexion.Open();
                     using (SqlDataReader rdr = cmd.ExecuteReader())
@@ -73,6 +73,7 @@ namespace CapaDatos
                             {
                                 IdTipo = Convert.ToInt32(rdr["IdTipo"]),
                                 Tipo = rdr["Tipo"].ToString(),
+                                Activo = Convert.ToBoolean(rdr["Activo"]),
                             });
                         }
                     }

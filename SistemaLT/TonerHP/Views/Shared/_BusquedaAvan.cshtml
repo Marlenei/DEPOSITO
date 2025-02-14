@@ -1,7 +1,27 @@
-﻿
-@{
-    ViewBag.Title = "_BusquedaAvan";
-    Layout = null;
-}
+﻿@{ ViewData["Title"] = "Filtrado de PRoductos"; }
+<div class="modal-body g-3">
+    <div class="row">
+        <div class="col-sm-6">
+            <label class="form-label">Rubro</label>
+            <select id="cborubro" class="form-select" name="idRubro" onchange="CargarTipos(this.value)">
+                <option value="">Seleccione un Rubro</option>
+            </select>
+        </div>
+
+        <div class="col-sm-6">
+            <label class="form-label">Codigo ID</label>
+            <select id="cbocodigo" class="form-select" name="idCodigo" onchange="CargarProductosporCI(this)">
+                <option value="">Seleccione un Codigo ID</option>
+            </select>
+        </div>
+    </div>
 
 
+    <div class="row mt-2">
+        <div class="col-sm-6">
+            <label class="form-label">Tipo</label>
+            <select id="cbotipo" class="form-select" name="idTipo" onchange="CargarProductosporTipo(this.value)">
+            </select>
+        </div>
+    </div>
+</div>
