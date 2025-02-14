@@ -10,6 +10,18 @@ namespace CapaEntidad
     {
         public string usuario { get; set; }
         public string clave { get; set; }
+
+       
+
+    }
+
+    public class UsuarioDatos
+    {
+        public int CodigoUnico { get; set; }
+        public int CodigoArea { get; set; }
+        public int CodigoSector { get; set; }
+        public string NombreArea { get; set; }
+        public string NombreSector { get; set; }
     }
 
     public class AccesoResultado
