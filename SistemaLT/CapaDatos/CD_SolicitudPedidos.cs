@@ -3,9 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.Text;
+using System.Web;
+using System.Reflection;
+using System.Security.Cryptography;
 
 namespace CapaDatos
 {
@@ -45,8 +49,8 @@ namespace CapaDatos
                                 },
                                 CantidadPedida = Convert.ToInt32(rdr["CantidadPedida"]),
                                 CantidadEntregada = rdr["CantidadEntregada"] != DBNull.Value ? Convert.ToInt32(rdr["CantidadEntregada"]) : 0,
-                                FechaPedido = Convert.ToDateTime(rdr["FechaPedido"]),
-                                FechaEntrega = rdr["FechaEntrega"] != DBNull.Value ? Convert.ToDateTime(rdr["FechaEntrega"]) : DateTime.MinValue,
+                                FechaPedido = Convert.ToString(rdr["FechaPedido"]),
+                                FechaEntrega = Convert.ToString(rdr["FechaEntrega"]),
                                 IdUsuarioPedido = Convert.ToInt32(rdr["IdUsuarioPedido"]),
                                 //FechaHoraActualizacion = Convert.ToDateTime(rdr["FechaHoraActualizacion"]),
                                 CodigoArea = Convert.ToInt32(rdr["CodigoArea"]),
@@ -68,6 +72,8 @@ namespace CapaDatos
             return lista;
         }
 
+
+
         public int Registrar(SolicitudPedidos obj)
         {
             int idautogenerado = 0;
@@ -76,14 +82,13 @@ namespace CapaDatos
             {
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
-                    SqlCommand cmd = new SqlCommand("T_RegistrarPedidos", oconexion);
+                    SqlCommand cmd = new SqlCommand("T_RegistrarP", oconexion);
                     cmd.Parameters.AddWithValue("@IdProducto", obj.oProductos.IdProducto);
                     cmd.Parameters.AddWithValue("@CantidadPedida", obj.CantidadPedida);
                     cmd.Parameters.AddWithValue("@CantidadEntregada", (object)obj.CantidadEntregada ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@FechaPedido", obj.FechaPedido);
-                    cmd.Parameters.AddWithValue("@FechaEntrega", (object)obj.FechaEntrega ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("FechaPedido", Convert.ToDateTime(obj.FechaPedido));
+                    cmd.Parameters.AddWithValue("FechaEntrega", Convert.ToDateTime(obj.FechaEntrega));
                     cmd.Parameters.AddWithValue("@IdUsuarioPedido", obj.IdUsuarioPedido);
-                    //cmd.Parameters.AddWithValue("@FechaHoraActualizacion", DateTime.Now);
                     cmd.Parameters.AddWithValue("@CodigoArea", obj.CodigoArea);
                     cmd.Parameters.AddWithValue("@CodigoSector", obj.CodigoSector);
                     cmd.Parameters.AddWithValue("@IdUsuarioEntrega", (object)obj.IdUsuarioEntrega ?? DBNull.Value);
@@ -110,6 +115,27 @@ namespace CapaDatos
             return idautogenerado;
         }
 
+        ////public async Task<UsuarioDatos> ObtenerDatosUsuario(string usuario, int codigoUnico)
+        ////{
+        ////    try
+        ////    {
+        ////        var response = await _httpClient.GetAsync($"http://10.4.51.49/SI_Apis/home/buscardatosdelusuario?usuario={HttpUtility.UrlEncode(usuario)}&codigounico={codigoUnico}");
+
+        ////        if (response.IsSuccessStatusCode)
+        ////        {
+        ////            var responseJson = await response.Content.ReadAsStringAsync();
+        ////            return JsonConvert.DeserializeObject<UsuarioDatos>(responseJson);
+        ////        }
+        ////        else
+        ////        {
+        ////            throw new Exception("Error al obtener datos del usuario.");
+        ////        }
+        ////    }
+        ////    catch (Exception ex)
+        ////    {
+        ////        throw new Exception($"Error en la llamada a la API: {ex.Message}", ex);
+        ////    }
+        //}
         public bool Editar(SolicitudPedidos obj, out string Mensaje)
         {
             bool resultado = false;
@@ -128,7 +154,6 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("@Observaciones", (object)obj.Observaciones ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@Visado", obj.Visado);
                     cmd.Parameters.AddWithValue("@UsuarioVisado", (object)obj.UsuarioVisado ?? DBNull.Value);
-                    //cmd.Parameters.AddWithValue("@FechaHoraActualizacion", DateTime.Now);
 
                     SqlParameter paramResult = cmd.Parameters.Add("@Resultado", SqlDbType.Bit);
                     paramResult.Direction = ParameterDirection.Output;
@@ -148,10 +173,83 @@ namespace CapaDatos
             }
             return resultado;
         }
+        
+        // Método para obtener áreas
+ 
+        public List<UsuarioDatos> ObtenerAreas() // Cambiar el nombre y retorno a List<Area>
+        {
+            List<UsuarioDatos> areas = new List<UsuarioDatos>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(Conexion.cn))
+                {
+                    // Usar el nombre del procedimiento almacenado
+                    SqlCommand command = new SqlCommand("Mio_Listado_Areas", connection);
+                    command.CommandType = CommandType.StoredProcedure; // Indicar que es un SP
+
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            areas.Add(new UsuarioDatos() // Asignar propiedades según el SP
+                            {
+                                CodigoArea = reader.GetInt32(0),
+                                NombreArea = reader.GetString(1),
+                              
+                               
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al obtener áreas: {ex.Message}", ex);
+            }
+            return areas;
+        }
+
+        // Método para obtener sectores por código de área
+        public List<UsuarioDatos> ObtenerSectoresPorArea(int codigoArea)
+        {
+            List<UsuarioDatos> sectores = new List<UsuarioDatos>();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(Conexion.cn))
+                {
+                    // Usar el nombre del procedimiento almacenado
+                    SqlCommand command = new SqlCommand("Mio_Listado_Sectores", connection);
+                    command.CommandType = CommandType.StoredProcedure; // Indicar que es un SP
+                    command.Parameters.AddWithValue("@CodigoArea", codigoArea);
+
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            sectores.Add(new UsuarioDatos
+                            {
+                                CodigoSector = reader.GetInt32(0),
+                                NombreSector = reader.GetString(1),
+                                CodigoArea = codigoArea // Asignar el código de área desde el parámetro
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al obtener sectores: {ex.Message}", ex);
+            }
+            return sectores;
+        }
+
+
     }
 }
-    
 
-     
-    
+
+
+
 
