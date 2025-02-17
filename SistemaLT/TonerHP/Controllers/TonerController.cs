@@ -282,11 +282,12 @@ namespace TonerHP.Controllers
             return Json(new { resultado = resultado, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
         }
 
-        
+      
+
 
         #endregion
 
-
+        //EGRESOS
 
         #region Egresos
         [HttpGet]
@@ -321,47 +322,10 @@ namespace TonerHP.Controllers
         [HttpGet]
         public JsonResult ListarPedidos()
         {
-            try
-            {
-                List<SolicitudPedidos> lista = new CN_SolicitudPedidos().Listar();
-
-                // Transformamos los datos para asegurar un formato de fecha consistente
-                var resultado = lista.Select(p => new
-                {
-                    IdSolicitud = p.IdSolicitud,
-                    oProductos = p.oProductos,
-                    CantidadPedida = p.CantidadPedida,
-                    CantidadEntregada = p.CantidadEntregada,
-                    FechaPedido = p.FechaPedido.ToString("dd/MM/yyyy"),
-                    // Verificamos si FechaEntrega es el valor por defecto de DateTime
-                    FechaEntrega = p.FechaEntrega == DateTime.MinValue ? "" : p.FechaEntrega.ToString("dd/MM/yyyy"),
-                    IdUsuarioPedido = p.IdUsuarioPedido,
-                    CodigoArea = p.CodigoArea,
-                    CodigoSector = p.CodigoSector,
-                    IdUsuarioEntrega = p.IdUsuarioEntrega,
-                    Observaciones = p.Observaciones,
-                    NroPedido = p.NroPedido,
-                    Visado = p.Visado
-                }).ToList();
-
-                System.Diagnostics.Debug.WriteLine($"Cantidad de registros encontrados: {lista.Count}");
-
-                // Agregar logging para verificar el formato de las fechas
-                if (resultado.Any())
-                {
-                    System.Diagnostics.Debug.WriteLine($"Ejemplo de fecha pedido: {resultado.First().FechaPedido}");
-                    System.Diagnostics.Debug.WriteLine($"Ejemplo de fecha entrega: {resultado.First().FechaEntrega}");
-                }
-
-                return Json(new { data = resultado }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error en ListarPedidos: {ex.Message}");
-                return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
+            List<SolicitudPedidos> oLista = new List<SolicitudPedidos>();
+            oLista = new CN_SolicitudPedidos().Listar();
+            return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
         }
-
         [HttpPost]
         public JsonResult GuardarPedidos(SolicitudPedidos objeto)
         {
@@ -382,10 +346,10 @@ namespace TonerHP.Controllers
                 // Establecer fechas
                 if (objeto.IdSolicitud == 0) // Es un nuevo registro
                 {
-                    objeto.FechaPedido = DateTime.Now;
+                    //objeto.FechaPedido = DateTime.Now;
                     if (objeto.CantidadEntregada > 0) // Si hay cantidad entregada
                     {
-                        objeto.FechaEntrega = DateTime.Now;
+                        //objeto.FechaEntrega = DateTime.Now;
                     }
                 }
 
@@ -449,6 +413,6 @@ namespace TonerHP.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
         }
-        #endregion
+#endregion
     }
 }
