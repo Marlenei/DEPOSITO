@@ -6,6 +6,9 @@
         dataType: "json",
         contentType: "application/json; charset=utf-8",
         success: function (data) {
+            $("#cborubro").empty();
+            $("#cbostockactual").empty();
+            $("<option>").attr({ "value": "" }).text("Seleccione un Rubro").appendTo("#cborubro"); // Opción por defecto
             $.each(data.data, function (index, valor) {
                 if (valor.Activo === true) {
                     $("<option>").attr({ "value": valor.IdRubro }).text(valor.Rubro).appendTo("#cborubro");
@@ -78,6 +81,9 @@ function CargarCodigosID(urlcodigoid) {
         dataType: "json",
         contentType: "application/json; charset=utf-8",
         success: function (data) {
+            $("#cbocodigo").empty();
+            $("#cbostockactual").empty();
+            $("<option>").attr({ "value": "" }).text("Seleccione un Codigo ID").appendTo("#cbocodigo"); // Opción por defecto
             $.each(data.data, function (index, valor) {
                 if (valor.Activo === true) {
                     $("<option>").attr({ "value": valor.IdProducto }).text(valor.CodigoId).appendTo("#cbocodigo");
@@ -116,5 +122,11 @@ function CargarProductosporCI(selectElement) {
         error: function (error) {
             console.log(error)
         },
+    });
+}
+
+function LimpiarCampos() {
+    $('.modal').on('hidden.bs.modal', function (e) {
+        $(this).removeData();
     });
 }

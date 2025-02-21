@@ -24,7 +24,7 @@
                     <th>Proveedor</th>
                     <th>Cantidad</th>
                     <th>Codigo ID</th>
-                    <th>N° de Exp.</th>
+                    <th>N° Exp.</th>
                     <th>Tipo de Ingreso</th>
                     <th>Fecha de ingreso</th>
                     <th>Ultima modificacion</th>
@@ -56,72 +56,73 @@
                     <input id="txtid" type="hidden" value="" />
                     <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
                     <div class="row g-2" id="contenedor">
-                        <div class="col-sm-6">
-                            <label class="form-label">Producto</label>
-                            <select id="cbodetalle" class="form-select ProductosS">
+                            <div class="col-sm-6">
+                                <label class="form-label">Producto</label>
+                                <select id="cbodetalle" class="form-select ProductosS">
                                 <option value="">Seleccione un Producto</option>
-                            </select>
-                        </div>
+                                </select>
+                            </div>
 
-                        <div id="contenedor" class="col-sm-6">
+                            <div id="contenedor" class="col-sm-6">
 
-                            <p class="d-inline-flex gap-1">
-                                <button class="btn btn-outline-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                    Busqueda Avanzada
-                                </button>
-                            </p>
-                            <div class="collapse" id="collapseExample">
-                                <div class="card card-body">
-                                    @Html.Partial("_BusquedaAvan")
+                                <p class="d-inline-flex gap-1">
+                                    <button class="btn btn-outline-success" id="BtnBusqueda" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                        Busqueda Avanzada
+                                    </button>
+                                </p>
+                                <div class="collapse" id="collapseExample">
+                                    <div class="card card-body">
+                                        @Html.Partial("_BusquedaAvan")
+                                    </div>
                                 </div>
+
+
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Stock Actual</label>
+                                <input id="cbostockactual" type="text" class="form-control" style="display: none;" readonly />
                             </div>
 
 
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="form-label">Stock Actual</label>
-                            <input id="cbostockactual" type="text" class="form-control" style="display: none;" readonly />
-                        </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Razon social</label>
+                                <select id="cboproveedores" class="form-select"> </select>
+                            </div>
 
+                            <div class="col-sm-6">
+                                <label for="txtcantidad" class="form-label">Cantidad</label>
+                                <input type="number" class="form-control" id="txtcantidad" min="0" required placeholder="Coloque una cantidad" oninput="this.value.replace(/[^0-9]/g, '');">
+                            </div>
 
-                        <div class="col-sm-6">
-                            <label class="form-label">Razon social</label>
-                            <select id="cboproveedores" class="form-select"> </select>
-                        </div>
+                            <div class="col-sm-6">
+                                <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                                <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
+                            </div>
 
-                        <div class="col-sm-6">
-                            <label for="txtcantidad" class="form-label">Cantidad</label>
-                            <input type="number" class="form-control" id="txtcantidad" min="0" required oninput="this.value.replace(/[^0-9]/g, '');">
-                        </div>
+                            <div class="col-sm-6">
+                                <label for="txtexpediente" class="form-label">N° de Expediente</label>
+                                <input type="text" class="form-control" id="txtexpediente" maxlength="15">
+                            </div>
 
-                        <div class="col-sm-6">
-                            <label for="txtcodigoid" class="form-label">Codigo ID</label>
-                            <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
-                        </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Tipo de Ingreso</label>
+                                <select id="txttipoingreso" class="form-select">
+                                    <option value="">Seleccionar</option>
+                                    <option value="C">Compra</option>
+                                    <option value="D">Devolucion</option>
+                                    <option value="O">Otro</option>
+                                </select>
+                            </div>
 
-                        <div class="col-sm-6">
-                            <label for="txtexpediente" class="form-label">N° de Expediente</label>
-                            <input type="text" class="form-control" id="txtexpediente" maxlength="15">
-                        </div>
+                            <div class="col-sm-6">
+                                <label for="txtfechaingreso" class="form-label">Fecha de Ingreso</label>
+                                <input type="text" class="form-control" id="txtfechaingreso" readonly>
+                            </div>
 
-                        <div class="col-sm-6">
-                            <label class="form-label">Tipo de Ingreso</label>
-                            <select id="txttipoingreso" class="form-select">
-                                <option value="C">Compra</option>
-                                <option value="D">Devolucion</option>
-                                <option value="O">Otro</option>
-                            </select>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <label for="txtfechaingreso" class="form-label">Fecha de Ingreso</label>
-                            <input type="text" class="form-control" id="txtfechaingreso" readonly>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <label for="txtobservaciones" class="form-label">Observaciones</label>
-                            <input type="text" class="form-control" id="txtobservaciones" maxlength="50">
-                        </div>
+                            <div class="col-sm-6">
+                                <label for="txtobservaciones" class="form-label">Observaciones</label>
+                                <input type="text" class="form-control" id="txtobservaciones" maxlength="50">
+                            </div>
                     </div>
                     @*-------------------------Mensaje de alerta-------------------------*@
                     <div class="row mt-12">
@@ -148,6 +149,9 @@
         var tabladata;
         var filaSeleccionada;
         var productos = {};
+
+
+
 
         $(function () {
             var startDate, endDate;
@@ -179,26 +183,20 @@
 
 
         $(document).ready(function () {
-
-            var urlrubros = '@Url.Action("ListarRubros", "Toner")'
-            CargarRubros(urlrubros);
-
-            var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
-            CargarCodigosID(urlcodigoid);
-
+            CargarProductos();
             tabladata = $("#tabla").DataTable({
-                responsive: true,
-                ordering: true,
-                order: [],
-                "ajax": {
-                    url: '@Url.Action("ListarIngresos", "Toner")',
-                    type: "GET",
-                    dataType: "json",
-                },
-                "columns": [
-                    {
-                        "data": "oProductos", "render": function (data) {
-                            return data.Detalle
+               responsive: true,
+               ordering: true,
+               order: [],
+               "ajax": {
+                   url: '@Url.Action("ListarIngresos", "Toner")',
+                   type: "GET",
+                   dataType: "json",
+               },
+               "columns": [
+                   {
+                       "data": "oProductos", "render": function (data) {
+                           return data.Detalle
                         },
                     },
                     {
@@ -236,6 +234,12 @@
                     },
                     { "data": "Observaciones" },
                     { "data": "NombreyApellido" },
+                   {
+                       "data": "NombreyApellido",
+                       "render": function (data) {
+                           return data ? data : '';
+                       },
+                   },
                     {
                         "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>',
                         "orderable": false,
@@ -248,9 +252,25 @@
                     url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json',
                 },
             });
+
+
+            $("#BtnBusqueda").on("click", function () {
+                    var urlrubros = '@Url.Action("ListarRubros", "Toner")'
+                    CargarRubros(urlrubros);
+
+                    var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
+                     CargarCodigosID(urlcodigoid);
+                     LimpiarCampos();
+                $("#cbostockactual").val('');
+            });
+            $('#collapseExample').on('hidden.bs.collapse', function () {
+                CargarProductos();
+                LimpiarCampos();
+                $("#cbostockactual").val('');
+            });
         });
 
-
+               //Listado Proveedores
             jQuery.ajax({
                 url: '@Url.Action("ListarProveedores", "Toner")',
                 type: "GET",
@@ -258,8 +278,7 @@
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cboproveedores");
-
+                    $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cboproveedores");
                     $.each(data.data, function (index, valor) {
                         if (valor.Activo === true) {
                             $("<option>").attr({ "value": valor.IdProveedor }).text(valor.RazonSocial).appendTo("#cboproveedores");
@@ -271,34 +290,28 @@
                 },
             });
 
-        var urlproductos = '@Url.Action("ListarProductos", "Toner")'
-        function CargarProductos(urlproductos) {
+        //Listado Productos
+        function CargarProductos() {
             $.ajax({
-                url: urlproductos,
-                 type: "GET",
-                 data: null,
-                 dataType: "json",
-                 contentType: "application/json; charset=utf-8",
-                 success: function (data) {
-                     //----DETALLE
-                     $('.ProductosS').select2({
-                         dropdownParent: $('#FormModal'),
-                         width: '100%',
-                     });
-                     $("<option>").attr({ "value": "0"}).text("Seleccionar").appendTo("#cbodetalle");
+                url: '@Url.Action("ListarProductos", "Toner")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cbodetalle");
+                    $.each(data.data, function (index, valor) {
+                        if (valor.Activo === true) {
+                            productos[valor.IdProducto] = valor.StockActual;
+                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
+                        }
 
-                     $.each(data.data, function (index, valor) {
-                         if (valor.Activo === true) {
-                             productos[valor.IdProducto] = valor.StockActual;
-                             $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
-                         }
-
-                     });
-                 },
-                 error: function (error) {
-                     console.log(error)
-                 },
-             });
+                    });
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+            });
         }
 
 
@@ -315,12 +328,14 @@
                     Swal.fire({
                         title: "Ya no se puede actualizar/ modificar este registro.",
                         icon: "error",
-                        confirmButtonClass: "btn-primary",
+                        customClass: {
+                            confirmButton: 'btn btn-primary' // Usa customClass para el estilo del botón
+                        },
                         confirmButtonText: "Ok",
                     });
                 } else {
                     $("#txtid").val(json.IdIngreso);
-                    $("#cbodetalle").val(json.oProductos.IdProducto).trigger('change');
+                    $("#cbodetalle").val(json.oProductos.IdProducto);
                     $("#cboproveedores").val(json.oProveedores.IdProveedor);
                     $("#txtcantidad").val(json.Cantidad);
                     $("#txtcodigoid").val(json.CodigoId);
@@ -329,6 +344,8 @@
                     $("#txtfechaingreso").val(json.FechaIngreso).prop("readonly", true)
                     $("#txtobservaciones").val(json.Observaciones);
                     $("#txtusuario").val(@Session["AccesCode"]);
+                    $("#mensajeError").hide();
+
                     $("#FormModal").modal("show");
                 }
             } else {
@@ -349,6 +366,7 @@
                  $("#txtobservaciones").val("");
                  $("#txtusuario").val(@Session["AccesCode"]);
                  $("#mensajeError").hide();
+
 
                  $("#cbodetalle").change(function () {
                      var idProducto = $(this).val();
@@ -386,7 +404,9 @@
                         text: "¿Desea cargar el producto?",
                         icon: "warning",
                         showCancelButton: true,
-                        confirmButtonClass: "btn-primary",
+                        customClass: {
+                            confirmButton: 'btn btn-primary' // Usa customClass para el estilo del botón
+                        },
                         confirmButtonText: "Sí",
                         cancelButtonText: "No",
                         closeOnConfirm: true
@@ -438,8 +458,10 @@
                                             title: "Número de gestión:",
                                             text: data.resultado,
                                             icon: "success",
-                                            confirmButtonClass: "btn-primary",
-                                            confirmButtonText: "Sí",
+                                            customClass: {
+                                                confirmButton: 'btn btn-primary' // Usa customClass para el estilo del botón
+                                            },
+                                            confirmButtonText: "Ok",
                                         });
                                     }, false);
                                     $("#FormModal").modal("hide");
@@ -454,8 +476,8 @@
                                     Ingresos = data.resultado;
                                     tabladata.ajax.reload(function () {
                                         tabladata.row(filaSeleccionada).data(Ingresos).draw(false);
-                                        filaSeleccionada = null;
-                                    }, false);
+                                    filaSeleccionada = null;
+                                    tabladata.ajax.reload();
                                     $("#FormModal").modal("hide");
                                 } else {
                                     $("#mensajeError").text(data.mensaje);

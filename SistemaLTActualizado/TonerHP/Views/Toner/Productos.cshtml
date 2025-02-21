@@ -114,6 +114,12 @@
         var tabladata;
         var filaSeleccionada
 
+
+        $(document).ready(function () { 
+            LimpiarCampos();
+        });
+
+
         tabladata = $("#tabla").DataTable({
             responsive: true,
             ordering: false,
