@@ -114,6 +114,12 @@
         var tabladata;
         var filaSeleccionada
 
+
+        $(document).ready(function () { 
+            LimpiarCampos();
+        });
+
+
         tabladata = $("#tabla").DataTable({
             responsive: true,
             ordering: false,
@@ -280,7 +286,6 @@
                         //PRODUCTO EDITAR
                     else {
                         if (data.resultado) {
-
                             tabladata.row(filaSeleccionada).data(Productos).draw(false);
                             filaSeleccionada = null;
                             $("#FormModal").modal("hide");
