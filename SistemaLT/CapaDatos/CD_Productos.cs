@@ -38,8 +38,14 @@ namespace CapaDatos
                             lista.Add(new Productos()
                             {
                                 IdProducto = Convert.ToInt32(rdr["IdProducto"]),
-                                oRubros = new Rubros() { IdRubro = Convert.ToInt32(rdr["IdRubro"]), Rubro = rdr["Rubro"].ToString() },
-                                oTipos = new Tipos() { IdTipo = Convert.ToInt32(rdr["IdTipo"]), Tipo = rdr["Tipo"].ToString() },
+                                oRubros = new Rubros() { 
+                                    IdRubro = Convert.ToInt32(rdr["IdRubro"]),
+                                    Rubro = rdr["Rubro"].ToString() 
+                                },
+                                oTipos = new Tipos() { 
+                                    IdTipo = Convert.ToInt32(rdr["IdTipo"]), 
+                                    Tipo = rdr["Tipo"].ToString() 
+                                },
                                 Detalle = rdr["Detalle"].ToString(),
                                 StockMinimo = Convert.ToInt32(rdr["StockMinimo"]),
                                 StockActual = Convert.ToInt32(rdr["StockActual"]),

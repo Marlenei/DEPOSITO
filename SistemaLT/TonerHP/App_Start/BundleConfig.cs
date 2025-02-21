@@ -12,6 +12,7 @@ namespace TonerHP
                         "~/Scripts/jquery-{version}.js"));
             bundles.Add(new ScriptBundle("~/bundles/complementos").Include(
                         "~/Scripts/fontawesome/all.min.js",
+                        //"~/Scripts/dataTables.min.js",
                         "~/Scripts/DataTables/jquery.dataTables.js",
                         "~/Scripts/DataTables/jdataTables.responsive.js",
                         "~/Scripts/loadingoverlay/loadingoverlay.min.js",
@@ -20,7 +21,8 @@ namespace TonerHP
                         "~/Scripts/jquery-ui.js",
                         "~/Scripts/moment.js",
                         "~/Scripts/scripts.js",
-                        "~/Scripts/select2.min.js",
+                        "~/Scripts/chosen.jquery.min.js",
+                        //"~/Scripts/select2.min.js",
                         "~/Scripts/daterangepicker.min.js"
 
 
@@ -39,13 +41,14 @@ namespace TonerHP
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/site.css",
+                      //"~/Content/dataTables.dataTables.min.css",
                       "~/Content/DataTables/css/jquery.dataTables.css",
                       "~/Content/DataTables/css/responsive.dataTables.css",
                       "~/Content/images",
                       "~/Content/sweetalert2.min.css",
                       "~/Content/jquery-ui.min.css",
                       "~/Content/bootstrap.css",
-                      "~/Content/select2.min.css",
+                      "~/Content/chosen.min.css",
                       "~/Content/daterangepicker.css"
                       ));
         }
