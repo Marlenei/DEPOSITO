@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+using static System.Net.WebRequestMethods;
 
 namespace TonerHP.Controllers
 {
@@ -21,6 +22,11 @@ namespace TonerHP.Controllers
         {
             _httpClient = new HttpClient();
             _httpClient.Timeout = TimeSpan.FromSeconds(30);
+        }
+
+        public UsuarioController(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
         }
 
         public ActionResult Login()
@@ -36,23 +42,29 @@ namespace TonerHP.Controllers
 
             try
             {
-                // 1. Autenticación inicial
                 var authResult = await AutenticarUsuario(acceso);
                 if (!authResult.Success) return View(acceso);
 
-                // 2. Obtener datos completos del usuario
                 var datosUsuario = await ObtenerDatosUsuario(acceso.usuario, authResult.UserId);
                 if (datosUsuario == null) return View(acceso);
 
-                // 3. Obtener y validar permisos
                 var permisos = await ObtenerPermisosUsuario(datosUsuario.CodigoUnico);
                 if (!ValidarPermisos(permisos)) return View(acceso);
 
-                // 4. Configurar sesión y autenticación
                 ConfigurarSesion(datosUsuario, authResult.UserId, permisos);
                 FormsAuthentication.SetAuthCookie(acceso.usuario, false);
 
                 return RedirectToAction("Index", "Home");
+            }
+            catch (HttpRequestException ex)
+            {
+                ModelState.AddModelError("", $"Error de conexión: {ex.Message}");
+                return View(acceso);
+            }
+            catch (JsonException ex)
+            {
+                ModelState.AddModelError("", $"Error en formato de datos: {ex.Message}");
+                return View(acceso);
             }
             catch (Exception ex)
             {
@@ -64,7 +76,6 @@ namespace TonerHP.Controllers
         private async Task<AuthResult> AutenticarUsuario(Acceso acceso)
         {
             var result = new AuthResult();
-
             var response = await _httpClient.PostAsync(
                 $"{ApiBaseUrl}api/access/loginuser",
                 new StringContent(JsonConvert.SerializeObject(acceso), Encoding.UTF8, "application/json"));
@@ -92,9 +103,7 @@ namespace TonerHP.Controllers
         private async Task<UsuarioDatos> ObtenerDatosUsuario(string UserId, int CodigoUnico)
         {
             var response = await _httpClient.GetAsync(
-                $"{ApiBaseUrl}home/buscardatosdelusuario?" +
-                $"usuario={HttpUtility.UrlEncode(UserId)}&" +
-                $"codigounico={CodigoUnico}");
+                $"{ApiBaseUrl}home/buscardatosdelusuario?usuario={HttpUtility.UrlEncode(UserId)}&codigounico={CodigoUnico}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -104,13 +113,23 @@ namespace TonerHP.Controllers
 
             var content = await response.Content.ReadAsStringAsync();
             var datos = JsonConvert.DeserializeObject<List<UsuarioDatos>>(content);
-
             var datosUsuario = datos?.FirstOrDefault();
-            //if (datosUsuario?.CodigoArea <= 0 || datosUsuario?.CodigoSector <= 0)
+
+            if (datosUsuario == null)
+                
             //{
             //    ModelState.AddModelError("", "Configuración de área/sector inválida");
             //    return null;
             //}
+            try
+            {
+                datosUsuario.ConvertirCampos();
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return null;
+            }
 
             return datosUsuario;
         }
@@ -138,16 +157,23 @@ namespace TonerHP.Controllers
                 ModelState.AddModelError("", "No tiene los permisos necesarios");
                 return false;
             }
+
+            //if (Session["CodigoArea"] == null || Session["CodigoSector"] == null)
+            //{
+            //    ModelState.AddModelError("", "El usuario no tiene área/sector configurado");
+            //    return false;
+            //}
+
             return true;
         }
 
         private void ConfigurarSesion(UsuarioDatos datosUsuario, int accessCode, List<Permiso> permisos)
         {
             Session["CodigoUnico"] = datosUsuario.CodigoUnico;
-            Session["CodigoArea"] = datosUsuario.CodigoArea;
+            Session["CodigoArea"] = datosUsuario.CodigoArea; // Usar valores convertidos
             Session["CodigoSector"] = datosUsuario.CodigoSector;
-            Session["NombreArea"] = datosUsuario.NombreArea;
-            Session["NombreSector"] = datosUsuario.NombreSector;
+            Session["NombreArea"] = datosUsuario.NombreArea ?? "Área no asignada";
+            Session["NombreSector"] = datosUsuario.NombreSector ?? "Sector no asignado";
             Session["AccesCode"] = accessCode;
             Session["PermissionsCode"] = permisos;
         }
@@ -159,7 +185,6 @@ namespace TonerHP.Controllers
             return RedirectToAction("Login", "Usuario");
         }
 
-        // Clases auxiliares
         private class AuthResult
         {
             public bool Success { get; set; }
@@ -169,7 +194,24 @@ namespace TonerHP.Controllers
         [Authorize]
         public async Task<ActionResult> ActualizarDatosSesion()
         {
-            var datosUsuario = await ObtenerDatosUsuario(User.Identity.Name, (int)Session["CodigoUnico"]);
+            if (Session["CodigoUnico"] == null || Session["AccesCode"] == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var datosUsuario = await ObtenerDatosUsuario(
+                User.Identity.Name,
+                (int)Session["CodigoUnico"]
+            );
+
+            if (datosUsuario.CodigoArea != (int)Session["CodigoArea"] ||
+                datosUsuario.CodigoSector != (int)Session["CodigoSector"])
+            {
+                FormsAuthentication.SignOut();
+                Session.Abandon();
+                return RedirectToAction("Login");
+            }
+
             ConfigurarSesion(datosUsuario, (int)Session["AccesCode"], (List<Permiso>)Session["PermissionsCode"]);
             return Redirect(Request.UrlReferrer?.ToString() ?? Url.Action("Index", "Home"));
         }

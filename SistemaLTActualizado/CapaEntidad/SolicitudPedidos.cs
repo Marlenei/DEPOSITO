@@ -31,32 +31,7 @@ namespace CapaEntidad
         public bool Visado { get; set; }
         public int UsuarioVisado { get; set; }
     }
-    //public class UsuarioDatos
-    //{
-    //    public int CodigoUnico { get; set; }
-    //    //public string NombreYApellido { get; set; }
-    //    //public string Usuario { get; set; }
-    //    public int CodigoArea { get; set; } // Asegurar que coincida con la API
-    //    public int CodigoSector { get; set; }
-    //}
-
-
-    //public class Area
-    //{
-    //    public int CodigoArea { get; set; }
-    //    public string NombreArea { get; set; }
-    //    public string CorreoElectronico { get; set; }
-    //    public bool Activo { get; set; }
-    //}
-
-    //public class Sector
-    //{
-    //    public int CodigoSector { get; set; }
-    //    public string Nombre { get; set; }
-    //    public int CodigoArea { get; set; } // Relación con área
-    //    public bool Activo { get; set; }
-    //}
-
+   
 }
 
 

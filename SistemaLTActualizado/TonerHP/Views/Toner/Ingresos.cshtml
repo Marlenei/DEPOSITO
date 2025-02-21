@@ -59,6 +59,7 @@
                             <div class="col-sm-6">
                                 <label class="form-label">Producto</label>
                                 <select id="cbodetalle" class="form-select ProductosS">
+                                <option value="">Seleccione un Producto</option>
                                 </select>
                             </div>
 
@@ -179,6 +180,8 @@
                 }
             );
         });
+
+
         $(document).ready(function () {
             CargarProductos();
             tabladata = $("#tabla").DataTable({
@@ -230,6 +233,7 @@
                         },
                     },
                     { "data": "Observaciones" },
+                    { "data": "NombreyApellido" },
                    {
                        "data": "NombreyApellido",
                        "render": function (data) {
@@ -309,7 +313,10 @@
                 },
             });
         }
+
+
         function abrirModal(json) {
+            CargarProductos(urlproductos);
             if (json != null) {
                 var fechaActMatch = json.FechaAct.match(/\/Date\((\d+)\)\//);
                 var timestamp = parseInt(fechaActMatch[1], 10);
@@ -414,6 +421,7 @@
 
             })
         function Guardar() {
+
                 var Ingresos = {
                     IdIngreso: $("#txtid").val(),
                     oProductos: {
@@ -465,6 +473,8 @@
                             //INGRESO EDITAR
                             else {
                                 if (data.resultado) {
+                                    Ingresos = data.resultado;
+                                    tabladata.ajax.reload(function () {
                                         tabladata.row(filaSeleccionada).data(Ingresos).draw(false);
                                     filaSeleccionada = null;
                                     tabladata.ajax.reload();
