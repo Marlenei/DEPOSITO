@@ -10,6 +10,7 @@ using System.Text;
 using System.Web;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Globalization;
 
 namespace CapaDatos
 {
@@ -74,68 +75,81 @@ namespace CapaDatos
 
 
 
-        public int Registrar(SolicitudPedidos obj)
+        public int Registrar(SolicitudPedidos obj, out string NroPedidoGenerado)
         {
             int idautogenerado = 0;
+            NroPedidoGenerado = string.Empty;
 
             try
             {
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
-                    SqlCommand cmd = new SqlCommand("T_RegistrarP", oconexion);
-                    cmd.Parameters.AddWithValue("@IdProducto", obj.oProductos.IdProducto);
-                    cmd.Parameters.AddWithValue("@CantidadPedida", obj.CantidadPedida);
-                    cmd.Parameters.AddWithValue("@CantidadEntregada", (object)obj.CantidadEntregada ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("FechaPedido", Convert.ToDateTime(obj.FechaPedido));
-                    cmd.Parameters.AddWithValue("FechaEntrega", Convert.ToDateTime(obj.FechaEntrega));
-                    cmd.Parameters.AddWithValue("@IdUsuarioPedido", obj.IdUsuarioPedido);
-                    cmd.Parameters.AddWithValue("@CodigoArea", obj.CodigoArea);
-                    cmd.Parameters.AddWithValue("@CodigoSector", obj.CodigoSector);
-                    cmd.Parameters.AddWithValue("@IdUsuarioEntrega", (object)obj.IdUsuarioEntrega ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Observaciones", (object)obj.Observaciones ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@NroPedido", (object)obj.NroPedido ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Visado", obj.Visado);
-                    cmd.Parameters.AddWithValue("@UsuarioVisado", (object)obj.UsuarioVisado ?? DBNull.Value);
-
-                    SqlParameter paramResult = cmd.Parameters.Add("@Resultado", SqlDbType.Int);
-                    paramResult.Direction = ParameterDirection.Output;
-
-                    cmd.CommandType = CommandType.StoredProcedure;
-
                     oconexion.Open();
-                    cmd.ExecuteNonQuery();
 
-                    idautogenerado = Convert.ToInt32(paramResult.Value);
+                    // Generar número de pedido
+                    using (SqlCommand cmdComprobante = new SqlCommand("Act_ComprobanteDP", oconexion))
+                    {
+                        cmdComprobante.CommandType = CommandType.StoredProcedure;
+                        SqlParameter paramNcom = new SqlParameter("@pNcom", SqlDbType.VarChar, 15);
+                        paramNcom.Direction = ParameterDirection.Output;
+                        cmdComprobante.Parameters.Add(paramNcom);
+                        cmdComprobante.ExecuteNonQuery();
+                        NroPedidoGenerado = paramNcom.Value.ToString();
+                        obj.NroPedido = NroPedidoGenerado;
+                    }
+
+                    // Paso 2: Registrar el pedido
+                    using (SqlCommand cmd = new SqlCommand("T_RegistrarP", oconexion))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@IdProducto", obj.oProductos.IdProducto);
+                        cmd.Parameters.AddWithValue("@CantidadPedida", obj.CantidadPedida);
+                        cmd.Parameters.AddWithValue("@CantidadEntregada", (object)obj.CantidadEntregada ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@FechaPedido", DateTime.ParseExact(
+                            obj.FechaPedido,
+                            "yyyy-MM-dd HH:mm:ss",
+                            CultureInfo.InvariantCulture
+                        ));
+
+                        if (!string.IsNullOrEmpty(obj.FechaEntrega))
+                        {
+                            cmd.Parameters.AddWithValue("@FechaEntrega", DateTime.ParseExact(
+                                obj.FechaEntrega,
+                                "yyyy-MM-dd HH:mm:ss",
+                                CultureInfo.InvariantCulture
+                            ));
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@FechaEntrega", DBNull.Value);
+                        }
+                        cmd.Parameters.AddWithValue("@IdUsuarioPedido", obj.IdUsuarioPedido);
+                        cmd.Parameters.AddWithValue("@CodigoArea", obj.CodigoArea);
+                        cmd.Parameters.AddWithValue("@CodigoSector", obj.CodigoSector);
+                        cmd.Parameters.AddWithValue("@IdUsuarioEntrega", (object)obj.IdUsuarioEntrega ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Observaciones", (object)obj.Observaciones ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@NroPedido", obj.NroPedido);
+                        cmd.Parameters.AddWithValue("@Visado", obj.Visado);
+                        cmd.Parameters.AddWithValue("@UsuarioVisado", (object)obj.UsuarioVisado ?? DBNull.Value);
+
+                        SqlParameter paramResult = new SqlParameter("@Resultado", SqlDbType.Int);
+                        paramResult.Direction = ParameterDirection.Output;
+                        cmd.Parameters.Add(paramResult);
+
+                        cmd.ExecuteNonQuery();
+                        idautogenerado = Convert.ToInt32(paramResult.Value);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error al registrar solicitud: {ex.Message}", ex);
             }
+
             return idautogenerado;
         }
 
-        ////public async Task<UsuarioDatos> ObtenerDatosUsuario(string usuario, int codigoUnico)
-        ////{
-        ////    try
-        ////    {
-        ////        var response = await _httpClient.GetAsync($"http://10.4.51.49/SI_Apis/home/buscardatosdelusuario?usuario={HttpUtility.UrlEncode(usuario)}&codigounico={codigoUnico}");
 
-        ////        if (response.IsSuccessStatusCode)
-        ////        {
-        ////            var responseJson = await response.Content.ReadAsStringAsync();
-        ////            return JsonConvert.DeserializeObject<UsuarioDatos>(responseJson);
-        ////        }
-        ////        else
-        ////        {
-        ////            throw new Exception("Error al obtener datos del usuario.");
-        ////        }
-        ////    }
-        ////    catch (Exception ex)
-        ////    {
-        ////        throw new Exception($"Error en la llamada a la API: {ex.Message}", ex);
-        ////    }
-        //}
         public bool Editar(SolicitudPedidos obj, out string Mensaje)
         {
             bool resultado = false;
@@ -173,39 +187,29 @@ namespace CapaDatos
             }
             return resultado;
         }
-        
+
         // Método para obtener áreas
- 
-        public List<UsuarioDatos> ObtenerAreas() // Cambiar el nombre y retorno a List<Area>
+
+        public List<UsuarioDatos> ObtenerAreas()
         {
             List<UsuarioDatos> areas = new List<UsuarioDatos>();
-            try
+            using (SqlConnection connection = new SqlConnection(Conexion.cn))
             {
-                using (SqlConnection connection = new SqlConnection(Conexion.cn))
+                // Especifica la base de datos: [NombreBaseDatos].[dbo].[SP]
+                SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Areas]", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                connection.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    // Usar el nombre del procedimiento almacenado
-                    SqlCommand command = new SqlCommand("Mio_Listado_Areas", connection);
-                    command.CommandType = CommandType.StoredProcedure; // Indicar que es un SP
-
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        areas.Add(new UsuarioDatos
                         {
-                            areas.Add(new UsuarioDatos() // Asignar propiedades según el SP
-                            {
-                                CodigoArea = reader.GetInt32(0),
-                                NombreArea = reader.GetString(1),
-                              
-                               
-                            });
-                        }
+                            CodigoArea = Convert.ToInt32(reader["CodigoArea"]),
+                            NombreArea = reader["NombreArea"].ToString()
+                        });
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error al obtener áreas: {ex.Message}", ex);
             }
             return areas;
         }
@@ -214,33 +218,27 @@ namespace CapaDatos
         public List<UsuarioDatos> ObtenerSectoresPorArea(int codigoArea)
         {
             List<UsuarioDatos> sectores = new List<UsuarioDatos>();
-            try
+            using (SqlConnection connection = new SqlConnection(Conexion.cn))
             {
-                using (SqlConnection connection = new SqlConnection(Conexion.cn))
-                {
-                    // Usar el nombre del procedimiento almacenado
-                    SqlCommand command = new SqlCommand("Mio_Listado_Sectores", connection);
-                    command.CommandType = CommandType.StoredProcedure; // Indicar que es un SP
-                    command.Parameters.AddWithValue("@CodigoArea", codigoArea);
+                // 1. Especificar la base de datos externa: [AHS].[dbo].[Mio_Listado_Sectores]
+                SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Sectores]", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CodigoArea", codigoArea);
 
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                connection.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        sectores.Add(new UsuarioDatos
                         {
-                            sectores.Add(new UsuarioDatos
-                            {
-                                CodigoSector = reader.GetInt32(0),
-                                NombreSector = reader.GetString(1),
-                                CodigoArea = codigoArea // Asignar el código de área desde el parámetro
-                            });
-                        }
+                            // 2. Asegurar que los nombres de las columnas coincidan con el SP
+                            CodigoSector = Convert.ToInt32(reader["CodigoSector"]),
+                            NombreSector = reader["NombreSector"].ToString(), // Nombre exacto de la columna
+                            CodigoArea = Convert.ToInt32(reader["CodigoArea"])
+                        });
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error al obtener sectores: {ex.Message}", ex);
             }
             return sectores;
         }
