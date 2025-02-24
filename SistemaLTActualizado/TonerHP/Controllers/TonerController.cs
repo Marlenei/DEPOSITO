@@ -327,92 +327,89 @@ namespace TonerHP.Controllers
             return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
-        public JsonResult GuardarPedidos(SolicitudPedidos objeto)
+        public JsonResult GuardarPedidos(SolicitudPedidos objeto, CN_SolicitudPedidos _cnSolicitudPedidos)
         {
             try
             {
-                // Validaciones básicas
+                // Validación básica del objeto
                 if (objeto == null)
                 {
-                    return Json(new { resultado = false, mensaje = "No se recibieron datos del pedido" }, JsonRequestBehavior.AllowGet);
+                    return Json(new { resultado = false, mensaje = "No se recibieron datos del pedido" });
                 }
 
-                // Validar campos requeridos
+                // Validar sesión activa
+                if (Session["CodigoArea"] == null || Session["CodigoSector"] == null)
+                {
+                    return Json(new { resultado = false, mensaje = "Sesión expirada. Vuelva a iniciar sesión" });
+                }
+
+                // Asignar códigos desde la sesión
+                objeto.CodigoArea = (int)Session["CodigoArea"];
+                objeto.CodigoSector = (int)Session["CodigoSector"];
+
+                // Validaciones de negocio
                 if (objeto.CantidadPedida <= 0)
                 {
-                    return Json(new { resultado = false, mensaje = "La cantidad pedida debe ser mayor a 0" }, JsonRequestBehavior.AllowGet);
+                    return Json(new { resultado = false, mensaje = "La cantidad pedida debe ser mayor a 0" });
                 }
 
-                // Establecer fechas
-                if (objeto.IdSolicitud == 0) // Es un nuevo registro
+                if (objeto.oProductos?.IdProducto == 0)
                 {
-                    //objeto.FechaPedido = DateTime.Now;
-                    if (objeto.CantidadEntregada > 0) // Si hay cantidad entregada
+                    return Json(new { resultado = false, mensaje = "Seleccione un producto válido" });
+                }
+
+                // Lógica de fechas
+                if (objeto.IdSolicitud == 0) // Nuevo pedido
+                {
+                    objeto.FechaPedido = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                    if (objeto.CantidadEntregada > 0)
                     {
-                        //objeto.FechaEntrega = DateTime.Now;
+                        objeto.FechaEntrega = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                     }
                 }
 
-                // Variable para el resultado
-                object resultado;
                 string mensaje = string.Empty;
+                string nroPedidoGenerado = string.Empty;
+                bool resultadoOperacion;
 
-                // Registrar o editar según corresponda
+                // Registrar o Editar
                 if (objeto.IdSolicitud == 0)
                 {
                     System.Diagnostics.Debug.WriteLine("Registrando nuevo pedido...");
-                    resultado = new CN_SolicitudPedidos().Registrar(objeto, out mensaje);
+                    int idGenerado = _cnSolicitudPedidos.Registrar(objeto, out mensaje, out nroPedidoGenerado);
+                    resultadoOperacion = idGenerado > 0;
 
-                    if (resultado != null && Convert.ToInt32(resultado) > 0)
+                    if (resultadoOperacion)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Pedido registrado exitosamente. ID: {resultado}");
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Error al registrar pedido: {mensaje}");
+                        System.Diagnostics.Debug.WriteLine($"Pedido registrado. ID: {idGenerado}, Nro: {nroPedidoGenerado}");
+                        objeto.NroPedido = nroPedidoGenerado; // Asignar número generado
                     }
                 }
                 else
                 {
                     System.Diagnostics.Debug.WriteLine($"Editando pedido ID: {objeto.IdSolicitud}");
-                    resultado = new CN_SolicitudPedidos().Editar(objeto, out mensaje);
-
-                    if (Convert.ToBoolean(resultado))
-                    {
-                        System.Diagnostics.Debug.WriteLine("Pedido editado exitosamente");
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Error al editar pedido: {mensaje}");
-                    }
-                }
-
-                // Validar el resultado antes de devolverlo
-                if (resultado == null)
-                {
-                    return Json(new
-                    {
-                        resultado = false,
-                        mensaje = "Error al procesar la solicitud"
-                    }, JsonRequestBehavior.AllowGet);
+                    resultadoOperacion = _cnSolicitudPedidos.Editar(objeto, out mensaje);
                 }
 
                 return Json(new
                 {
-                    resultado = resultado,
-                    mensaje = string.IsNullOrEmpty(mensaje) ? "Operación exitosa" : mensaje
-                }, JsonRequestBehavior.AllowGet);
+                    resultado = resultadoOperacion,
+                    mensaje = resultadoOperacion ? "Operación exitosa" : mensaje,
+                    nroPedido = nroPedidoGenerado // Devolver número generado
+                });
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error en GuardarPedidos: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error crítico: {ex.ToString()}");
                 return Json(new
                 {
                     resultado = false,
-                    mensaje = "Se produjo un error al procesar la solicitud: " + ex.Message
-                }, JsonRequestBehavior.AllowGet);
+                    mensaje = $"Error interno: {ex.Message}"
+                });
             }
         }
-#endregion
+
+        #endregion
     }
 }
