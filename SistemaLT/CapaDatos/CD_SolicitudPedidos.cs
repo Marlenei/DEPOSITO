@@ -53,7 +53,7 @@ namespace CapaDatos
                                 FechaPedido = Convert.ToString(rdr["FechaPedido"]),
                                 FechaEntrega = Convert.ToString(rdr["FechaEntrega"]),
                                 IdUsuarioPedido = Convert.ToInt32(rdr["IdUsuarioPedido"]),
-                                //FechaHoraActualizacion = Convert.ToDateTime(rdr["FechaHoraActualizacion"]),
+                                FechaHoraActualizacion = Convert.ToDateTime(rdr["FechaHoraActualizacion"]),
                                 CodigoArea = Convert.ToInt32(rdr["CodigoArea"]),
                                 CodigoSector = Convert.ToInt32(rdr["CodigoSector"]),
                                 IdUsuarioEntrega = rdr["IdUsuarioEntrega"] != DBNull.Value ? Convert.ToInt32(rdr["IdUsuarioEntrega"]) : 0,
@@ -72,6 +72,7 @@ namespace CapaDatos
             }
             return lista;
         }
+
 
 
 
@@ -188,60 +189,59 @@ namespace CapaDatos
             return resultado;
         }
 
-        // Método para obtener áreas
 
-        public List<UsuarioDatos> ObtenerAreas()
-        {
-            List<UsuarioDatos> areas = new List<UsuarioDatos>();
-            using (SqlConnection connection = new SqlConnection(Conexion.cn))
-            {
-                // Especifica la base de datos: [NombreBaseDatos].[dbo].[SP]
-                SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Areas]", connection);
-                cmd.CommandType = CommandType.StoredProcedure;
-                connection.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        areas.Add(new UsuarioDatos
-                        {
-                            CodigoArea = Convert.ToInt32(reader["CodigoArea"]),
-                            NombreArea = reader["NombreArea"].ToString()
-                        });
-                    }
-                }
-            }
-            return areas;
-        }
+        // Método para obtener áreas
+        //public List<UsuarioDatos> ObtenerAreas(int codArea)
+        //{
+        //    List<UsuarioDatos> areas = new List<UsuarioDatos>();
+        //    using (SqlConnection connection = new SqlConnection(Conexion.cn))
+        //    {
+        //        SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Areas]", connection);
+        //        cmd.CommandType = CommandType.StoredProcedure;
+        //        cmd.Parameters.AddWithValue("@CodArea", codArea);
+
+        //        connection.Open();
+        //        using (SqlDataReader reader = cmd.ExecuteReader())
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                areas.Add(new UsuarioDatos
+        //                {
+        //                    CodArea = Convert.ToInt32(reader["CodigoArea"]),
+        //                    NombreArea = reader["NombreArea"].ToString()
+        //                });
+        //            }
+        //        }
+        //    }
+        //    return areas;
+        //}
 
         // Método para obtener sectores por código de área
-        public List<UsuarioDatos> ObtenerSectoresPorArea(int codigoArea)
-        {
-            List<UsuarioDatos> sectores = new List<UsuarioDatos>();
-            using (SqlConnection connection = new SqlConnection(Conexion.cn))
-            {
-                // 1. Especificar la base de datos externa: [AHS].[dbo].[Mio_Listado_Sectores]
-                SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Sectores]", connection);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CodigoArea", codigoArea);
+        //public List<UsuarioDatos> ObtenerSectoresPorArea(int codigoArea)
+        //{
+        //    List<UsuarioDatos> sectores = new List<UsuarioDatos>();
+        //    using (SqlConnection connection = new SqlConnection(Conexion.cn))
+        //    {
+        //        SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Sectores]", connection);
+        //        cmd.CommandType = CommandType.StoredProcedure;
+        //        cmd.Parameters.AddWithValue("@CodigoArea", codigoArea);
 
-                connection.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        sectores.Add(new UsuarioDatos
-                        {
-                            // 2. Asegurar que los nombres de las columnas coincidan con el SP
-                            CodigoSector = Convert.ToInt32(reader["CodigoSector"]),
-                            NombreSector = reader["NombreSector"].ToString(), // Nombre exacto de la columna
-                            CodigoArea = Convert.ToInt32(reader["CodigoArea"])
-                        });
-                    }
-                }
-            }
-            return sectores;
-        }
+        //        connection.Open();
+        //        using (SqlDataReader reader = cmd.ExecuteReader())
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                sectores.Add(new UsuarioDatos
+        //                {
+        //                    CodSector = Convert.ToInt32(reader["CodigoSector"]),
+        //                    NombreSector = reader["NombreSector"].ToString(),
+        //                    CodArea = Convert.ToInt32(reader["CodigoArea"])
+        //                });
+        //            }
+        //        }
+        //    }
+        //    return sectores;
+        //}
 
 
     }
