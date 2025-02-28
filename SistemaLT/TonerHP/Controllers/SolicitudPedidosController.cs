@@ -17,64 +17,68 @@ namespace TonerHP.Controllers
 {
     public class SolicitudPedidosController : Controller
     {
-        private readonly CD_SolicitudPedidos _cdSolicitudPedidos;
+        private readonly CN_SolicitudPedidos _cnPedidos = new CN_SolicitudPedidos();
 
-        // Constructor sin parámetros (requerido por ASP.NET MVC)
-        public SolicitudPedidosController()
+        public ActionResult Index()
         {
-            _cdSolicitudPedidos = new CD_SolicitudPedidos();
-        }
+            // Obtener códigos de sesión
+            var codArea = Session["CodArea"] as int? ?? 0;
+            var codSector = Session["CodSector"] as int? ?? 0;
 
-        // Constructor con parámetros (para inyección de dependencias si es necesario)
-        public SolicitudPedidosController(CD_SolicitudPedidos cdSolicitudPedidos)
-        {
-            _cdSolicitudPedidos = cdSolicitudPedidos;
-        }
-
-
-        [HttpGet]
-        [Authorize]
-        public ActionResult SolicitudPedidos()
-        {
-            // Obtener áreas desde la capa de datos
-            var listaAreas = _cdSolicitudPedidos.ObtenerAreas();
-            ViewBag.Areas = listaAreas;
-
-            // Obtener sectores del usuario actual
-            int codigoAreaUsuario = (int)Session["CodigoArea"];
-            var listaSectores = _cdSolicitudPedidos.ObtenerSectoresPorArea(codigoAreaUsuario);
-            ViewBag.Sectores = listaSectores;
+            // Obtener nombres actualizados
+            ViewBag.NombreArea = _cnPedidos.ObtenerNombreArea(codArea);
+            ViewBag.NombreSector = _cnPedidos.ObtenerNombreSector(codArea, codSector);
 
             return View();
         }
 
-        [HttpGet]
-        public JsonResult ObtenerAreas()
-        {
-            try
-            {
-                var areas = _cdSolicitudPedidos.ObtenerAreas();
-                return Json(new { data = areas }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
-        }
 
-        [HttpPost]
-        public JsonResult ObtenerSectoresPorArea(int codigoArea)
-        {
-            try
-            {
-                var sectores = _cdSolicitudPedidos.ObtenerSectoresPorArea(codigoArea);
-                return Json(new { data = sectores });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { error = ex.Message });
-            }
-        }
+        //[HttpGet]
+        //[Authorize]
+        //public ActionResult SolicitudPedidos()
+        //{
+        //    // Obtener áreas desde la capa de datos
+        //    var listaAreas = _cdSolicitudPedidos.ObtenerAreas();
+        //    ViewBag.Areas = listaAreas;
+
+        //    // Obtener sectores del usuario actual
+        //    int codigoAreaUsuario = (int)Session["CodigoArea"];
+        //    var listaSectores = _cdSolicitudPedidos.ObtenerSectoresPorArea(codigoAreaUsuario);
+        //    ViewBag.Sectores = listaSectores;
+
+        //    return View();
+        //}
+
+
+
+        //[HttpGet]
+        //public JsonResult ObtenerAreas()
+        //{
+        //    try
+        //    {
+        //        var areas = _cdSolicitudPedidos.ObtenerAreas();
+        //        return Json(new { data = areas }, JsonRequestBehavior.AllowGet);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { error = ex.Message }, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
+
+        //[HttpPost]
+        //public JsonResult ObtenerSectoresPorArea(int codigoArea)
+        //{
+        //    try
+        //    {
+        //        var sectores = _cdSolicitudPedidos.ObtenerSectoresPorArea(codigoArea);
+        //        return Json(new { data = sectores });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { error = ex.Message });
+        //    }
+        //}
+
 
         [HttpGet]
         public JsonResult GenerarNumeroPedido()

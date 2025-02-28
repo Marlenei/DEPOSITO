@@ -2,6 +2,9 @@
 using CapaEntidad;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -89,14 +92,98 @@ namespace CapaNegocio
             }
         }
 
-        public List<UsuarioDatos> ObtenerAreas()
+        public string ObtenerNombreArea(int codArea)
         {
-            return objCapaDato.ObtenerAreas();
+            using (SqlConnection connection = new SqlConnection(Conexion.cn))
+            {
+                SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Areas]", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CodigoArea", codArea);
+
+                connection.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return reader["NombreArea"].ToString();
+                    }
+                }
+                return "Área no definida";
+            }
+        }
+
+        public string ObtenerNombreSector(int codArea, int codSector)
+        {
+            using (SqlConnection connection = new SqlConnection(Conexion.cn))
+            {
+                SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Sectores]", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CodigoArea", codArea); // Solo este parámetro
+
+                connection.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (Convert.ToInt32(reader["CodigoSector"]) == codSector)
+                        {
+                            return reader["NombreSector"].ToString();
+                        }
+                    }
+                }
+            }
+            return "Sector no definido";
+        }
+
+        public List<UsuarioDatos> ObtenerAreas(int codArea)
+        {
+            List<UsuarioDatos> areas = new List<UsuarioDatos>();
+            using (SqlConnection connection = new SqlConnection(Conexion.cn))
+            {
+                SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Areas]", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CodigoArea", codArea);
+
+                connection.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        areas.Add(new UsuarioDatos
+                        {
+                            CodArea = Convert.ToInt32(reader["CodigoArea"]),
+                            NombreArea = reader["NombreArea"].ToString()
+                        });
+                    }
+                }
+            }
+            return areas;
         }
 
         public List<UsuarioDatos> ObtenerSectoresPorArea(int codigoArea)
         {
-            return objCapaDato.ObtenerSectoresPorArea(codigoArea);
+            List<UsuarioDatos> sectores = new List<UsuarioDatos>();
+            using (SqlConnection connection = new SqlConnection(Conexion.cn))
+            {
+                SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Sectores]", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CodigoArea", codigoArea);
+
+                connection.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        sectores.Add(new UsuarioDatos
+                        {
+                            CodSector = Convert.ToInt32(reader["CodigoSector"]),
+                            NombreSector = reader["NombreSector"].ToString(),
+                            CodArea = Convert.ToInt32(reader["CodigoArea"])
+                        });
+                    }
+                }
+            }
+            return sectores;
         }
     }
 }

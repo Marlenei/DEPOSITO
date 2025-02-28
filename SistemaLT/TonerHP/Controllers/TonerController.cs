@@ -332,6 +332,7 @@ namespace TonerHP.Controllers
             oLista = new CN_SolicitudPedidos().Listar();
             return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
         }
+
         [HttpPost]
         public JsonResult GuardarPedidos(SolicitudPedidos objeto, CN_SolicitudPedidos _cnSolicitudPedidos)
         {
@@ -343,15 +344,15 @@ namespace TonerHP.Controllers
                     return Json(new { resultado = false, mensaje = "No se recibieron datos del pedido" });
                 }
 
-                // Validar sesión activa
-                if (Session["CodigoArea"] == null || Session["CodigoSector"] == null)
-                {
-                    return Json(new { resultado = false, mensaje = "Sesión expirada. Vuelva a iniciar sesión" });
-                }
+                //// Validar sesión activa
+                //if (Session["CodigoArea"] == null || Session["CodigoSector"] == null)
+                //{
+                //    return Json(new { resultado = false, mensaje = "Sesión expirada. Vuelva a iniciar sesión" });
+                //}
 
                 // Asignar códigos desde la sesión
-                objeto.CodigoArea = (int)Session["CodigoArea"];
-                objeto.CodigoSector = (int)Session["CodigoSector"];
+                objeto.CodigoArea = (int)Session["CodArea"];
+                objeto.CodigoSector = (int)Session["CodSector"];
 
                 // Validaciones de negocio
                 if (objeto.CantidadPedida <= 0)

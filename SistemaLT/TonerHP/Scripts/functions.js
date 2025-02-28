@@ -49,6 +49,8 @@ function CargarTipos(idRubro) {
     });
 }
 
+
+
 function CargarProductosporTipo(idTipo) {
     var urlproductos = 'https://localhost:44347/Toner/ListarProductosPorTipo?idTipo=' + idTipo;
     $.ajax({

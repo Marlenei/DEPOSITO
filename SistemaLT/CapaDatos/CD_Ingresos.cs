@@ -19,8 +19,10 @@ namespace CapaDatos
             {
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
-                    SqlCommand cmd = new SqlCommand("ListarIngresos", oconexion);
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlCommand cmd = new SqlCommand("ListarIngresos", oconexion)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
                     oconexion.Open();
                     using (SqlDataReader rdr = cmd.ExecuteReader())
                     {
