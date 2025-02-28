@@ -8,7 +8,7 @@
         success: function (data) {
             $("#cborubro").empty();
             $("#cbostockactual").empty();
-            $("<option>").attr({ "value": "" }).text("Seleccione un Rubro").appendTo("#cborubro"); // Opción por defecto
+            $("<option>").attr({ "value": "" }).text("Seleccione un Rubro").appendTo("#cborubro"); 
             $.each(data.data, function (index, valor) {
                 if (valor.Activo === true) {
                     $("<option>").attr({ "value": valor.IdRubro }).text(valor.Rubro).appendTo("#cborubro");
@@ -72,6 +72,29 @@ function CargarProductosporTipo(idTipo) {
         },
     });
 }
+function selects2() {
+    $('#cborubro').select2({
+        placeholder: "Selecciona una opción",
+        allowClear: true,
+        dropdownParent: $('#FormModal'),
+    });
+    $('#cbotipo').select2({
+        placeholder: "Selecciona una opción",
+        allowClear: true,
+        dropdownParent: $('#FormModal'),
+    });
+    $('#cbocodigo').select2({
+        placeholder: "Selecciona una opción",
+        allowClear: true,
+        dropdownParent: $('#FormModal'),
+    });
+    $('#cbodetalle').select2({
+        placeholder: "Selecciona una opción",
+        allowClear: true,
+        dropdownParent: $('#FormModal'),
+    });
+
+}
 
 function CargarCodigosID(urlcodigoid) {
     $.ajax({
@@ -83,7 +106,7 @@ function CargarCodigosID(urlcodigoid) {
         success: function (data) {
             $("#cbocodigo").empty();
             $("#cbostockactual").empty();
-            $("<option>").attr({ "value": "" }).text("Seleccione un Codigo ID").appendTo("#cbocodigo"); // Opción por defecto
+            $("<option>").attr({ "value": "" }).text("Seleccione un Codigo ID").appendTo("#cbocodigo"); 
             $.each(data.data, function (index, valor) {
                 if (valor.Activo === true) {
                     $("<option>").attr({ "value": valor.IdProducto }).text(valor.CodigoId).appendTo("#cbocodigo");
@@ -110,7 +133,7 @@ function CargarProductosporCI(selectElement) {
         contentType: "application/json; charset=utf-8",
         success: function (data) {
             $("#cbodetalle").empty();
-            $("<option>").attr({ "value": 0 }).text("Seleccionar producto").appendTo("#cbodetalle");
+            //$("<option>").attr({ "value": 0 }).text("Seleccionar producto").appendTo("#cbodetalle");
 
             $.each(data, function (index, valor) {
                 if (valor.Activo === true) {
@@ -128,5 +151,18 @@ function CargarProductosporCI(selectElement) {
 function LimpiarCampos() {
     $('.modal').on('hidden.bs.modal', function (e) {
         $(this).removeData();
+    });
+}
+
+function LimpiarColapse() {
+    let productoSeleccionado = null;
+    $('#collapseExample').on('hide.bs.collapse', function () {
+        productoSeleccionado = $('#cbodetalle').val();
+    });
+    $('#collapseExample').on('hidden.bs.collapse', function () {
+        if (productoSeleccionado) {
+            $('#cbodetalle').val(productoSeleccionado);
+        }
+        CargarProductos();
     });
 }

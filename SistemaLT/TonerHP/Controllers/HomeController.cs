@@ -21,5 +21,11 @@ namespace TonerHP.Controllers
 
         }
 
+        [Authorize]
+        public ActionResult Error()
+            {
+                return View();
+            }
+
     }
 }

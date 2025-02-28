@@ -3,9 +3,11 @@
     ViewBag.Title = "Rubros";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="card">
-    <div class="card-header">
-        <i class="fas fa-users me-1"></i> Lista de Rubros
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-boxes me-2"></i>Rubros
+        </h5>
     </div>
     <div class="card-body">
         <div class="row">
@@ -16,8 +18,8 @@
 
         <hr />
 
-        <table id="tabla" class="display cell-border" style="width:100%">
-            <thead>
+        <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width:100%">
+            <thead class="table-dark">
                 <tr>
                     <th>Rubro</th>
                     <th>Codigo</th>
@@ -46,6 +48,8 @@
 
             <div class="modal-body g-2">
                 <input id="txtid" type="hidden" value="0" />
+                <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
+
                 <div class="row g-2" id="contenedor">
 
                     <div class="col-sm-6">
@@ -58,12 +62,6 @@
                         <label class="form-label">Codigo</label>
                         <input type="text" class="form-control" id="txtcodigoid">
 
-                    </div>
-
-
-                    <div class="col-sm-6">
-                        <label for="txtusuario" class="form-label">IdUsuario</label>
-                        <input type="text" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
                     </div>
 
                     <div class="col-sm-6">
@@ -123,10 +121,13 @@
                         '<button type="button" class="btn btn-danger btn-sm ms-2"> <i class="fas fa-trash"></i></button>',
                     "orderable": false,
                     "searchable": false,
-                    "width": "90px"
+                    "width": "auto"
                 }
 
-         ]
+            ],
+            "language": {
+                "url":"/Language/es-Es.json",
+            }
 
         });
 

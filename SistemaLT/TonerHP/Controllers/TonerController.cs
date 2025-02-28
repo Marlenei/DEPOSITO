@@ -25,11 +25,12 @@ namespace TonerHP.Controllers
 
         public ActionResult Proveedores()
         {
-            //var userAccessCode = Session["AccesCode"] as int?;
-            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
-            //{
-            //    return RedirectToAction("Index", "Home");
-            //}
+            var permisos = Session["PermissionsCode"] as List<Permiso>;
+            var tieneAcceso = permisos.Any(p => p.Accesos == 24);
+            if (!tieneAcceso)
+            {
+                return RedirectToAction("Error", "Home");
+            }
 
             return View();
         }
@@ -39,7 +40,8 @@ namespace TonerHP.Controllers
             //var userAccessCode = Session["AccesCode"] as int?;
             //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
             //{
-            //    return RedirectToAction("Index", "Home");
+            //                    return RedirectToAction("Error", "Home");
+
             //}
 
             //var userAccessCode = Session["AccesCode"] as int?;
@@ -52,7 +54,8 @@ namespace TonerHP.Controllers
             //var userAccessCode = Session["AccesCode"] as int?;
             //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
             //{
-            //    return RedirectToAction("Index", "Home");
+            //                    return RedirectToAction("Error", "Home");
+
             //}
 
             return View();
@@ -64,7 +67,7 @@ namespace TonerHP.Controllers
             var tieneAcceso = permisos.Any(p => p.Accesos == 24);
             if (!tieneAcceso)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Error", "Home");
             }
 
             return View();
@@ -78,7 +81,8 @@ namespace TonerHP.Controllers
             var tieneAcceso = permisos.Any(p => p.Accesos == 25);
             if (!tieneAcceso)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Error", "Home");
+
             }
 
             return View();
@@ -89,7 +93,8 @@ namespace TonerHP.Controllers
             //var userAccessCode = Session["AccesCode"] as int?;
             //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
             //{
-            //    return RedirectToAction("Index", "Home");
+            //                    return RedirectToAction("Error", "Home");
+
             //}
 
             return View();
@@ -101,7 +106,8 @@ namespace TonerHP.Controllers
             //var userAccessCode = Session["AccesCode"] as int?;
             //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
             //{
-            //    return RedirectToAction("Index", "Home");
+            //                   return RedirectToAction("Error", "Home");
+
             //}
 
             return View();

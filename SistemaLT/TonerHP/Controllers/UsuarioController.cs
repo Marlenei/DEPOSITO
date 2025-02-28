@@ -18,6 +18,12 @@ namespace TonerHP.Controllers
         private readonly HttpClient _httpClient;
         private const string ApiBaseUrl = "http://10.4.51.49/SI_Apis/";
 
+        private class AuthResult
+        {
+            public bool Success { get; set; }
+            public int UserId { get; set; }
+        }
+
         public UsuarioController()
         {
             _httpClient = new HttpClient();
@@ -176,21 +182,17 @@ namespace TonerHP.Controllers
             Session["NombreSector"] = datosUsuario.NombreSector ?? "Sector no asignado";
             Session["AccesCode"] = accessCode;
             Session["PermissionsCode"] = permisos;
+
+            Console.WriteLine("CodigoUnico: " + Session["CodigoUnico"]);
+            Console.WriteLine("CodigoArea: " + Session["CodigoArea"]);
+            Console.WriteLine("CodigoSector: " + Session["CodigoSector"]);
+            Console.WriteLine("NombreArea: " + Session["NombreArea"]);
+            Console.WriteLine("NombreSector: " + Session["NombreSector"]);
+            Console.WriteLine("AccesCode: " + Session["AccesCode"]);
+            Console.WriteLine("PermissionsCode: " + Session["PermissionsCode"]);
         }
 
-        public ActionResult CerrarSesion()
-        {
-            FormsAuthentication.SignOut();
-            Session.Abandon();
-            return RedirectToAction("Login", "Usuario");
-        }
-
-        private class AuthResult
-        {
-            public bool Success { get; set; }
-            public int UserId { get; set; }
-        }
-
+    
         [Authorize]
         public async Task<ActionResult> ActualizarDatosSesion()
         {
@@ -214,6 +216,13 @@ namespace TonerHP.Controllers
 
             ConfigurarSesion(datosUsuario, (int)Session["AccesCode"], (List<Permiso>)Session["PermissionsCode"]);
             return Redirect(Request.UrlReferrer?.ToString() ?? Url.Action("Index", "Home"));
+        }
+
+        public ActionResult CerrarSesion()
+        {
+            FormsAuthentication.SignOut();
+            Session.Abandon();
+            return RedirectToAction("Login", "Usuario");
         }
     }
 }
