@@ -3,9 +3,11 @@
     ViewBag.Title = "Productos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="card">
-    <div class="card-header">
-        <i class="fas fa-users me-1"></i> Lista de Productos
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-boxes me-2"></i>Productos
+        </h5>
     </div>
     <div class="card-body">
         <div class="row">
@@ -16,8 +18,8 @@
 
         <hr />
 
-        <table id="tabla" class="display cell-border" style="width:100%">
-            <thead>
+        <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width:100%">
+            <thead class="table-dark">
                 <tr>
                     <th>Detalle</th>
                     <th>Rubro</th>
@@ -47,7 +49,8 @@
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body g-2" >
+            <div class="modal-body g-2">
+                <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
                 <input id="txtid" type="hidden" value="0" />
                 <div class="row g-2" id="contenedor">
 
@@ -58,7 +61,9 @@
 
                     <div class="col-sm-6">
                         <label class="form-label">Rubro</label>
-                        <select id="cborubro" class="form-control"> </select>
+                        <select id="cborubro" class="form-select" name="idRubro" onchange="CargarTipos(this.value)">
+                            <option value="">Seleccione un Rubro</option>
+                        </select>
                     </div>
 
                     <div class="col-sm-6">
@@ -75,13 +80,6 @@
                         <label for="txtcodigoid" class="form-label">Codigo ID</label>
                         <input type="text" class="form-control" id="txtcodigoid">
                     </div>
-
-
-                    <div class="col-sm-6">
-                        <label for="txtusuario" class="form-label">IdUsuario</label>
-                        <input type="text" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
-                    </div>
-
                     <div class="col-sm-6">
                         <label for="cboactivo" class="form-label">Activo</label>
                         <select id="cboactivo" class="form-select">
@@ -91,11 +89,11 @@
                     </div>
                 </div>
 
-@*--------Mensaje de alerta----------*@
+                @*--------Mensaje de alerta----------*@
                 <div class="row mt-12">
                     <div class="col-12">
                         <div id="mensajeError" class="alert alert-danger" role="alert">
-                            
+
                         </div>
 
                     </div>
@@ -115,8 +113,11 @@
         var filaSeleccionada
 
 
-        $(document).ready(function () { 
+        $(document).ready(function () {
             LimpiarCampos();
+            var urlrubros = '@Url.Action("ListarRubros", "Toner")'
+            CargarRubros(urlrubros);
+            selects2();
         });
 
 
@@ -159,16 +160,16 @@
                         '<button type="button" class="btn btn-danger btn-sm ms-2 btn-eliminar"> <i class="fas fa-trash"></i></button>',
                     "orderable": false,
                     "searchable": false,
-                    "widht": "90px"
+                    "width": "auto"
                 }
 
             ],
-            language: {
-                url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json',
-            },
+            "language": {
+                "url": "/Language/es-Es.json",
+            }
         });
 
-            jQuery.ajax({
+            @*jQuery.ajax({
             url: '@Url.Action("ListarRubros", "Toner")',
             type: "GET",
             data: null,
@@ -207,7 +208,29 @@
                 error: function (error) {
                     console.log(error)
                 },
-            });
+            });*@
+
+
+
+        @*jQuery.ajax({
+            url: '@Url.Action("ListarTiposPorRubro", "Toner")',
+            type: "GET",
+            data: { idRubro: idRubro }, 
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                $("<option>").attr({ "value": 0 }).text("Seleccionar Tipo").appendTo("#cbotipo");
+                $.each(data, function (index, valor) {
+                    if (valor.Activo === true) {
+                        $("<option>").attr({ "value": valor.IdTipo }).text(valor.Tipo).appendTo("#cbotipo");
+                    }
+                });
+            },
+            error: function (error) {
+                console.log(error)
+            },
+        });*@
+
 
 
         function abrirModal(json) {

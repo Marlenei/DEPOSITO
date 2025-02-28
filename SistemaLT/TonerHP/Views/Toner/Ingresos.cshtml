@@ -2,9 +2,11 @@
     ViewBag.Title = "Ingresos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="card">
-    <div class="card-header">
-        <i class="fas fa-users me-1"></i> Ingresos
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-boxes me-2"></i>Ingresos
+        </h5>
     </div>
     <div class="card-body">
         <div class="row">
@@ -15,18 +17,19 @@
 
         <hr />
         <div style="justify-self:center">
+            <h6>Seleccione el rango que desea ver:</h6>
             <input type="text" name="daterange" />
         </div>
-        <table id="tabla" class="display cell-border" style="width:100%">
-            <thead>
+        <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width:100%">
+            <thead class="table-dark">
                 <tr>
                     <th>Detalle</th>
                     <th>Proveedor</th>
                     <th>Cantidad</th>
                     <th>Codigo ID</th>
                     <th>N° Exp.</th>
-                    <th>Tipo de Ingreso</th>
-                    <th>Fecha de ingreso</th>
+                    <th>Tipo Ingreso</th>
+                    <th>Fecha ingreso</th>
                     <th>Ultima modificacion</th>
                     <th>Observaciones</th>
                     <th>Usuario</th>
@@ -56,12 +59,15 @@
                     <input id="txtid" type="hidden" value="" />
                     <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
                     <div class="row g-2" id="contenedor">
-                            <div class="col-sm-6">
-                                <label class="form-label">Producto</label>
-                                <select id="cbodetalle" class="form-select ProductosS">
-                                <option value="">Seleccione un Producto</option>
-                                </select>
-                            </div>
+                        
+                        
+                        <div class="col-sm-6">
+                            <label class="form-label">Producto </label>
+                            <select id="cbodetalle" class="form-select ProductosS" >
+                            
+                            
+                            </select>
+                        </div>
 
                             <div id="contenedor" class="col-sm-6">
 
@@ -146,6 +152,8 @@
 
 @section scripts{
     <script>
+
+
         var tabladata;
         var filaSeleccionada;
         var productos = {};
@@ -184,6 +192,27 @@
 
         $(document).ready(function () {
             CargarProductos();
+            LimpiarCampos();
+            selects2();
+            let productoSeleccionado = null;
+
+            $('#collapseExample').on('hide.bs.collapse', function () {
+                productoSeleccionado = $('#cbodetalle').val();
+
+            });
+            $('#collapseExample').on('hidden.bs.collapse', function () {
+                if (productoSeleccionado) {
+                    $('#cbodetalle').val(productoSeleccionado);
+                }
+            });
+            $(document).ajaxComplete(function () {
+                if (productoSeleccionado) {
+                    $('#cbodetalle').val(productoSeleccionado);
+                }
+            });
+
+
+
             tabladata = $("#tabla").DataTable({
                responsive: true,
                ordering: true,
@@ -196,18 +225,38 @@
                "columns": [
                    {
                        "data": "oProductos", "render": function (data) {
-                           return data.Detalle
-                        },
+                           return data && data.Detalle ? data.Detalle : '';
+                        }
                     },
                     {
                         "data": "oProveedores", "render": function (data) {
-                            return data.RazonSocial
+                            return data && data.RazonSocial ? data.RazonSocial : '';
                         }
                     },
-                    { "data": "Cantidad", },
-                    { "data": "CodigoId" },
-                    { "data": "NroExpediente" },
-                    { "data": "TipoIngreso" },
+                   {
+                       "data": "Cantidad",
+                       "render": function (data) {
+                           return data ? data : '';
+                       }
+                   },
+                   {
+                       "data": "CodigoId", "render": function (data) {
+                           return data ? data : '';
+                       }
+                   },
+                   {
+                       "data": "NroExpediente",
+                       "render": function (data) {
+                           return data ? data : '';
+                       }
+                   },
+                   {
+                       "data": "TipoIngreso",
+                       "render": function (data) {
+                           return data ? data : '';
+                       }
+
+                   },
                     {
                         "data": "FechaIngreso", "render": function (data) {
                             if (!data) return '';
@@ -218,7 +267,7 @@
                             var año = parseInt(partes[2], 10);
                             var fecha = new Date(año, mes, dia);
                             return (fecha.getDate()) + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear();
-                        },
+                        }
                     },
                     {
                         "data": "FechaAct1", "render": function (data) {
@@ -230,10 +279,14 @@
                             var año = parseInt(partes[2], 10);
                             var fecha = new Date(año, mes, dia);
                             return (fecha.getDate()) + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear();
-                        },
+                        }
                     },
-                    { "data": "Observaciones" },
-                    { "data": "NombreyApellido" },
+                   {
+                       "data": "Observaciones", 
+                       "render": function (data) {
+                           return data ? data : '';
+                       },
+                   },
                    {
                        "data": "NombreyApellido",
                        "render": function (data) {
@@ -244,15 +297,14 @@
                         "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>',
                         "orderable": false,
                         "searchable": false,
-                        "width": "90px"
+                        "width": "auto"
                     }
 
                 ],
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json',
-                },
+                "language": {
+                    "url": "/Language/es-Es.json",
+                }
             });
-
 
             $("#BtnBusqueda").on("click", function () {
                     var urlrubros = '@Url.Action("ListarRubros", "Toner")'
@@ -260,17 +312,38 @@
 
                     var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
                      CargarCodigosID(urlcodigoid);
-                     LimpiarCampos();
-                $("#cbostockactual").val('');
-            });
-            $('#collapseExample').on('hidden.bs.collapse', function () {
-                CargarProductos();
-                LimpiarCampos();
-                $("#cbostockactual").val('');
             });
         });
 
-               //Listado Proveedores
+
+        $('#collapseExample').on('hidden.bs.collapse', function () {
+            CargarProductos();
+        });
+
+        $('#exampleDataList').on('input', function () {
+            var inputVal = $(this).val();
+            var selectedOption = $('#cbodetalle option').filter(function () {
+                return $(this).text() === inputVal; // Cambiar a .text() para comparar el texto
+            });
+
+            if (selectedOption.length) {
+                var idProducto = selectedOption.data('id'); // Obtener el IdProducto
+                var stockActual = productos[idProducto]; // Obtener el stock actual
+
+                if (stockActual !== undefined) {
+                    $("#cbostockactual").val(stockActual).show(); // Mostrar el stock actual
+                } else {
+                    $("#cbostockactual").val("").hide(); // Ocultar si no hay stock
+                }
+
+                // Guardar el ID del producto en un campo oculto
+                $("#txtidProducto").val(idProducto); // Asegúrate de tener un campo oculto para el ID
+                console.log("ID del producto seleccionado: " + idProducto);
+            }
+        });
+
+
+        //Listado Proveedores
             jQuery.ajax({
                 url: '@Url.Action("ListarProveedores", "Toner")',
                 type: "GET",
@@ -292,6 +365,7 @@
 
         //Listado Productos
         function CargarProductos() {
+
             $.ajax({
                 url: '@Url.Action("ListarProductos", "Toner")',
                 type: "GET",
@@ -316,7 +390,6 @@
 
 
         function abrirModal(json) {
-            CargarProductos(urlproductos);
             if (json != null) {
                 var fechaActMatch = json.FechaAct.match(/\/Date\((\d+)\)\//);
                 var timestamp = parseInt(fechaActMatch[1], 10);
@@ -335,9 +408,10 @@
                     });
                 } else {
                     $("#txtid").val(json.IdIngreso);
-                    $("#cbodetalle").val(json.oProductos.IdProducto);
+                    $("#cbodetalle").val(json.oProductos.IdProducto).trigger('change');
                     $("#cboproveedores").val(json.oProveedores.IdProveedor);
                     $("#txtcantidad").val(json.Cantidad);
+                    $("#cbostockactual").val(json.oProductos.StockActual).show();
                     $("#txtcodigoid").val(json.CodigoId);
                     $("#txtexpediente").val(json.NroExpediente);
                     $("#txttipoingreso").val(json.TipoIngreso);
@@ -367,26 +441,24 @@
                  $("#txtusuario").val(@Session["AccesCode"]);
                  $("#mensajeError").hide();
 
-
-                 $("#cbodetalle").change(function () {
-                     var idProducto = $(this).val();
-                     var stockActual = obtenerStockPorId(idProducto);
-
-
-                     if (stockActual !== undefined) {
-                         $("#cbostockactual").val(stockActual);
-                         $("#cbostockactual").show();
-                     }
-                 });
-
-
-                 function obtenerStockPorId(idProducto) {
-                     return productos[idProducto];
-                 }
-
                 $("#FormModal").modal("show");
 
 
+            }
+            $("#cbodetalle").change(function () {
+                var idProducto = $(this).val();
+                var stockActual = obtenerStockPorId(idProducto);
+
+
+                if (stockActual !== undefined) {
+                    $("#cbostockactual").val(stockActual);
+                    $("#cbostockactual").show();
+                }
+            });
+
+
+            function obtenerStockPorId(idProducto) {
+                return productos[idProducto];
             }
         }
 
@@ -459,7 +531,7 @@
                                             text: data.resultado,
                                             icon: "success",
                                             customClass: {
-                                                confirmButton: 'btn btn-primary' // Usa customClass para el estilo del botón
+                                                confirmButton: 'btn btn-primary'
                                             },
                                             confirmButtonText: "Ok",
                                         });
@@ -474,8 +546,7 @@
                             else {
                                 if (data.resultado) {
                                     Ingresos = data.resultado;
-                                    tabladata.ajax.reload(function () {
-                                        tabladata.row(filaSeleccionada).data(Ingresos).draw(false);
+                                    tabladata.row(filaSeleccionada).data(Ingresos).draw(false);
                                     filaSeleccionada = null;
                                     tabladata.ajax.reload();
                                     $("#FormModal").modal("hide");
