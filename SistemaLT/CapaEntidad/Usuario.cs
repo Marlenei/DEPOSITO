@@ -12,47 +12,6 @@ namespace CapaEntidad
     {
         public string usuario { get; set; }
         public string clave { get; set; }
-
-       
-
-    }
-
-    public class UsuarioDatos
-    {
-        [JsonProperty("CodigoUnico")]
-        public int CodigoUnico { get; set; }
-
-        // Campos desde la API (strings)
-        [JsonProperty("CodArea")]
-        public string CodArea { get; set; }
-
-        [JsonProperty("CodSector")]
-        public string CodSector { get; set; }
-
-        // Campos convertidos a enteros
-        public int CodigoArea { get; set; }
-        public int CodigoSector { get; set; }
-
-        [JsonProperty("NombreArea")]
-        public string NombreArea { get; set; }
-
-        [JsonProperty("NombreSector")]
-        public string NombreSector { get; set; }
-
-        public void ConvertirCampos()
-        {
-            if (!int.TryParse(CodArea, out int codigoArea))
-            {
-                throw new InvalidOperationException("Formato inválido para CodArea");
-            }
-            CodigoArea = codigoArea;
-
-            if (!int.TryParse(CodSector, out int codigoSector))
-            {
-                throw new InvalidOperationException("Formato inválido para CodSector");
-            }
-            CodigoSector = codigoSector;
-        }
     }
 
     public class AccesoResultado
@@ -76,5 +35,15 @@ namespace CapaEntidad
         //public int IdUnico { get; set; }
         //public int CodigoUsuario { get; set; }
         //public int Accesos { get; set; }
+    }
+
+    public class UsuarioDatos
+    {
+
+        public string NombreArea { get; set; }
+
+        public string NombreSector { get; set; }
+        public int CodArea { get; set; }
+        public int CodSector { get; set; }
     }
 }
