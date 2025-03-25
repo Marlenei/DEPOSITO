@@ -152,16 +152,20 @@
             },
             "columns": [
                 {
-                    "data": "oProductos", "render": function (data) {
-                        return data.Detalle
-                    }
+                    "data": "oProductos",
+                    "render": function (data) {
+                        return data.Detalle;
+                    },
+                    "title": "Producto"
                 },
 
                 { "data": "Cantidad" },
                 {
-                    "data": "oStockActual", "render": function (data) {
-                        return data.StockActual
-                    }
+                    "data": "oProductos",
+                    "render": function (data) {
+                        return data.StockActual;
+                    },
+                    "title": "Stock Actual"
                 },
                 { "data": "CodigoId" },
 
@@ -257,7 +261,7 @@
                 $("#txtid").val(json.IdEgreso);
                 $("#cbodetalle").val(json.oProductos.IdProducto);
                 $("#txtcantidad").val(json.Cantidad);
-                $("#cbostockactual").val(json.oStockActual.StockActual); 
+                $("#cbostockactual").val(json.oProductos.StockActual); 
                 $("#txtcodigoid").val(json.CodigoId);
                 $("#txttipoingreso").val(json.TipoSalida);
                 const fechaEgreso = new Date(json.FechaEgreso);
@@ -276,14 +280,25 @@
             abrirModal(data);
         });
 
-       function Guardar() {
+        function Guardar() {
+            var cantidad = parseInt($("#txtcantidad").val()) || 0;
+            var idProducto = $("#cbodetalle option:selected").val();
+            var stockActual = parseInt($("#cbostockactual option:selected").text()) || 0;
+
+            // Validar stock suficiente
+            if (cantidad > stockActual) {
+                $("#mensajeError").text("¡Stock insuficiente!").show();
+                return;
+            }
+
             var Egresos = {
                 IdEgreso: $("#txtid").val(), 
                 oProductos: {
-                    IdProducto: $("#cbodetalle option:selected").val(),
+                    IdProducto: idProducto,
                     Detalle: $("#cbodetalle option:selected").text(),
+                    StockActual: stockActual - cantidad ,
                 },
-                Cantidad: $("#txtcantidad").val(),
+                Cantidad: cantidad,
                 CodigoId: $("#txtcodigoid").val(),
                 TipoSalida: $("#txttipoingreso").val(),
                 FechaEgreso: $('#txtfechaingreso').val(), 

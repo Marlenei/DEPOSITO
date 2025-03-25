@@ -201,6 +201,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\EntregaPedidosController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\SolicitudPedidosController.cs" />
     <Compile Include="Controllers\TonerController.cs" />
@@ -633,10 +634,12 @@
     <Content Include="Views\Usuario\Login.cshtml" />
     <Content Include="Views\Shared\_BusquedaAvan.cshtml" />
     <Content Include="Views\Toner\SolicitudPedidos.cshtml" />
+    <Content Include="Views\Shared\_LimpiarM.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
+    <Folder Include="Views\EntregaPedidos\" />
     <Folder Include="Views\SolicitudPedidos\" />
   </ItemGroup>
   <ItemGroup>

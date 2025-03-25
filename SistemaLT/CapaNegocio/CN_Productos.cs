@@ -27,6 +27,12 @@ namespace CapaNegocio
         }
      
 
+        public Productos ObtenerProductoPorCodigoId(string codigoId)
+        {
+            var lista = objCapaDato.ListarProductosporCI(codigoId);
+            return lista.FirstOrDefault(); // Devuelve el primero o null
+        }
+
         public List<Productos> ListarporIDTipos(int idTipo)
         {
             return objCapaDato.ListarProductosporTipos(idTipo);

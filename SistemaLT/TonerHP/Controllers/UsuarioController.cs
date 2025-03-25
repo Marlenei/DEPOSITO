@@ -173,11 +173,6 @@ namespace TonerHP.Controllers
         //    return RedirectToAction("Login", "Usuario");
         //}
 
-        public ActionResult CerrarSesion()
-        {
-            FormsAuthentication.SignOut();
-            Session.Abandon();
-            return RedirectToAction("Login", "Usuario");
-        }
+      
     }
 }
