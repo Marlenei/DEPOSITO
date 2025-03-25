@@ -24,8 +24,11 @@
 
     });
 }
+
+ 
 function CargarTipos(idRubro) {
-    var urltipos = 'https://localhost:44347/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
+    var port = window.location.port;
+    var urltipos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/SistemaLT/TonerHP/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
     $.ajax({
         url: urltipos,
         type: "GET",
@@ -52,7 +55,8 @@ function CargarTipos(idRubro) {
 
 
 function CargarProductosporTipo(idTipo) {
-    var urlproductos = 'https://localhost:44347/Toner/ListarProductosPorTipo?idTipo=' + idTipo;
+    var port = window.location.port;
+    var urlproductos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/SistemaLT/TonerHP/Toner/ListarProductosPorTipo?idTipo=' + idTipo;
     $.ajax({
         url: urlproductos,
         type: "GET",
@@ -74,6 +78,63 @@ function CargarProductosporTipo(idTipo) {
         },
     });
 }
+
+
+function CargarCodigosID(urlcodigoid) {
+    $.ajax({
+        url: urlcodigoid,
+        type: "GET",
+        data: null,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            $("#cbocodigo").empty();
+            $("#cbostockactual").empty();
+            $("<option>").attr({ "value": "" }).text("Seleccione un Codigo ID").appendTo("#cbocodigo"); 
+
+            $.each(data.data, function (index, valor) {
+                if (valor.Activo === true && valor.CodigoId) {
+                    $("<option>").attr({ "value": valor.IdProducto }).text(valor.CodigoId).appendTo("#cbocodigo");
+                }
+            });
+            $("#cbodetalle").empty();
+        },
+        error: function (error) {
+            console.log(error)
+        },
+
+    });
+}
+
+
+function CargarProductosporCI(selectElement) {
+    var idCodigo = selectElement.options[selectElement.selectedIndex].text;
+    var port = window.location.port;
+    var urlproductos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/SistemaLT/TonerHP/Toner/ListarProductosporCI?idCodigo=' + idCodigo;
+
+    $.ajax({
+        url: urlproductos,
+        type: "GET",
+        data: null,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            $("#cbodetalle").empty();
+            //$("<option>").attr({ "value": 0 }).text("Seleccionar producto").appendTo("#cbodetalle");
+
+            $.each(data, function (index, valor) {
+                if (valor.Activo === true) {
+                    productos[valor.IdProducto] = valor.StockActual;
+                    $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
+                }
+            })
+        },
+        error: function (error) {
+            console.log(error)
+        },
+    });
+}
+
 function selects2() {
     $('#cborubro').select2({
         placeholder: "Selecciona una opción",
@@ -96,58 +157,6 @@ function selects2() {
         dropdownParent: $('#FormModal'),
     });
 
-}
-
-function CargarCodigosID(urlcodigoid) {
-    $.ajax({
-        url: urlcodigoid,
-        type: "GET",
-        data: null,
-        dataType: "json",
-        contentType: "application/json; charset=utf-8",
-        success: function (data) {
-            $("#cbocodigo").empty();
-            $("#cbostockactual").empty();
-            $("<option>").attr({ "value": "" }).text("Seleccione un Codigo ID").appendTo("#cbocodigo"); 
-            $.each(data.data, function (index, valor) {
-                if (valor.Activo === true) {
-                    $("<option>").attr({ "value": valor.IdProducto }).text(valor.CodigoId).appendTo("#cbocodigo");
-                }
-            });
-            $("#cbodetalle").empty();
-        },
-        error: function (error) {
-            console.log(error)
-        },
-
-    });
-}
-
-
-function CargarProductosporCI(selectElement) {
-    var idCodigo = selectElement.options[selectElement.selectedIndex].text;
-    var urlproductos = 'https://localhost:44347/Toner/ListarProductosporCI?idCodigo=' + idCodigo;
-    $.ajax({
-        url: urlproductos,
-        type: "GET",
-        data: null,
-        dataType: "json",
-        contentType: "application/json; charset=utf-8",
-        success: function (data) {
-            $("#cbodetalle").empty();
-            //$("<option>").attr({ "value": 0 }).text("Seleccionar producto").appendTo("#cbodetalle");
-
-            $.each(data, function (index, valor) {
-                if (valor.Activo === true) {
-                    productos[valor.IdProducto] = valor.StockActual;
-                    $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
-                }
-            })
-        },
-        error: function (error) {
-            console.log(error)
-        },
-    });
 }
 
 function LimpiarCampos() {

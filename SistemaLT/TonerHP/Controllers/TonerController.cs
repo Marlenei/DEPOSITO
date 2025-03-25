@@ -218,6 +218,7 @@ namespace TonerHP.Controllers
             oLista = new CN_Tipos().Listar();
             return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
         }
+        
         [HttpGet]
         public JsonResult ListarTiposPorRubro(int idRubro)
         {
@@ -253,7 +254,8 @@ namespace TonerHP.Controllers
             oLista = new CN_Productos().Listar();
             return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
         }
-        
+    
+
         [HttpGet]
         public JsonResult ListarProductosPorTipo(int idTipo)
         {

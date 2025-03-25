@@ -53,7 +53,7 @@
 
                     <div class="col-sm-6">
                         <label for="txtnombres" class="form-label">Tipo</label>
-                        <input type="text" class="form-control" id="txttipo">
+                        <select id="cbotipo" class="form-select"> </select>
                     </div>
 
                     <div class="col-sm-6">
@@ -91,17 +91,15 @@
         var tabladata;
         var filaSeleccionada;
 
-
-
-
         $(document).ready(function () {
+            LimpiarCampos();
 
-            $('#cborubro').select2({
-                placeholder: "Selecciona una opción",
-                allowClear: true,
-                dropdownParent: $('#FormModal'),
+            $('#exampleDataList').on('input', function () {
+                var inputVal = $(this).val();
+                var selectedOption = $('#cbotipo option').filter(function () {
+                    return $(this).text() === inputVal;
+                });
             });
-
 
 
             tabladata = $("#tabla").DataTable({
@@ -130,8 +128,7 @@
                         }
                     },
                     {
-                        "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>' +
-                            '<button type="button" class="btn btn-danger btn-sm ms-2 btn-eliminar"> <i class="fas fa-trash"></i></button>',
+                        "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>',
                         "orderable": false,
                         "searchable": false,
                         "widht": "auto"
@@ -139,7 +136,7 @@
 
                 ],
                 "language": {
-                    "url": "/Language/es-Es.json",
+                    "url": "../Language/es-Es.json",
                 }
             });
 
@@ -150,32 +147,69 @@
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                     success: function (data) {
+                        $("<option>").attr({ "value": "" }).text("Seleccione un Rubro").appendTo("#cborubro");
                         $.each(data.data, function (index, valor) {
                             if (valor.Activo == true) {
                                 $("<option>").attr({ "value": valor.IdRubro }).text(valor.Rubro).appendTo("#cborubro");
                             }
                         })
+
+                        $('#cborubro').select2({
+                            placeholder: "Selecciona una opción",
+                            allowClear: true,
+                            dropdownParent: $('#FormModal'),
+                        });
                     },
                     error: function (error) {
                         console.log(error)
                     },
                 });
+
+              jQuery.ajax({
+                    url: '@Url.Action("ListarTipos", "Toner")',
+                    type: "GET",
+                    data: null,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function(data) {
+                        var opciones = [];
+                        $.each(data.data, function(index, valor) {
+                            opciones.push({
+                                id: valor.IdTipo, 
+                                text: valor.Tipo 
+                            });
+                        });
+
+        
+                        $('#cbotipo').select2({
+                            data: opciones,
+                            tags: true,
+                            placeholder: "Selecciona una opción",
+                            allowClear: true,
+                            dropdownParent: $('#FormModal'),
+
+                        });
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+               });
+
+
         });
 
 
             function abrirModal(json) {
                 $("#txtid").val(0);
-                $("#txttipo").val("");
-                $("#cborubro").val("");
+                $("#cbotipo").val(null).trigger('change');
+                $("#cborubro").val(null).trigger('change');
                 $("#txtusuario").val(@Session["AccesCode"]);
                 $("#cboactivo").val(1);
                 $("#mensajeError").hide();
-
-
                 if (json != null) {
                     $("#txtid").val(json.IdTipo);
-                    $("#txttipo").val(json.Tipo);
-                    $("#cborubro").val(json.oRubros.IdRubro);
+                    $("#cbotipo").val(json.IdTipo).trigger('change');
+                    $("#cborubro").val(json.oRubros.IdRubro).trigger('change');
                     $("#txtusuario").val(json.IdUsuario);
                     $("#cboactivo").val(json.Activo == true ? 1:0 );
 
@@ -195,7 +229,7 @@
                 var Tipos = {
                     IdTipo: $("#txtid").val(),
                     Activo: $("#cboactivo").val() == 1?true:false,
-                    Tipo: $("#txttipo").val(),
+                    Tipo: $("#cbotipo option:selected").text(),
                     IdUsuario: $("#txtusuario").val(),
                     oRubros: {
                         IdRubro: $("#cborubro option:selected").val(),
@@ -216,10 +250,12 @@
                             if (data.resultado != 0) {
                                 Tipos.IdTipo = data.resultado;
                                 tabladata.row.add(Tipos).draw(false);
+                                location.reload();
                                 $("#FormModal").modal("hide");
                             } else {
                                 $("#mensajeError").text(data.mensaje);
                                 $("#mensajeError").show();
+
                             }
                         }
                             //TIPO EDITAR
@@ -229,6 +265,7 @@
                                 tabladata.row(filaSeleccionada).data(Tipos).draw(false);
                                 filaSeleccionada = null;
                                 $("#FormModal").modal("hide");
+                                location.reload();
                             } else {
                                 $("#mensajeError").text(data.mensaje);
                                 $("#mensajeError").show();
