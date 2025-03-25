@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<!--<!-- Modal -->
+<!-- Modal -->
 <div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -50,7 +50,7 @@
                 <div class="row g-2">
                     <div class="col-sm-6">
                         <label for="txtrazonsocial" class="form-label">Razon Social</label>
-                        <input type="text" class="form-control" id="txtrazonsocial">
+                        <select id="cborazonsocial" class="form-select"> </select>
                     </div>
 
                     <div class="col-sm-6">
@@ -98,29 +98,59 @@
                     }
                 },
                 {
-                    "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"><i class="fas fa-pen"></i></button>' +
-                                    '<button type="button" class="btn btn-danger btn-sm ms-2 btn-eliminar"><i class="fas fa-trash"></i></button>',
+                    "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"><i class="fas fa-pen"></i></button>',
                     "orderable": false,
                     "searchable": false,
                     "width": "auto"
                 }
             ],
             "language": {
-                "url": "/Language/es-Es.json",
+                "url": "../Language/es-Es.json",
             }
         });
+
+         jQuery.ajax({
+               url: '@Url.Action("ListarProveedores", "Toner")',
+               type: "GET",
+               data: null,
+               dataType: "json",
+               contentType: "application/json; charset=utf-8",
+               success: function(data) {
+                   $("<option>").attr({ "value": "" }).text("Seleccione un Proveedor").appendTo("#cborazonsocial");
+                   var opciones = [];
+                   $.each(data.data, function(index, valor) {
+                       opciones.push({
+                           id: valor.IdProveedor,
+                           text: valor.RazonSocial
+                       });
+                   });
+
+
+                   $('#cborazonsocial').select2({
+                       data: opciones,
+                       tags: true,
+                       placeholder: "Selecciona una opción",
+                       allowClear: true,
+                       dropdownParent: $('#FormModal'),
+
+                   });
+               },
+               error: function(error) {
+                   console.log(error);
+               }
+           });
 
             function abrirModal(json) {
                 $("#txtid").val(0);
                 $("#txtusuario").val(@Session["AccesCode"]);
-                $("#txtrazonsocial").val("");
+                $("#cborazonsocial").val(null).trigger('change');
                 $("#cboactivo").val(1);
                 $("#mensajeError").hide();
 
 
                 if (json != null) {
                     $("#txtid").val(json.IdProveedor);
-                    $("#txtrazonsocial").val(json.RazonSocial);
+                    $("#cborazonsocial").val(json.IdProveedor).trigger('change');
                     $("#txtusuario").val(json.IdUsuario);
                     $("#cboactivo").val(json.Activo == true ? 1:0 );
 
@@ -139,7 +169,7 @@
                 var Proveedores = {
                     IdProveedor: $("#txtid").val(),
                     IdUsuario: $("#txtusuario").val(),
-                    RazonSocial: $("#txtrazonsocial").val(),
+                    RazonSocial: $("#cborazonsocial option:selected").text(),
                     Activo: $("#cboactivo").val() == 1?true:false,
                 }
 
@@ -156,6 +186,7 @@
                             if (data.resultado != 0) {
                                 Proveedores.IdProveedor = data.resultado;
                                 tabladata.row.add(Proveedores).draw(false);
+                                location.reload();
                                 $("#FormModal").modal("hide");
                             } else {
                                 $("#mensajeError").text(data.mensaje);
@@ -168,6 +199,7 @@
 
                                 tabladata.row(filaSeleccionada).data(Proveedores).draw(false);
                                 filaSeleccionada = null;
+                                location.reload();
                                 $("#FormModal").modal("hide");
                             } else {
                                 $("#mensajeError").text(data.mensaje);

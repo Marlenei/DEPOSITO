@@ -25,6 +25,7 @@ namespace CapaDatos
                     sb.AppendLine("t.Activo, t.IdUsuario");
                     sb.AppendLine("FROM Tonner_Tipos t");
                     sb.AppendLine("inner join Tonner_Rubros r on r.IdRubro = t.IdRubro");
+                    sb.AppendLine("ORDER BY IdTipo DESC");
 
                     SqlCommand cmd = new SqlCommand(sb.ToString(), oconexion);
                     cmd.CommandType = CommandType.Text;
@@ -37,7 +38,10 @@ namespace CapaDatos
                             {
                                 IdTipo = Convert.ToInt32(rdr["IdTipo"]),
                                 Tipo = rdr["Tipo"].ToString(),
-                                oRubros = new Rubros() { IdRubro = Convert.ToInt32(rdr["IdRubro"]), Rubro = rdr["Rubro"].ToString() },
+                                oRubros = new Rubros() { 
+                                    IdRubro = Convert.ToInt32(rdr["IdRubro"]), 
+                                    Rubro = rdr["Rubro"].ToString() },
+
                                 Activo = Convert.ToBoolean(rdr["Activo"]),
                                 IdUsuario = Convert.ToInt32(rdr["IdUsuario"]),
                             });

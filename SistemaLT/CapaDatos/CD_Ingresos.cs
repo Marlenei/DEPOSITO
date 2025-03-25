@@ -45,7 +45,7 @@ namespace CapaDatos
                                 Cantidad = Convert.ToInt32(rdr["Cantidad"]),
                                 Observaciones = rdr["Observaciones"].ToString(),
                                 TipoIngreso = Convert.ToChar(rdr["TipoIngreso"]),
-                                FechaIngreso = rdr["FechaIngreso"].ToString(),
+                                FechaIngreso = Convert.ToDateTime(rdr["FechaIngreso"]),
                                 NombreyApellido = rdr["NombreyApellido"].ToString(),
                                 FechaAct1 = rdr["FechayHoraAct"].ToString(),
                                 FechaAct = Convert.ToDateTime(rdr["FechayHoraAct"]),

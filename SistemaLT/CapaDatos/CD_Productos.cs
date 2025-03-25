@@ -23,10 +23,12 @@ namespace CapaDatos
                     sb.AppendLine("r.IdRubro, r.Rubro, ");
                     sb.AppendLine("t.IdTipo, t.Tipo, ");
                     sb.AppendLine("COALESCE(p.StockActual, 0) AS StockActual, ");
-                    sb.AppendLine("p.Detalle, p.StockMinimo, p.StockActual, p.Activo, p.IdUsuario, p.CodigoId ");
+                    sb.AppendLine("p.Detalle, p.StockMinimo, p.StockActual, p.Activo, p.IdUsuario, p.CodigoId, p.FechaAlta ");
                     sb.AppendLine("FROM Tonner_Productos p ");
                     sb.AppendLine("inner join Tonner_Rubros r on r.IdRubro = p.IdRubro");
                     sb.AppendLine("inner join Tonner_Tipos t on t.IdTipo = p.IdTipo ");
+                    sb.AppendLine("ORDER BY p.IdProducto DESC");
+
 
                     SqlCommand cmd = new SqlCommand(sb.ToString(), oconexion);
                     cmd.CommandType = CommandType.Text;
@@ -51,6 +53,7 @@ namespace CapaDatos
                                 StockActual = Convert.ToInt32(rdr["StockActual"]),
                                 CodigoId = rdr["CodigoId"].ToString(),
                                 Activo = Convert.ToBoolean(rdr["Activo"]),
+                                FechaAlta = Convert.ToDateTime(rdr["FechaAlta"]),
                                 IdUsuario = Convert.ToInt32(rdr["IdUsuario"]),
                             });
                         }
@@ -147,10 +150,10 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("IdTipo", obj.oTipos.IdTipo);
                     cmd.Parameters.AddWithValue("Detalle", obj.Detalle);
                     cmd.Parameters.AddWithValue("StockMinimo", obj.StockMinimo);
-                    cmd.Parameters.AddWithValue("CodigoId", obj.CodigoId);
+                    cmd.Parameters.AddWithValue("CodigoId", (object)obj.CodigoId ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("IdUsuario", obj.IdUsuario);
                     cmd.Parameters.AddWithValue("Activo", obj.Activo);
-                    cmd.Parameters.Add("resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add("Resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 100).Direction = ParameterDirection.Output;
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -158,16 +161,17 @@ namespace CapaDatos
 
                     cmd.ExecuteNonQuery();
 
-                    idautogenerado = Convert.ToInt32(cmd.Parameters["resultado"].Value);
+                    idautogenerado = Convert.ToInt32(cmd.Parameters["Resultado"].Value);
                     Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                Mensaje = ex.Message;
+                Mensaje = "No se guardo el producto";
                 idautogenerado = 0;
             }
-            return idautogenerado;
+            return idautogenerado ;
+
         }
 
         public bool Editar(Productos obj, out string Mensaje)
@@ -184,7 +188,7 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("IdTipo", obj.oTipos.IdTipo);
                     cmd.Parameters.AddWithValue("Detalle", obj.Detalle);
                     cmd.Parameters.AddWithValue("StockMinimo", obj.StockMinimo);
-                    cmd.Parameters.AddWithValue("CodigoId", obj.CodigoId);
+                    cmd.Parameters.AddWithValue("CodigoId", (object)obj.CodigoId ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("IdUsuario", obj.IdUsuario);
                     cmd.Parameters.AddWithValue("Activo", obj.Activo);
                     cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
