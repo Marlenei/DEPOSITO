@@ -14,10 +14,32 @@ namespace CapaNegocio
     {
         private CD_SolicitudPedidos objCapaDato = new CD_SolicitudPedidos();
 
-        public List<SolicitudPedidos> Listar()
+
+        public List<SolicitudPedidos> Listar(int idUsuario)
         {
-            return objCapaDato.Listar();
+            return objCapaDato.Listar(idUsuario);
         }
+
+        public List<SolicitudPedidos> ObtenerPedidos(int? codArea, int? codSector, string nroPedido, DateTime fechaInicio, DateTime fechaFin, bool soloPendientes)
+        {
+            CD_SolicitudPedidos cdSolicitudPedidos = new CD_SolicitudPedidos();
+            return cdSolicitudPedidos.ListarFiltrados(codArea, codSector, nroPedido, fechaInicio, fechaFin, soloPendientes);
+        }
+
+        public List<SolicitudPedidos> ListarFiltradosNro(
+      // Parámetro requerido primero
+      string nroPedido = null,           // Parámetro opcional
+      bool soloPendientes = false)       // Parámetro opcional
+        {
+            return objCapaDato.ListarFiltradosNro(
+
+                nroPedido: nroPedido,
+                soloPendientes: soloPendientes
+            );
+        }
+
+
+
 
         // Modificado para incluir el número de pedido generado
         public int Registrar(SolicitudPedidos obj, out string Mensaje, out string NroPedidoGenerado)
@@ -61,6 +83,90 @@ namespace CapaNegocio
                 return 0;
             }
         }
+        public SolicitudPedidos ObtenerPedido(int idPedido)
+        {
+            try
+            {
+                return objCapaDato.ObtenerPedido(idPedido);
+            }
+            catch (Exception ex)
+            {
+                // Manejar excepciones o registrar errores
+                throw new Exception($"Error al obtener pedido: {ex.Message}", ex);
+            }
+        }
+
+        public bool ActualizarEntrega(SolicitudPedidos pedido, out string mensaje)
+        {
+            mensaje = string.Empty;
+            try
+            {
+                var pedidoExistente = objCapaDato.ObtenerPedido(pedido.IdSolicitud);
+
+                if (pedidoExistente == null)
+                {
+                    mensaje = "Pedido no encontrado";
+                    return false;
+                }
+
+                if (pedidoExistente.Visado)
+                {
+                    mensaje = "No se puede modificar un pedido visado";
+                    return false;
+                }
+
+                if ((DateTime.Now - pedidoExistente.FechaHoraActualizacion).TotalHours > 24)
+                {
+                    mensaje = "El periodo de modificación ha expirado (24 horas)";
+                    return false;
+                }
+
+                return objCapaDato.ActualizarEntrega(pedido, out mensaje);
+            }
+            catch (Exception ex)
+            {
+                mensaje = ex.Message;
+                return false;
+            }
+        }
+
+        public bool Actualizar(SolicitudPedidos pedido, out string mensaje)
+        {
+            return objCapaDato.Actualizar(pedido, out mensaje);
+        }
+
+        public bool RegistrarVisado(int idPedido, int idUsuario, out string mensaje)
+        {
+            try
+            {
+                var pedido = objCapaDato.ObtenerPedido(idPedido);
+
+                if (pedido == null)
+                {
+                    mensaje = "Pedido no encontrado";
+                    return false;
+                }
+
+                if (pedido.IdUsuarioPedido != idUsuario)
+                {
+                    mensaje = "Solo el solicitante puede visar el pedido";
+                    return false;
+                }
+
+                if (pedido.CantidadEntregada <= 0)
+                {
+                    mensaje = "No se puede visar con cantidad entregada igual a cero";
+                    return false;
+                }
+
+                return objCapaDato.RegistrarVisado(idPedido, idUsuario, out mensaje);
+            }
+            catch (Exception ex)
+            {
+                mensaje = ex.Message;
+                return false;
+            }
+        }
 
         public bool Editar(SolicitudPedidos obj, out string Mensaje)
         {
@@ -68,21 +174,15 @@ namespace CapaNegocio
 
             try
             {
-                if (obj == null)
+                var pedidoExistente = objCapaDato.ObtenerPedido(obj.IdSolicitud);
+
+                if (pedidoExistente.Visado)
                 {
-                    Mensaje = "El objeto de solicitud no puede ser nulo.";
+                    Mensaje = "No se puede editar un pedido visado";
                     return false;
                 }
 
-                if (string.IsNullOrWhiteSpace(obj.Observaciones))
-                    Mensaje += "Las observaciones no pueden estar vacías. ";
-
-                if (obj.CantidadEntregada < 0)
-                    Mensaje += "La cantidad entregada no puede ser negativa. ";
-
-                if (!string.IsNullOrEmpty(Mensaje))
-                    return false;
-
+                // Resto de validaciones...
                 return objCapaDato.Editar(obj, out Mensaje);
             }
             catch (Exception ex)
@@ -91,6 +191,8 @@ namespace CapaNegocio
                 return false;
             }
         }
+
+
 
         public string ObtenerNombreArea(int codArea)
         {
@@ -135,55 +237,9 @@ namespace CapaNegocio
             return "Sector no definido";
         }
 
-        public List<UsuarioDatos> ObtenerAreas(int codArea)
-        {
-            List<UsuarioDatos> areas = new List<UsuarioDatos>();
-            using (SqlConnection connection = new SqlConnection(Conexion.cn))
-            {
-                SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Areas]", connection);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CodigoArea", codArea);
+       
 
-                connection.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        areas.Add(new UsuarioDatos
-                        {
-                            CodArea = Convert.ToInt32(reader["CodigoArea"]),
-                            NombreArea = reader["NombreArea"].ToString()
-                        });
-                    }
-                }
-            }
-            return areas;
-        }
 
-        public List<UsuarioDatos> ObtenerSectoresPorArea(int codigoArea)
-        {
-            List<UsuarioDatos> sectores = new List<UsuarioDatos>();
-            using (SqlConnection connection = new SqlConnection(Conexion.cn))
-            {
-                SqlCommand cmd = new SqlCommand("[AHS].[dbo].[Mio_Listado_Sectores]", connection);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@CodigoArea", codigoArea);
 
-                connection.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        sectores.Add(new UsuarioDatos
-                        {
-                            CodSector = Convert.ToInt32(reader["CodigoSector"]),
-                            NombreSector = reader["NombreSector"].ToString(),
-                            CodArea = Convert.ToInt32(reader["CodigoArea"])
-                        });
-                    }
-                }
-            }
-            return sectores;
-        }
     }
 }

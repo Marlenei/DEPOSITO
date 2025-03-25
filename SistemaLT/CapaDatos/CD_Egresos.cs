@@ -21,7 +21,7 @@ namespace CapaDatos
                     StringBuilder sb = new StringBuilder();
                     sb.AppendLine("SELECT i.IdEgreso,");
                     sb.AppendLine("i.CodigoId,");
-                    sb.AppendLine("prod.IdProducto, prod.Detalle, prod.StockActual,");
+                    sb.AppendLine("prod.IdProducto , prod.Detalle , prod.StockActual ,");
                     sb.AppendLine("i.CodigoId, i.Cantidad, i.Observaciones, i.IdUsuario, i.TipoSalida, i.FechaEgreso,");
                     sb.AppendLine("i.CodigoArea, i.CodigoSector "); // Asegúrate de que estos campos existan en la tabla
                     sb.AppendLine("FROM Tonner_Egresos i ");
@@ -36,8 +36,13 @@ namespace CapaDatos
                         {
                             lista.Add(new Egresos()
                             {
-                                oProductos = new Productos() { IdProducto = Convert.ToInt32(rdr["IdProducto"]), Detalle = rdr["Detalle"].ToString() },
-                                oStockActual = new Productos() { IdProducto = Convert.ToInt32(rdr["IdProducto"]), StockActual = Convert.ToInt32(rdr["StockActual"]) },
+                                IdEgreso = Convert.ToInt32(rdr["IdEgreso"]),
+                                oProductos = new Productos()
+                                {
+                                    IdProducto = Convert.ToInt32(rdr["IdProducto"]),
+                                    Detalle = rdr["Detalle"].ToString(),
+                                    StockActual = Convert.ToInt32(rdr["StockActual"])
+                                },
                                 CodigoId = rdr["CodigoId"].ToString(),
                                 Cantidad = Convert.ToInt32(rdr["Cantidad"]),
                                 CodigoArea = Convert.ToInt32(rdr["CodigoArea"]),
@@ -72,10 +77,10 @@ namespace CapaDatos
                 // Asegúrate de que todos los parámetros tengan el símbolo '@'
                 cmd.Parameters.AddWithValue("@IdProducto", obj.oProductos.IdProducto);
                 cmd.Parameters.AddWithValue("@Cantidad", obj.Cantidad);
-               
                 cmd.Parameters.AddWithValue("@CodigoId", obj.CodigoId);
                 cmd.Parameters.AddWithValue("@Observaciones", obj.Observaciones);
                 cmd.Parameters.AddWithValue("@IdUsuario", obj.IdUsuario);
+                cmd.Parameters.AddWithValue("@StockActual", obj.oProductos.StockActual);
                 cmd.Parameters.AddWithValue("@TipoSalida", obj.TipoSalida);
                 cmd.Parameters.AddWithValue("@CodigoArea", obj.CodigoArea);
                 cmd.Parameters.AddWithValue("@CodigoSector", obj.CodigoSector);

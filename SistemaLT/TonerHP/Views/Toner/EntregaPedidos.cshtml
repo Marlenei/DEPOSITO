@@ -1,6 +1,6 @@
-﻿@using CapaEntidad
+﻿
 @{
-    ViewBag.Title = "Solicitud de Pedidos";
+    ViewBag.Title = "EntregaPedidos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -12,7 +12,7 @@
 <div class="card shadow-sm">
     <div class="card-header bg-primary text-white">
         <h5 class="card-title mb-0">
-            <i class="fas fa-boxes me-2"></i>Solicitud de Pedidos
+            <i class="fas fa-boxes me-2"></i>Entrega de Pedidos
         </h5>
     </div>
 
@@ -39,12 +39,12 @@
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
             <button type="button" class="btn btn-success" onclick="abrirModal(null)">
-                <i class="fas fa-plus-circle me-1"></i> Nuevo Pedido
+                <i class="fas fa-plus-circle me-1"></i> Entrega Pedido
             </button>
         </div>
 
         <div class="row mb-4">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <div class="input-group">
                     <input type="text" class="form-control"
                            id="txtBuscarPedido"
@@ -56,13 +56,44 @@
                     </button>
                 </div>
             </div>
-            <div class="col-md-6">
-                <button class="btn btn-warning w-100"
-                        onclick="mostrarPendientes()">
-                    <i class="fas fa-clipboard-list me-2"></i>
-                    Ver Pendientes de Mi Área
-                </button>
+        </div>
+
+        <!-- Bloque de filtros -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-3 mb-3 mb-md-0">
+                <label for="cboArea">Área</label>
+                <select id="cboArea" class="form-select" onchange="cargarSectores(this.value)">
+                    <option value="">Todas las áreas</option>
+                    <!-- Aquí se llenarán las áreas desde el servidor -->
+                </select>
             </div>
+
+            <div class="col-12 col-md-3 mb-3 mb-md-0">
+                <label for="cboSector">Sector</label>
+                <select id="cboSector" class="form-select">
+                    <option value="">Seleccione un Sector</option>
+                    <option value="0">Todos</option> <!-- Opción para todos -->
+                    <!-- Aquí se llenarán los sectores según el área seleccionada -->
+                </select>
+            </div>
+
+            <div class="col-12 col-md-3 mb-3 mb-md-0">
+                <label for="txtFechaInicio">Fecha Inicio</label>
+                <input type="date" id="txtFechaInicio" class="form-control"
+                       value="@DateTime.Now.AddDays(-30).ToString("yyyy-MM-dd")">
+            </div>
+
+            <div class="col-12 col-md-3 mb-3 mb-md-0">
+                <label for="txtFechaFin">Fecha Fin</label>
+                <input type="date" id="txtFechaFin" class="form-control"
+                       value="@DateTime.Now.ToString("yyyy-MM-dd")">
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-primary" onclick="aplicarFiltros()">
+                <i class="fas fa-filter"></i> Aplicar Filtros
+            </button>
         </div>
 
         <div class="table-responsive">
@@ -71,19 +102,19 @@
                     <tr>
                         <th></th>
                         <th>Producto</th>
+                        <th>Area</th>
+                        <th>Sector</th>
                         <th>Cant. Pedida</th>
                         <th>Cant. Entregada</th>
                         <th>Fecha Entrega</th>
                         <th>N° Pedido</th>
                         <th>Visado</th>
-                        <th>Acciones</th>
-                      
                     </tr>
                 </thead>
             </table>
         </div>
     </div>
-</div>
+    </div>
 
 <!-- Modal -->
 <div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
@@ -99,6 +130,7 @@
                 <input type="text" class="form-control" id="txtusuario" value="@User.Identity.Name" readonly>
 
                 <div class="row g-2" id="contenedor">
+
                     <div class="col-sm-6">
                         <label class="form-label">Producto</label>
                         <select id="cbodetalle" class="form-select ProductosS">
@@ -106,10 +138,14 @@
                         </select>
                     </div>
 
-                    <div class="col-sm-6">
+
+
+                    <div id="contenedor" class="col-sm-6">
+
+
                         <p class="d-inline-flex gap-1">
                             <button class="btn btn-outline-success" id="BtnBusqueda" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                Búsqueda Avanzada
+                                Busqueda Avanzada
                             </button>
                         </p>
                         <div class="collapse" id="collapseExample">
@@ -117,7 +153,13 @@
                                 @Html.Partial("_BusquedaAvan")
                             </div>
                         </div>
+
+
                     </div>
+
+
+
+
 
                     <div class="col-sm-6">
                         <label for="txtfechapedido" class="form-label">Fecha de Pedido</label>
@@ -131,21 +173,26 @@
 
                     <div class="col-sm-6">
                         <label class="form-label">Área</label>
-                        <input type="text" class="form-control" id="txtArea" value="@Session["NombreArea"]" readonly>
+                        <input type="text" class="form-control"
+                               id="txtArea"
+                               value="@Session["NombreArea"]"
+                               readonly>
                     </div>
-
                     <div class="col-sm-6">
                         <label class="form-label">Sector</label>
-                        <input type="text" class="form-control" id="txtSector" value="@Session["NombreSector"]" readonly>
+                        <input type="text" class="form-control"
+                               id="txtSector"
+                               value="@Session["NombreSector"]"
+                               readonly>
                     </div>
 
                     <div class="col-sm-6">
                         <label for="txtcantidad" class="form-label">Cantidad</label>
-                        <input type="number" class="form-control" id="txtcantidad" min="0" required placeholder="Coloque una cantidad">
+                        <input type="number" class="form-control" id="txtcantidad" min="0" required placeholder="Coloque una cantidad" oninput="this.value.replace(/[^0-9]/g, '');">
                     </div>
 
                     <div class="col-sm-6">
-                        <label for="txtcodigoid" class="form-label">Código ID</label>
+                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
                         <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
                     </div>
 
@@ -163,7 +210,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary btn-guardar" id="btnGuardar">Guardar</button>
+                <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
                 <button class="btn btn-secondary btn-lg" onclick="imprimirPedido()" id="btnImprimir">
                     <i class="fas fa-print me-2"></i> Imprimir
                 </button>
@@ -180,118 +227,91 @@
         var productos = {};
 
 
+
+
         $(document).ready(function () {
             inicializarDataTable();
+
             cargarProductos();
+            cargarAreas();
             $('.btn-guardar').click(Guardar);
+
         });
 
-         function abrirModal(json) {
-                 $('#txtArea').val('@Session["NombreArea"]');
-                 $('#txtSector').val('@Session["NombreSector"]');
-                 $("#txtid").val(0);
-                 $("#cbodetalle").val("");
-                 $("#txtcantidad").val("");
-                 $("#txtobservaciones").val("");
-                 $("#txtusuario").val(@Session["AccesCode"]);
-                 $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', new Date()));
-                 $("#mensajeError").hide();
+        $(document).ready(function () {
+        // Cargar áreas al cargar la página
+        $.getJSON('@Url.Action("ObtenerAreas", "SolicitudPedidos")', function (data) {
+            $.each(data, function (index, area) {
+                $('#cboArea').append($('<option>', {
+                    value: area.CodArea,
+                    text: area.NombreArea
+                }));
+            });
+        });
 
-                 if (json) {
-                     // Cargar datos para edición
-                     $("#txtid").val(json.IdSolicitud);
-                     $("#cbodetalle").val(json.oProductos.IdProducto);
-                     $("#txtcantidad").val(json.CantidadPedida);
-                     $("#txtobservaciones").val(json.Observaciones);
-                     $("#txtpedido").val(json.NroPedido);
-                     $("#txtfechapedido").val(new Date(json.FechaPedido).toLocaleDateString());
-                     $("#txtusuario").val(@Session[" AccesCode"]);
+        // Al cambiar el área, cargar los sectores correspondientes
+            $('#cboArea').change(function () {
+            var codArea = $(this).val();
+                $('#cboSector').empty(); // Limpiar sectores
 
-                     $("#btnGuardar").text("Actualizar");
-                 } else {
-                     // Generar nuevo número de pedido
-                     $.ajax({
-                         url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")',
-                         success: function(data) {
-                             $("#txtpedido").val(data);
-                         }
-                     });
-                     $("#txtfechapedido").val(new Date().toLocaleDateString());
+            // Agregar opción "Todos"
+                $('#cboSector').append($('<option>', {
+                value: "0",
+                text: "Todos"
+            }));
 
-                     $("#btnGuardar").text("Guardar");
-                 }
-
-                 $("#FormModal").modal("show");
-             }
-
-             $("#tabla tbody").on("click", '.btn-editar', function () {
-                 filaSeleccionada = $(this).closest("tr");
-                 var data = tabladata.row(filaSeleccionada).data();
-                 abrirModal(data);
-             });
-
-             function Guardar() {
-                 if ($("#cbodetalle").val() === "") {
-                     mostrarError("¡Seleccione un producto!");
-                     return;
-                 }
-
-                 const pedidoData = {
-                     IdSolicitud: $("#txtid").val(),
-                     oProductos: {
-                         IdProducto: $("#cbodetalle").val(),
-                         CodigoId: $("#txtcodigoid").val()
-                     },
-                     CantidadPedida: $("#txtcantidad").val(),
-                     Observaciones: $("#txtobservaciones").val(),
-                     NroPedido: $("#txtpedido").val(),
-                     IdUsuarioPedido: $("#txtusuario").val(),
-                 };
-
-                 const url = pedidoData.IdSolicitud == 0
-                     ? '@Url.Action("GuardarPedidos", "SolicitudPedidos")'
-                     : '@Url.Action("Actualizar", "SolicitudPedidos")';
-
-                 $.ajax({
-                     url: url,
-                     type: "POST",
-                     contentType: "application/json",
-                     data: JSON.stringify({ objeto: pedidoData }),
-                     success: function(response) {
-                         if (response.resultado) {
-                             Swal.fire('¡Éxito!', response.mensaje, 'success');
-                             $("#FormModal").modal("hide");
-                             tabladata.ajax.reload(null, false);
-                         } else {
-                             mostrarError(response.mensaje);
-                         }
-                     },
-                     error: function(xhr) {
-                         mostrarError("Error al guardar: " + xhr.responseText);
-                     }
-                 });
-             }
-
-             function mostrarError(mensaje) {
-                 $("#mensajeError").text(mensaje).show().delay(5000).fadeOut();
-             }
+            if (codArea) {
+                $.getJSON('@Url.Action("ObtenerSectoresPorArea", "SolicitudPedidos")', { codArea: codArea }, function (data) {
+                    $.each(data, function (index, sector) {
+                        $('#cboSector').append($('<option>', {
+                            value: sector.CodSector,
+                            text: sector.Nombre
+                        }));
+                    });
+                });
+            }
+        });
+    });
 
 
-         function inicializarDataTable() {
-            tabladata = $('#tabla').DataTable({
+        function aplicarFiltros() {
+            const filtros = {
+                codArea: $('#cboArea').val() || null,
+                codSector: $('#cboSector').val() || null,
+                fechaInicio: $('#txtFechaInicio').val(),
+                fechaFin: $('#txtFechaFin').val()
+            };
+
+            tabladata.ajax.url('@Url.Action("ListarFiltrados", "SolicitudPedidos")?' + $.param(filtros)).load();
+        }
+
+       function inicializarDataTable() {
+                tabladata = $('#tabla').DataTable({
                     ajax: {
-                        url: '@Url.Action("Listar", "SolicitudPedidos")',
-                        dataSrc: 'data' // Especificar la propiedad que contiene los datos
+                        url: '@Url.Action("ListarFiltrados", "SolicitudPedidos")',
+                        data: function (d) {
+                            d.codArea = $('#cboArea').val();
+                            d.codSector = $('#cboSector').val();
+                            d.fechaInicio = $('#txtFechaInicio').val();
+                            d.fechaFin = $('#txtFechaFin').val();
+                        }
                     },
                     columns: [
                         { data: "IdSolicitud", visible: false },
                         { data: "oProductos.Detalle", title: "Producto" },
+                        { data: "NombreArea" },
+                        { data: "NombreSector" },
                         { data: "CantidadPedida", title: "Cant. Pedida" },
                         {
                             data: "CantidadEntregada",
                             title: "Cant. Entregada",
-                            render: function (data) {
-                                return data || '0';
+                            render: function (data, type, row) {
+                                                    return `<input type="number" class="form-control input-entregado "
+                                    data-id="${row.IdSolicitud}"
+                                    value="${data || 0}"
+                                    min="0"
+                                    max="${row.CantidadPedida}"
+                                    ${row.Visado ? 'disabled' : ''}>`;
                             }
                         },
                         {
@@ -309,45 +329,42 @@
                                 return data ? '<i class="fas fa-check-circle text-success"></i>' :
                                              '<i class="fas fa-times-circle text-danger"></i>';
                             }
-                        },
-                        {
-                            data: null,
-                            render: function(data, type, row) {
-                                if (!row.Visado && row.CantidadEntregada > 0) {
-                                    return `<button class="btn btn-sm btn-warning btn-visar"
-                                            data-id="${row.IdSolicitud}">Visar</button>`;
-                                }
-                                return '';
-                            }
-                        },
-                        {
-                            "defaultContent": '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>',
-                            "orderable": false,
-                            "searchable": false,
-                            "width": "90px"
                         }
+
                     ],
                     language: {
                         url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json'
                     }
                 });
 
-                @*// Evento para actualizar cantidad entregada
+
+
+                // Evento para actualizar cantidad entregada
                 $('#tabla tbody').on('change', '.input-entregado', function() {
                     const id = $(this).data('id');
                     const cantidad = $(this).val();
 
-                    $.post('@Url.Action("ActualizarEntrega", "SolicitudPedidos")', {
+
+
+
+                    $.post('@Url.Action("ActualizarEntrega", "EntregaPedidos")', {
                         IdSolicitud: id,
                         CantidadEntregada: cantidad
-                    }).done(function(response) {
-                        if (!response.resultado) {
+                    }).done(function (response) {
+                        if (response.resultado) {
+                            Swal.fire('¡Éxito!', 'Cantidad entregada actualizada correctamente.', 'success');
+                            // Recargar la tabla para reflejar los cambios
+                            requestAnimationFrame(() => {
+                                tabladata.ajax.reload();
+                            });
+                        } else {
                             Swal.fire('Error', response.mensaje, 'error');
-                            tabladata.ajax.reload();
                         }
+                    }).fail(function (xhr) {
+                        Swal.fire('Error', 'Ocurrió un error al actualizar la cantidad entregada.', 'error');
                     });
-                });*@
-                   $('#tabla tbody').on('click', '.btn-visar', function() {
+                });
+                   @*$('#tabla tbody').on('click', '.btn-visar', function() {
                         const id = $(this).data('id');
 
                         Swal.fire({
@@ -366,24 +383,24 @@
                                 });
                             }
                         });
-                    });
+                    });*@
                 }
+                        // Función para buscar por número de pedido
+                      function buscarPorNumero() {
+                            const nroPedido = $("#txtBuscarPedido").val();
+                            tabladata.ajax.url('@Url.Action("ListarFiltrados", "SolicitudPedidos")' +
+                                '?nroPedido=' + encodeURIComponent(nroPedido) +
+                                '&soloPendientes=false').load();
+                        }
+
+                        @*// Función para mostrar pendientes
+                        function mostrarPendientes() {
+                            tabladata.ajax.url('@Url.Action("ListarFiltrados", "SolicitudPedidos")' +
+                                '?soloPendientes=true').load();
+                        }*@
 
 
 
-                       // Función para buscar por número de pedido
-                 function buscarPorNumero() {
-                       const nroPedido = $("#txtBuscarPedido").val();
-                       tabladata.ajax.url('@Url.Action("ListarFiltradosNro", "SolicitudPedidos")' +
-                           '?nroPedido=' + encodeURIComponent(nroPedido) +
-                           '&soloPendientes=false').load();
-                   }
-
-                   // Función para mostrar pendientes
-                   function mostrarPendientes() {
-                       tabladata.ajax.url('@Url.Action("ListarFiltradosNro", "SolicitudPedidos")' +
-                           '?soloPendientes=true').load();
-                   }
 
 
                $("#BtnBusqueda").on("click", function () {
@@ -565,138 +582,94 @@
         });
 
 
+        function abrirModal(json) {
 
 
+             $('#txtArea').val('@Session["NombreArea"]');
+            $('#txtSector').val('@Session["NombreSector"]');
+            $("#txtid").val(0);
+            $("#cbodetalle").val("");
+            $("#txtcantidad").val("");
+            $("#txtobservaciones").val("");
+            $("#txtusuario").val(@Session["AccesCode"]);
+            $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', new Date()));
+            $("#mensajeError").hide();
+
+            if (json) {
+                // Cargar datos para edición
+                $("#txtid").val(json.IdSolicitud);
+                $("#cbodetalle").val(json.oProductos.IdProducto);
+                $("#txtcantidad").val(json.CantidadPedida);
+                $("#txtobservaciones").val(json.Observaciones);
+                $("#txtpedido").val(json.NroPedido);
+                $("#txtfechapedido").val(new Date(json.FechaPedido).toLocaleDateString());
+                $("#txtusuario").val(@Session["AccesCode"]);
+            } else {
+                // Generar nuevo número de pedido
+                $.ajax({
+                    url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")',
+                    success: function(data) {
+                        $("#txtpedido").val(data);
+                    }
+                });
+                $("#txtfechapedido").val(new Date().toLocaleDateString());
+            }
+                $.ajax({
+                     url: '@Url.Action("ObtenerDatosUbicacion", "Usuario")',
+                     type: 'GET',
+                     success: function(data) {
+                         $('#txtArea').val(data.nombreArea);
+                         $('#txtSector').val(data.nombreSector);
+                     }
+                 });
+                $("#FormModal").modal("show");
+        }
 
 
+        // Modificar la función Guardar para incluir código ID
+        function Guardar() {
+            if ($("#cbodetalle").val() === "") {
+                mostrarError("¡Seleccione un producto!");
+                return;
+            }
 
-             function imprimirPedido() {
-            // Obtener datos del pedido
-            const pedido = {
-                nroPedido: $("#txtpedido").val(),
-                fechaPedido: $("#txtfechapedido").val(),
-                usuario: $("#txtusuario").val(),
-                area: $("#txtArea").val(),
-                sector: $("#txtSector").val(),
-                producto: $("#cbodetalle option:selected").text(),
-                cantidad: $("#txtcantidad").val(),
-                observaciones: $("#txtobservaciones").val()
+            const pedidoData = {
+                IdSolicitud: $("#txtid").val(),
+                oProductos: {
+                    IdProducto: $("#cbodetalle").val(),
+                    CodigoId: $("#txtcodigoid").val() // Nuevo campo
+                },
+                CantidadPedida: $("#txtcantidad").val(),
+                Observaciones: $("#txtobservaciones").val(),
+                NroPedido: $("#txtpedido").val(),
+                IdUsuarioEntrega: $("#txtusuario").val(),
             };
 
-            // Crear contenido del comprobante
-            const contenido = `
-                <style>
-                    .comprobante {
-                        font-family: Arial, sans-serif;
-                        max-width: 800px;
-                        margin: 20px auto;
-                        padding: 20px;
-                        border: 1px solid #ddd;
+            $.ajax({
+                url: '@Url.Action("GuardarPedidos", "SolicitudPedidos")',
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ objeto: pedidoData }),
+                success: function(response) {
+                    if (response.resultado) {
+                        Swal.fire('¡Éxito!', response.mensaje, 'success');
+                        tabladata.ajax.reload();
+                        $("#FormModal").modal("hide");
+                    } else {
+                        mostrarError(response.mensaje);
                     }
-                    .header {
-                        display: flex;
-                        justify-content: space-between;
-                        margin-bottom: 20px;
-                    }
-                    .logo {
-                        max-width: 2cm;
-                        max-height: 2cm;
-                    }
-                    .titulo {
-                        text-align: center;
-                        margin: 20px 0;
-                    }
-                    .datos-usuario {
-                        margin-bottom: 30px;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin: 20px 0;
-                    }
-                    th, td {
-                        border: 1px solid #000;
-                        padding: 8px;
-                        text-align: left;
-                    }
-                    .firmas {
-                        display: flex;
-                        justify-content: space-between;
-                        margin-top: 50px;
-                    }
-                    .firma {
-                        width: 45%;
-                        border-top: 1px solid #000;
-                        padding-top: 10px;
-                        margin-top: 60px;
-                    }
-                    .pie {
-                        margin-top: 30px;
-                        text-align: center;
-                    }
-                    @@media print {
-                        body { visibility: hidden; }
-                        .comprobante { visibility: visible; }
-                    }
-                </style>
-
-                <div class="comprobante">
-                    <div class="header">
-                        <div>
-                            <h2>Nota de pedido de insumos generales</h2>
-                            <p>Fecha: ${pedido.fechaPedido}</p>
-                            <p>N° de Pedido: ${pedido.nroPedido}</p>
-                        </div>
-                        <img src="/img/logo-institucion.png" class="logo" alt="Logo">
-                    </div>
-
-                    <div class="datos-usuario">
-                        <p>Solicitante: ${pedido.usuario}</p>
-                        <p>Área: ${pedido.area}</p>
-                        <p>Sector: ${pedido.sector}</p>
-                    </div>
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Descripción</th>
-                                <th>Cantidad Solicitada</th>
-                                <th>Cantidad Entregada</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>${pedido.producto}</td>
-                                <td>${pedido.cantidad}</td>
-                                <td style="height: 30px;">&nbsp;</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="firmas">
-                        <div class="firma">
-                            Firma del Solicitante<br>
-                            ${pedido.usuario}
-                        </div>
-                        <div class="firma">
-                            Firma de Recepción<br>
-                            (Nombre y apellido)
-                        </div>
-                    </div>
-
-                    <div class="pie">
-                        <p>Fecha de impresión: ${new Date().toLocaleDateString()}</p>
-                        <p>N° de Pedido: ${pedido.nroPedido}</p>
-                    </div>
-                </div>
-            `;
-
-            // Crear ventana de impresión
-            const ventanaImpresa = window.open('', '_blank');
-            ventanaImpresa.document.write(contenido);
-            ventanaImpresa.document.close();
-            ventanaImpresa.print();
+                }
+            });
         }
+
+        function mostrarError(mensaje) {
+            $("#mensajeError").text(mensaje).show().delay(5000).fadeOut();
+        }
+
+
+
+
+
 
 
     </script>
@@ -706,4 +679,5 @@
 
 
 }
+
 

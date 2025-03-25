@@ -13,7 +13,7 @@ namespace CapaEntidad
         public Productos oProductos { get; set; }
 
         public int CantidadPedida { get; set; }
-        public int CantidadEntregada { get; set; }
+        public int? CantidadEntregada { get; set; }
         public string FechaPedido { get; set; }
         public string FechaEntrega { get; set; }
         public int IdUsuarioPedido { get; set; }
