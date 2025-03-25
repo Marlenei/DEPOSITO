@@ -28,6 +28,7 @@ namespace CapaEntidad
         public string CodigoId { get; set; }
         public bool Activo { get; set; }
         public int IdUsuario { get; set; }
+        public DateTime FechaAlta { get; set; }
 
     }
 }

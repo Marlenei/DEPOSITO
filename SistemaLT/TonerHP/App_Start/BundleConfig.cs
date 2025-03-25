@@ -1,5 +1,8 @@
-﻿using System.Web;
+﻿using CapaEntidad;
+using System.Data;
+using System.Web;
 using System.Web.Optimization;
+using System.Web.UI.WebControls;
 
 namespace TonerHP
 {
@@ -11,20 +14,31 @@ namespace TonerHP
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
             bundles.Add(new ScriptBundle("~/bundles/complementos").Include(
-                        "~/Scripts/fontawesome/all.min.js",
-                        "~/Scripts/dataTables.min.js",
-                        //"~/Scripts/DataTables/jquery.dataTables.js",
-                        //"~/Scripts/DataTables/jdataTables.responsive.js",
-                        "~/Scripts/loadingoverlay/loadingoverlay.min.js",
-                        "~/Scripts/sweetalert2.min.js",
-                        "~/Scripts/Datepicker.js",
-                        "~/Scripts/jquery-ui.js",
-                        "~/Scripts/moment.js",
-                        "~/Scripts/scripts.js",
-                        //"~/Scripts/chosen.jquery.min.js",
-                        "~/Scripts/select2.min.js",
-                        "~/Scripts/daterangepicker.min.js"
+                "~/Scripts/fontawesome/all.min.js",
+                "~/Scripts/dataTables.min.js",
+                //"~/Scripts/DataTables/jquery.dataTables.js",
+                "~/Scripts/moment.min.js",
+                "~/Scripts/datetime-moment.js",
+                "~/Scripts/DataTables/dataTables.buttons.js",
+                "~/Scripts/DataTables/buttons.dataTables.js",
+                "~/Scripts/DataTables/jszip.min.js",
+                "~/Scripts/DataTables/pdfmake.min.js",
+                "~/Scripts/DataTables/vfs_fonts.js",
+                "~/Scripts/DataTables/buttons.html5.min.js",
+                "~/Scripts/DataTables/buttons.print.min.js",
+                "~/Scripts/DataTables/buttons.colVis.min.js",
+                "~/Scripts/DataTables/jdataTables.responsive.js",
+                "~/Scripts/loadingoverlay/loadingoverlay.min.js",
+                "~/Scripts/sweetalert2.min.js",
+                "~/Scripts/Datepicker.js",
+                "~/Scripts/jquery-ui.js",
+                "~/Scripts/scripts.js",
+                "~/Scripts/select2.min.js",
+                "~/Scripts/daterangepicker.min.js"
 
+
+                        
+                        
 
                         ));
 
@@ -44,12 +58,12 @@ namespace TonerHP
                       "~/Content/dataTables.dataTables.min.css",
                       //"~/Content/DataTables/css/jquery.dataTables.css",
                       "~/Content/DataTables/css/responsive.dataTables.css",
+                      "~/Content/DataTables/buttons.dataTables.css",
                       "~/Content/images",
                       "~/Content/sweetalert2.min.css",
                       "~/Content/jquery-ui.min.css",
                       "~/Content/bootstrap.css",
                       "~/Content/select2.min.css",
-                      //"~/Content/chosen.min.css",
                       "~/Content/daterangepicker.css"
                       ));
         }

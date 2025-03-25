@@ -55,12 +55,12 @@
                     <div class="col-sm-6">
                         <label class="form-label">Rubro</label>
 
-                        <input type="text" class="form-control" id="cborubro">
+                        <select id="cborubro" class="form-select"> </select>
                     </div>
 
                     <div class="col-sm-6">
                         <label class="form-label">Codigo</label>
-                        <input type="text" class="form-control" id="txtcodigoid">
+                        <input type="text" class="form-control" id="txtcodigoid" maxlength="5">
 
                     </div>
 
@@ -98,52 +98,101 @@
         var tabladata;
         var filaSeleccionada;
 
-        tabladata = $('#tabla').DataTable({
-            responsive: true,
-            ordering: false,
-            "ajax": {
-                url: '@Url.Action("ListarRubros","Toner")',
-                type: "GET",
-                dataType: "json"
-            },
-            "columns": [
-                { "data": "Rubro" },
-                { "data": "Codigo" },
+        $(document).ready(function () {
+            LimpiarCampos();
 
+            $('#cborubro').select2({
+                tags: true,
+                placeholder: "Selecciona una opción",
+                allowClear: true,
+                dropdownParent: $('#FormModal'),
+            });
 
-                {
-                    "data": "Activo", "render": function (data) {
-                        return data ? '<span class="badge text-bg-success">Si</span>' : '<span class="badge text-bg-danger">No</span>';
-                    }
+            $('#exampleDataList').on('input', function () {
+                var inputVal = $(this).val();
+                var selectedOption = $('#cborubro option').filter(function () {
+                    return $(this).text() === inputVal;
+                });
+            });
+
+            tabladata = $('#tabla').DataTable({
+                responsive: true,
+                ordering: false,
+                "ajax": {
+                    url: '@Url.Action("ListarRubros","Toner")',
+                    type: "GET",
+                    dataType: "json"
                 },
-                {
-                    "defaultContent": '<button type="button" class="btn btn-primary btn-sm"> <i class="fas fa-pen"></i></button>' +
-                        '<button type="button" class="btn btn-danger btn-sm ms-2"> <i class="fas fa-trash"></i></button>',
-                    "orderable": false,
-                    "searchable": false,
-                    "width": "auto"
+                "columns": [
+                    { "data": "Rubro" },
+                    { "data": "Codigo" },
+
+
+                    {
+                        "data": "Activo", "render": function (data) {
+                            return data ? '<span class="badge text-bg-success">Si</span>' : '<span class="badge text-bg-danger">No</span>';
+                        }
+                    },
+                    {
+                        "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>',
+                        "orderable": false,
+                        "searchable": false,
+                        "width": "auto"
+                    }
+
+                ],
+                "language": {
+                    "url": "../Language/es-Es.json",
                 }
 
-            ],
-            "language": {
-                "url":"/Language/es-Es.json",
-            }
-
+            });
         });
+
+                jQuery.ajax({
+                url: '@Url.Action("ListarRubros", "Toner")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        $("<option>").attr({ "value": "" }).text("Seleccione un Rubro").appendTo("#cborubro");
+                        var opciones = [];
+                        $.each(data.data, function (index, valor) {
+                            opciones.push({
+                                id: valor.IdRubro,
+                                text: valor.Rubro
+                            });
+                        });
+
+
+                        $('#cborubro').select2({
+                            data: opciones,
+                            tags: true,
+                            placeholder: "Selecciona una opción",
+                            allowClear: true,
+                            dropdownParent: $('#FormModal'),
+
+                        });
+                    },
+                    error: function (error) {
+                        console.log(error)
+                    },
+                });
 
         function abrirModal(json) {
 
                 $("#txtid").val(0);
-                $("#cborubro").val("");
+                $("#cborubro").val(null).trigger('change');
                 $("#txtcodigoid").val("");
                 $("#txtusuario").val(@Session["AccesCode"]);
                 $("#cboactivo").val(1);
                 $("#mensajeError").hide();
 
 
-                if (json != null) {
+            if (json != null) {
+                console.log(json);
                     $("#txtid").val(json.IdRubro);
-                    $("#cborubro").val(json.Rubro);
+                    $("#cborubro").val(json.IdRubro).trigger('change');
                     $("#txtcodigoid").val(json.Codigo);
                     $("#txtusuario").val(json.IdUsuario);
                     $("#cboactivo").val(json.Activo == true ? 1:0 );
@@ -151,78 +200,74 @@
                 }
                 $("#FormModal").modal("show");
 
-            }
+        }
 
- $("#tabla tbody").on("click", '.btn-editar', function () {
-     filaSeleccionada = $(this).closest("tr");
-     var data = tabladata.row(filaSeleccionada).data();
-     abrirModal(data)
- })
 
-  function Guardar() {
+             $("#tabla tbody").on("click", '.btn-editar', function () {
+                 filaSeleccionada = $(this).closest("tr");
+                 var data = tabladata.row(filaSeleccionada).data();
+                 abrirModal(data)
+             })
 
-    var Rubros = {
-        IdRubro: $("#txtid").val(),
-
-       oRubros: {
-            IdRubro: $("#cborubro option:selected").val(),
-            Rubro: $("#cborubro option:selected").text(),
-       },
-
-       CodigoId: $("#txtcodigoid").val(),
-       IdUsuario: $("#txtusuario").val(),
-       Activo: $("#cboactivo").val() == 1 ? true : false,
-    }
-
-    jQuery.ajax({
-        url: '@Url.Action("GuardarRubros", "Toner")',
-        type: "POST",
-        data: JSON.stringify({ objeto: Rubros }),
-        dataType: "json",
-        contentType: "application/json; charset=utf-8",
-        success: function (data) {
-            $(".modal-body").LoadingOverlay("hide");
-            //PRODUCTO NUEVO
-            if (Rubros.IdRubro == 0) {
-                if (data.resultado != 0) {
-                    Rubros.IdRubro = data.resultado;
-                    tabladata.row.add(Rubros).draw(false);
-                    $("#FormModal").modal("hide");
-                } else {
-                    $("#mensajeError").text(data.mensaje);
-                    $("#mensajeError").show();
+              function Guardar() {
+                
+                var Rubros = {
+                    IdRubro: $("#txtid").val(),
+                    Rubro: $("#cborubro option:selected").text(),
+                    Codigo: $("#txtcodigoid").val(),
+                    IdUsuario: $("#txtusuario").val(),
+                    Activo: $("#cboactivo").val() == 1 ? true : false,
                 }
+                jQuery.ajax({
+                    url: '@Url.Action("GuardarRubros", "Toner")',
+                    type: "POST",
+                    data: JSON.stringify({ objeto: Rubros }),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        $(".modal-body").LoadingOverlay("hide");
+                        //PRODUCTO NUEVO
+                        if (Rubros.IdRubro == 0) {
+                            if (data.resultado != 0) {
+                                Rubros.IdRubro = data.resultado;
+                                tabladata.row.add(Rubros).draw(false);
+                                location.reload();
+                                $("#FormModal").modal("hide");
+                            } else {
+                                $("#mensajeError").text(data.mensaje);
+                                $("#mensajeError").show();
+                            }
+                        }
+                            //PRODUCTO EDITAR
+                        else {
+                            if (data.resultado) {
+                                tabladata.row(filaSeleccionada).data(Rubros).draw(false);
+                                filaSeleccionada = null;
+                                location.reload();
+                                $("#FormModal").modal("hide");
+                            } else {
+                                $("#mensajeError").text(data.mensaje);
+                                $("#mensajeError").show();
+                            }
+                        }
+                    },
+                    error: function (error) {
+                        $(".modal-body").LoadingOverlay("hide");
+                        $("#mensajeError").text("Error Ajax");
+                        $("#mensajeError").show();
+
+                        console.log(error)
+                    },
+                    beforeSend: function () {
+                        $(".modal-body").LoadingOverlay("show", {
+                            imageResizeFactor: 2,
+                            text: "Cargando...",
+                            size:14
+                        })
+
+                    },
+                });
             }
-                //PRODUCTO EDITAR
-            else {
-                if (data.resultado) {
-
-                    tabladata.row(filaSeleccionada).data(Rubros).draw(false);
-                    filaSeleccionada = null;
-                    $("#FormModal").modal("hide");
-                } else {
-                    $("#mensajeError").text(data.mensaje);
-                    $("#mensajeError").show();
-                }
-            }
-        },
-        error: function (error) {
-            $(".modal-body").LoadingOverlay("hide");
-            $("#mensajeError").text("Error Ajax");
-            $("#mensajeError").show();
-
-            console.log(error)
-        },
-        beforeSend: function () {
-            $(".modal-body").LoadingOverlay("show", {
-                imageResizeFactor: 2,
-                text: "Cargando...",
-                size:14
-            })
-
-        },
-    });
-}
 
     </script>
 }

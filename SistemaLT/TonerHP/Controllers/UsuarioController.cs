@@ -167,11 +167,11 @@ namespace TonerHP.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult CerrarSesion()
-        {
-            FormsAuthentication.SignOut();
-            return RedirectToAction("Login", "Usuario");
-        }
+        //public ActionResult CerrarSesion()
+        //{
+        //    FormsAuthentication.SignOut();
+        //    return RedirectToAction("Login", "Usuario");
+        //}
 
       
     }

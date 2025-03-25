@@ -11,7 +11,6 @@
     <title>@ViewBag.Title H. Pediatrico - Libreria/I. Informaticos</title>
     @Styles.Render("~/Content/css")
     <style>
-        /* Estilos personalizados sin cambiar estructura */
         body {
             background: linear-gradient(135deg, #1e3c72, #2a5298);
         }
@@ -86,7 +85,6 @@
     @Scripts.Render("~/bundles/complementos")
     @Scripts.Render("~/bundles/bootstrap")
     <script>
-        // Validación básica de formulario
         document.querySelector('form').addEventListener('submit', function (e) {
             if (!this.checkValidity()) {
                 e.preventDefault();

@@ -160,24 +160,26 @@
 
 
 
-
+        //Dataranger - rangos
         $(function () {
             var startDate, endDate;
-            startDate = moment().subtract(183, 'days');
-            endDate = moment();
+            startDate = moment().subtract(2, 'days').startOf('day');;
+            endDate = moment().endOf('day');;
             $('input[name="daterange"]').daterangepicker({
-                opens: 'left',
-                startDate: moment().subtract(183, 'days'),
+                opens: 'center',
+                startDate: moment(),
                 endDate: moment(),
-                locale: {
-                    format: 'DD-MM-YYYY'
-                }
-            }, function (start, end) {
-                startDate = start;
-                endDate = end;
-                tabladata.draw();
-        });
 
+                locale: {
+                    format: 'DD-MM-YYYY',
+                }
+            },
+                function (start, end) {
+                    startDate = start.startOf('day');;
+                    endDate = end.endOf('day');;
+                    tabladata.draw();
+        });
+            $('input[name="daterange"]').val(startDate.format('DD-MM-YYYY') + ' - ' + endDate.format('DD-MM-YYYY'));
             $.fn.DataTable.ext.search.push(
                 function (setting, data, dataIndex) {
                     var fechaIngreso = moment(data[6], 'DD/MM/YYYY');
@@ -189,11 +191,21 @@
             );
         });
 
-
+        $.fn.dataTable.moment('DD/MM/YYYY');
         $(document).ready(function () {
+
             CargarProductos();
             LimpiarCampos();
             selects2();
+
+            $('#cboproveedores').select2({
+                placeholder: "Selecciona una opción",
+                allowClear: true,
+                dropdownParent: $('#FormModal'),
+
+            });
+
+            //Mantener el Producto cuando se cierre el collapse
             let productoSeleccionado = null;
 
             $('#collapseExample').on('hide.bs.collapse', function () {
@@ -212,16 +224,33 @@
             });
 
 
-
             tabladata = $("#tabla").DataTable({
+                autoWidth: true,
                responsive: true,
                ordering: true,
-               order: [],
+                order: [],
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'pdf',
+                        pageSize: 'A4',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    'colvis'
+                ],
                "ajax": {
                    url: '@Url.Action("ListarIngresos", "Toner")',
                    type: "GET",
                    dataType: "json",
-               },
+                },
                "columns": [
                    {
                        "data": "oProductos", "render": function (data) {
@@ -258,34 +287,17 @@
 
                    },
                     {
-                        "data": "FechaIngreso", "render": function (data) {
-                            if (!data) return '';
-                            var partes = data.split('/');
-                            if (partes.length !== 3) return '';
-                            var dia = parseInt(partes[0], 10);
-                            var mes = parseInt(partes[1], 10) - 1;
-                            var año = parseInt(partes[2], 10);
-                            var fecha = new Date(año, mes, dia);
-                            return (fecha.getDate()) + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear();
-                        }
-                    },
+                        "data": "FechaIngreso"
+                   },
                     {
-                        "data": "FechaAct1", "render": function (data) {
-                            if (!data) return '';
-                            var partes = data.split('/');
-                            if (partes.length !== 3) return '';
-                            var dia = parseInt(partes[0], 10);
-                            var mes = parseInt(partes[1], 10) - 1;
-                            var año = parseInt(partes[2], 10);
-                            var fecha = new Date(año, mes, dia);
-                            return (fecha.getDate()) + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear();
-                        }
+                        "data": "FechaAct"
                     },
                    {
-                       "data": "Observaciones", 
+                       "data": "Observaciones",
                        "render": function (data) {
                            return data ? data : '';
                        },
+                       searchable: false,
                    },
                    {
                        "data": "NombreyApellido",
@@ -301,17 +313,27 @@
                     }
 
                 ],
+                columnDefs: [
+                    {
+                        targets: [6, 7], render: function (data) {
+                            return moment(data).format('DD/MM/YYYY');
+                        }                    }
+                ],
                 "language": {
-                    "url": "/Language/es-Es.json",
-                }
+                    "url": "../Language/es-Es.json",
+                },
+
             });
+
+
 
             $("#BtnBusqueda").on("click", function () {
                     var urlrubros = '@Url.Action("ListarRubros", "Toner")'
                     CargarRubros(urlrubros);
 
                     var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
-                     CargarCodigosID(urlcodigoid);
+                    CargarCodigosID(urlcodigoid);
+
             });
         });
 
@@ -320,27 +342,28 @@
             CargarProductos();
         });
 
-        $('#exampleDataList').on('input', function () {
+        //Manejo del Stock Actual
+        $('#StockDatos').on('input', function () {
             var inputVal = $(this).val();
             var selectedOption = $('#cbodetalle option').filter(function () {
-                return $(this).text() === inputVal; // Cambiar a .text() para comparar el texto
+                return $(this).text() === inputVal;
             });
 
             if (selectedOption.length) {
-                var idProducto = selectedOption.data('id'); // Obtener el IdProducto
-                var stockActual = productos[idProducto]; // Obtener el stock actual
+                var idProducto = selectedOption.data('id');
+                var stockActual = productos[idProducto];
 
                 if (stockActual !== undefined) {
-                    $("#cbostockactual").val(stockActual).show(); // Mostrar el stock actual
+                    $("#cbostockactual").val(stockActual).show();
                 } else {
-                    $("#cbostockactual").val("").hide(); // Ocultar si no hay stock
+                    $("#cbostockactual").val("").hide();
                 }
 
-                // Guardar el ID del producto en un campo oculto
-                $("#txtidProducto").val(idProducto); // Asegúrate de tener un campo oculto para el ID
-                console.log("ID del producto seleccionado: " + idProducto);
+                $("#txtidProducto").val(idProducto);
+
             }
         });
+
 
 
         //Listado Proveedores
@@ -352,10 +375,24 @@
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
                     $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cboproveedores");
+                    var opciones = [];
                     $.each(data.data, function (index, valor) {
                         if (valor.Activo === true) {
-                            $("<option>").attr({ "value": valor.IdProveedor }).text(valor.RazonSocial).appendTo("#cboproveedores");
+
+                            opciones.push({
+                                id: valor.IdProveedor,
+                                text: valor.RazonSocial
+                            });
                         }
+                    });
+
+
+                    $('#cboproveedores').select2({
+                        data: opciones,
+                        placeholder: "Selecciona una opción",
+                        allowClear: true,
+                        dropdownParent: $('#FormModal'),
+
                     });
                 },
                 error: function (error) {
@@ -390,26 +427,27 @@
 
 
         function abrirModal(json) {
+            $('#collapseExample').collapse('hide');
             if (json != null) {
                 var fechaActMatch = json.FechaAct.match(/\/Date\((\d+)\)\//);
                 var timestamp = parseInt(fechaActMatch[1], 10);
                 var fechaRegistro = new Date(timestamp);
                 var fechaActual = new Date();
-                var diferenciaDias = (fechaActual.getTime() - fechaRegistro.getTime()) / (1000 * 3600 * 24); // 1000 ms * 3600 s * 24 h
+                var diferenciaDias = (fechaActual.getTime() - fechaRegistro.getTime()) / (1000 * 3600 * 24);
 
                 if (diferenciaDias >= 1) {
                     Swal.fire({
                         title: "Ya no se puede actualizar/ modificar este registro.",
                         icon: "error",
                         customClass: {
-                            confirmButton: 'btn btn-primary' // Usa customClass para el estilo del botón
+                            confirmButton: 'btn btn-primary'
                         },
                         confirmButtonText: "Ok",
                     });
                 } else {
                     $("#txtid").val(json.IdIngreso);
                     $("#cbodetalle").val(json.oProductos.IdProducto).trigger('change');
-                    $("#cboproveedores").val(json.oProveedores.IdProveedor);
+                    $("#cboproveedores").val(json.oProveedores.IdProveedor).trigger('change');
                     $("#txtcantidad").val(json.Cantidad);
                     $("#cbostockactual").val(json.oProductos.StockActual).show();
                     $("#txtcodigoid").val(json.CodigoId);
@@ -492,6 +530,9 @@
                 }
 
             })
+
+
+
         function Guardar() {
 
                 var Ingresos = {
