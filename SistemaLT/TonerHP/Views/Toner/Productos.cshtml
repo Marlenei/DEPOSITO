@@ -56,12 +56,12 @@
 
                     <div class="col-sm-6">
                         <label for="txtdetalle" class="form-label">Detalle</label>
-                        <input type="text" class="form-control" id="txtdetalle">
+                        <select id="cbodetalle" class="form-control">  </select>
                     </div>
 
                     <div class="col-sm-6">
                         <label class="form-label">Rubro</label>
-                        <select id="cborubro" class="form-select" name="idRubro" onchange="CargarTipos(this.value)">
+                        <select id="cborubro" class="form-select" name="idRubro" onchange="CargarTiposPorRubro(this.value)">
                             <option value="">Seleccione un Rubro</option>
                         </select>
                     </div>
@@ -112,64 +112,103 @@
         var tabladata;
         var filaSeleccionada
 
-
         $(document).ready(function () {
             LimpiarCampos();
-            var urlrubros = '@Url.Action("ListarRubros", "Toner")'
-            CargarRubros(urlrubros);
-            selects2();
-        });
+            $('#cbotipo').select2({
+                placeholder: "Selecciona una opción",
+                allowClear: true,
+                dropdownParent: $('#FormModal'),
 
+            });
 
-        tabladata = $("#tabla").DataTable({
-            responsive: true,
-            ordering: false,
-            "ajax": {
-                url: '@Url.Action("ListarProductos", "Toner")',
-                type: "GET",
-                dataType: "json"
-            },
-            "columns": [
-                { "data": "Detalle" },
-                {
-                    "data": "oRubros", "render": function (data) {
-                        return data.Rubro
-                    }
+            //TABLA
+            tabladata = $("#tabla").DataTable({
+                responsive: true,
+                ordering: false,
+                "ajax": {
+                    url: '@Url.Action("ListarProductos", "Toner")',
+                    type: "GET",
+                    dataType: "json"
                 },
-                {
-                    "data": "oTipos", "render": function (data) {
-                        return data.Tipo
-                    }
-                },
-                { "data": "StockMinimo" },
-                { "data": "StockActual" },
-                { "data": "CodigoId" },
-
-                {
-                    "data": "Activo", "render": function (valor) {
-                        if (valor) {
-
-                            return '<span class="badge text-bg-success">Si</span>'
-                        } else {
-                            return '<span class="badge text-bg-danger">No</span>'
+                "columns": [
+                    { "data": "Detalle" },
+                    {
+                        "data": "oRubros", "render": function (data) {
+                            return data.Rubro
                         }
-                    }
-                },
-                {
-                    "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>' +
-                        '<button type="button" class="btn btn-danger btn-sm ms-2 btn-eliminar"> <i class="fas fa-trash"></i></button>',
-                    "orderable": false,
-                    "searchable": false,
-                    "width": "auto"
-                }
+                    },
+                    {
+                        "data": "oTipos", "render": function (data) {
+                            return data.Tipo
+                        }
+                    },
+                    { "data": "StockMinimo" },
+                    { "data": "StockActual" },
+                    { "data": "CodigoId" },
 
-            ],
-            "language": {
-                "url": "/Language/es-Es.json",
-            }
+                    {
+                        "data": "Activo", "render": function (valor) {
+                            if (valor) {
+
+                                return '<span class="badge text-bg-success">Si</span>'
+                            } else {
+                                return '<span class="badge text-bg-danger">No</span>'
+                            }
+                        }
+                    },
+                    {
+                        "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>',
+                        "orderable": false,
+                        "searchable": false,
+                        "width": "auto"
+                    }
+
+                ],
+                "language": {
+                    "url": "../Language/es-Es.json",
+                }
+            });
+
         });
 
-            @*jQuery.ajax({
+
+        //LISTADO PRODUCTOS
+               jQuery.ajax({
+                    url: '@Url.Action("ListarProductos", "Toner")',
+                    type: "GET",
+                    data: null,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function(data) {
+                        $("<option>").attr({ "value": "" }).text("Seleccione un Producto").appendTo("#cbodetalle");
+                        var opciones = [];
+                        $.each(data.data, function(index, valor) {
+                            opciones.push({
+                                id: valor.IdProducto,
+                                text: valor.Detalle
+                            });
+                        });
+
+
+                        $('#cbodetalle').select2({
+                            data: opciones,
+                            tags: true,
+                            placeholder: "Selecciona una opción",
+                            allowClear: true,
+                            dropdownParent: $('#FormModal'),
+
+                        });
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+               });
+
+
+
+        //LISTADO RUBROS
+
+            jQuery.ajax({
             url: '@Url.Action("ListarRubros", "Toner")',
             type: "GET",
             data: null,
@@ -177,88 +216,115 @@
             contentType: "application/json; charset=utf-8",
                 success: function (data) {
                     $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cborubro");
+                    $("#cborubro").empty();
 
+                    var opciones = [];
                     $.each(data.data, function (index, valor) {
-                        if (valor.Activo == true) {
-                            $("<option>").attr({ "value": valor.IdRubro }).text(valor.Rubro).appendTo("#cborubro");
+                        if (valor.Activo === true) {
+                            opciones.push({
+                                id: valor.IdRubro,
+                                text: valor.Rubro
+                            });
                         }
-                    })
+                    });
+
+
+                    $('#cborubro').select2({
+                        data: opciones,
+                        placeholder: "Selecciona una opción",
+                        allowClear: true,
+                        dropdownParent: $('#FormModal'),
+
+                    });
+
+
                 },
                 error: function (error) {
                     console.log(error)
                 },
             });
 
-
-            jQuery.ajax({
-            url: '@Url.Action("ListarTipos", "Toner")',
-            type: "GET",
-            data: null,
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbotipo");
-
-                    $.each(data.data, function (index, valor) {
-                        if (valor.Activo == true) {
-                            $("<option>").attr({ "value": valor.IdTipo }).text(valor.Tipo).appendTo("#cbotipo");
-                        }
-                    })
-                },
-                error: function (error) {
-                    console.log(error)
-                },
-            });*@
-
-
-
-        @*jQuery.ajax({
-            url: '@Url.Action("ListarTiposPorRubro", "Toner")',
-            type: "GET",
-            data: { idRubro: idRubro }, 
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
-            success: function (data) {
-                $("<option>").attr({ "value": 0 }).text("Seleccionar Tipo").appendTo("#cbotipo");
-                $.each(data, function (index, valor) {
-                    if (valor.Activo === true) {
-                        $("<option>").attr({ "value": valor.IdTipo }).text(valor.Tipo).appendTo("#cbotipo");
-                    }
-                });
-            },
-            error: function (error) {
-                console.log(error)
-            },
-        });*@
-
-
-
-        function abrirModal(json) {
-            $("#txtid").val(0);
-            $("#txttipo").val("");
-            $("#txtdetalle").val("");
-            $("#cborubro").val("");
-            $("#cbotipo").val("");
-            $("#txtstockminimo").val("");
-            $("#txtcodigoid").val("");
-            $("#txtusuario").val(@Session["AccesCode"]);
-            $("#cboactivo").val(1);
-            $("#mensajeError").hide();
-
-
-            if (json != null) {
-                $("#txtid").val(json.IdProducto);
-                $("#txtdetalle").val(json.Detalle);
-                $("#cborubro").val(json.oRubros.IdRubro);
-                $("#cbotipo").val(json.oTipos.IdTipo);
-                $("#txtstockminimo").val(json.StockMinimo);
-                $("#txtcodigoid").val(json.CodigoId);
-                $("#txtusuario").val(json.IdUsuario);
-                $("#cboactivo").val(json.Activo == true ? 1 : 0);
-
+        //LISTADO TIPOS
+        function CargarTiposPorRubro(idRubro, callback) {
+            if (!idRubro) {
+                return;
             }
-            $("#FormModal").modal("show");
+              jQuery.ajax({
+                  url: '@Url.Action("ListarTiposPorRubro", "Toner")' + '?idRubro=' + idRubro,
+                  type: "GET",
+                  dataType: "json",
+                  contentType: "application/json; charset=utf-8",
+                  success: function (data) {
+                      $("#cbotipo").empty();
 
+                      $.each(data, function (index, valor) {
+                          if (valor.Activo === true) {
+                              $("<option>").attr({ "value": valor.IdTipo }).text(valor.Tipo).appendTo("#cbotipo");
+                          }
+                      });
+                      if (callback) {
+                          callback();
+                      }
+                  },
+                  error: function (error) {
+                      console.log(error)
+                  },
+              });
+          };
+
+
+
+        function abrirModal(data) {
+             if (data != null) {
+                 var fechaActMatch = data.FechaAlta.match(/\/Date\((\d+)\)\//);
+                 var timestamp = parseInt(fechaActMatch[1], 10);
+                 var fechaRegistro = new Date(timestamp);
+                 var fechaActual = new Date();
+                 var diferenciaDias = (fechaActual.getTime() - fechaRegistro.getTime()) / (1000 * 3600 * 24);
+
+                 if (diferenciaDias >= 7) {
+                     $("#txtid").val(data.IdProducto);
+                     $("#cbodetalle").val(data.IdProducto).prop('disabled', true).trigger('change');
+                     $("#cborubro").val(data.oRubros.IdRubro).prop('disabled', true).trigger('change');
+                     CargarTiposPorRubro(data.oRubros.IdRubro, function () {
+                         $("#cbotipo").val(data.oTipos.IdTipo).prop('disabled', true).trigger('change');
+                     });
+                     $("#txtstockminimo").val(data.StockMinimo).prop('disabled', true);
+                     $("#txtcodigoid").val(data.CodigoId).prop('disabled', true);
+                     $("#cboactivo").val(data.Activo == true ? 1 : 0);
+                     $("#mensajeError").text("Solo se puede modificar el estado activo después de 7 días.").show();
+                     $("#FormModal").modal("show");
+
+                 } else {
+                       $("#txtid").val(data.IdProducto);
+                        $("#cbodetalle").val(data.IdProducto).trigger('change');
+                        $("#cborubro").val(data.oRubros.IdRubro).trigger('change');
+                        CargarTiposPorRubro(data.oRubros.IdRubro, function () {
+                            $("#cbotipo").val(data.oTipos.IdTipo).trigger('change');
+                        });
+                      $("#txtstockminimo").val(data.StockMinimo);
+                      $("#txtcodigoid").val(data.CodigoId);
+                      $("#txtusuario").val(data.IdUsuario);
+                      $("#cboactivo").val(data.Activo == true ? 1 : 0);
+                      $("#mensajeError").hide();
+
+                     $("#FormModal").modal("show");
+                 }
+             } else {
+                    $("#txtid").val(0);
+                    $("#cbodetalle").val(null).trigger('change');
+                    $("#cbotipo").val(null).trigger('change');
+                    $("#cborubro").val(null).trigger('change');
+                    $("#txtstockminimo").val("");
+                    $("#txtcodigoid").val("");
+                    $("#txtusuario").val(@Session["AccesCode"]);
+                    $("#cboactivo").val(1);
+                    $("#mensajeError").hide();
+
+                 $("#FormModal").modal("show");
+
+
+             }
         }
 
         $("#tabla tbody").on("click", '.btn-editar', function () {
@@ -271,7 +337,7 @@
 
             var Productos = {
                IdProducto: $("#txtid").val(),
-               Detalle: $("#txtdetalle").val(),
+               Detalle: $("#cbodetalle option:selected").text(),
                oRubros: {
                     IdRubro: $("#cborubro option:selected").val(),
                     Rubro: $("#cborubro option:selected").text(),
@@ -300,6 +366,7 @@
                         if (data.resultado != 0) {
                             Productos.IdProducto = data.resultado;
                             tabladata.row.add(Productos).draw(false);
+                            location.reload();
                             $("#FormModal").modal("hide");
                         } else {
                             $("#mensajeError").text(data.mensaje);
@@ -309,9 +376,9 @@
                         //PRODUCTO EDITAR
                     else {
                         if (data.resultado) {
-
                             tabladata.row(filaSeleccionada).data(Productos).draw(false);
                             filaSeleccionada = null;
+                            location.reload();
                             $("#FormModal").modal("hide");
                         } else {
                             $("#mensajeError").text(data.mensaje);

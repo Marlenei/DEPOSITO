@@ -19,7 +19,7 @@ namespace CapaEntidad
 
         public string NroExpediente {  get; set; }
         public char TipoIngreso { get; set; }
-        public string FechaIngreso { get; set; }
+        public DateTime FechaIngreso { get; set; }
         public string FechaAct1 { get; set; }
         public string NombreyApellido { get; set; }
         public DateTime FechaAct { get; set; }

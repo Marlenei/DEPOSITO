@@ -11,15 +11,12 @@ namespace CapaNegocio
 {
     public class CN_Ingresos
     {
-        // Método para verificar si la cadena es alfanumérica
         private bool IsAlphanumeric(string input)
         {
             if (input == null)
             {
-                return true; // O false, dependiendo de tu lógica de negocio
+                return true; 
             }
-
-            // Expresión regular que permite solo letras y números
             return Regex.IsMatch(input, "^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚüÜ ]*$");
         }
 

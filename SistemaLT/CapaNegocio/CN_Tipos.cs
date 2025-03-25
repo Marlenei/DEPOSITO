@@ -4,12 +4,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CapaNegocio
 {
     public class CN_Tipos
     {
+        private bool IsAlphanumeric(string input)
+        {
+            if (input == null)
+            {
+                return true;
+            }
+            return Regex.IsMatch(input, "^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚüÜ ]*$");
+        }
+
         private CD_Tipos objCapaDato = new CD_Tipos();
         public List<Tipos> Listar()
         {
@@ -24,10 +34,12 @@ namespace CapaNegocio
         public int Registrar(Tipos obj, out string Mensaje)
         {
             Mensaje = string.Empty;
-            if (string.IsNullOrEmpty(obj.Tipo) || string.IsNullOrWhiteSpace(obj.Tipo))
+
+            if (!IsAlphanumeric(obj.Tipo))
             {
-                Mensaje = "Ingresar tipo";
+                Mensaje = "Solo se aceptan letras y numeros";
             }
+
             else if (obj.oRubros.IdRubro == 0)
             {
                 Mensaje = "Ingresar rubro";
@@ -45,9 +57,10 @@ namespace CapaNegocio
         public bool Editar(Tipos obj, out string Mensaje)
         {
             Mensaje = string.Empty;
-            if (string.IsNullOrEmpty(obj.Tipo) || string.IsNullOrWhiteSpace(obj.Tipo))
+
+            if (!IsAlphanumeric(obj.Tipo))
             {
-                Mensaje = "Ingresar tipo";
+                Mensaje = "Solo se aceptan letras y numeros";
             }
             else if (obj.oRubros.IdRubro == 0)
             {
@@ -61,12 +74,6 @@ namespace CapaNegocio
             {
                 return false;
             }
-        }
-
-        public bool Eliminar(int id, out string Mensaje)
-        {
-            return objCapaDato.Eliminar(id, out Mensaje);
-
         }
     }
 }

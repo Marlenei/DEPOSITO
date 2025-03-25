@@ -19,7 +19,7 @@ namespace CapaDatos
             {
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
-                    string query = "SELECT IdRubro, Rubro, Codigo, Activo, IdUsuario FROM Tonner_Rubros";
+                    string query = "SELECT IdRubro, Rubro, Codigo, Activo, IdUsuario FROM Tonner_Rubros ORDER BY IdRubro DESC ";
                     SqlCommand cmd = new SqlCommand(query, oconexion);
                     cmd.CommandType = CommandType.Text;
                     oconexion.Open();

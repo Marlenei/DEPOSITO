@@ -233,6 +233,7 @@
     <Content Include="Content\brands.min.css" />
     <Content Include="Content\chosen.min.css" />
     <Content Include="Content\dataTables.dataTables.min.css" />
+    <Content Include="Content\DataTables\buttons.dataTables.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap.min.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap4.css" />
@@ -463,9 +464,17 @@
     <Content Include="Content\images\3d-delivery-list-icon-png.webp" />
     <Content Include="Language\es-ES.json" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
+    <Content Include="Scripts\buttons.colVis.min.js" />
     <Content Include="Scripts\chosen.jquery.min.js" />
     <Content Include="Scripts\Dark-light.js" />
     <Content Include="Scripts\dataTables.min.js" />
+    <Content Include="Scripts\DataTables\1.js" />
+    <Content Include="Scripts\DataTables\2.js" />
+    <Content Include="Scripts\DataTables\3.js" />
+    <Content Include="Scripts\DataTables\4.js" />
+    <Content Include="Scripts\DataTables\5.js" />
+    <Content Include="Scripts\DataTables\6.js" />
+    <Content Include="Scripts\DataTables\7.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap4.js" />
@@ -482,6 +491,7 @@
     <Content Include="Scripts\DataTables\buttons.bootstrap4.min.js" />
     <Content Include="Scripts\DataTables\buttons.colVis.js" />
     <Content Include="Scripts\DataTables\buttons.colVis.min.js" />
+    <Content Include="Scripts\DataTables\buttons.dataTables.js" />
     <Content Include="Scripts\DataTables\buttons.flash.js" />
     <Content Include="Scripts\DataTables\buttons.flash.min.js" />
     <Content Include="Scripts\DataTables\buttons.foundation.js" />
@@ -530,8 +540,11 @@
     <Content Include="Scripts\DataTables\dataTables.semanticui.min.js" />
     <Content Include="Scripts\DataTables\dataTables.uikit.js" />
     <Content Include="Scripts\DataTables\dataTables.uikit.min.js" />
+    <Content Include="Scripts\DataTables\datetime.js" />
     <Content Include="Scripts\DataTables\jquery.dataTables.js" />
     <Content Include="Scripts\DataTables\jquery.dataTables.min.js" />
+    <Content Include="Scripts\DataTables\jszip.min.js" />
+    <Content Include="Scripts\DataTables\pdfmake.min.js" />
     <Content Include="Scripts\DataTables\responsive.bootstrap.js" />
     <Content Include="Scripts\DataTables\responsive.bootstrap.min.js" />
     <Content Include="Scripts\DataTables\responsive.bootstrap4.js" />
@@ -542,8 +555,10 @@
     <Content Include="Scripts\DataTables\responsive.jqueryui.min.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.min.js" />
+    <Content Include="Scripts\DataTables\vfs_fonts.js" />
     <Content Include="Scripts\Datepicker.js" />
     <Content Include="Scripts\daterangepicker.min.js" />
+    <Content Include="Scripts\datetime-moment.js" />
     <Content Include="Scripts\fontawesome\all.js" />
     <Content Include="Scripts\fontawesome\all.min.js" />
     <Content Include="Scripts\fontawesome\brands.js" />
@@ -577,6 +592,7 @@
     <Content Include="Scripts\moment-with-locales.min.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\moment2.min.js" />
     <Content Include="Scripts\Select2.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\sweetalert.min.js" />
@@ -615,10 +631,8 @@
     <Content Include="Views\Toner\Tipos.cshtml" />
     <Content Include="Views\Toner\Rubros.cshtml" />
     <Content Include="Views\Usuario\Login.cshtml" />
-    <Content Include="Views\Shared\_BusAvan.cshtml" />
     <Content Include="Views\Shared\_BusquedaAvan.cshtml" />
     <Content Include="Views\Toner\SolicitudPedidos.cshtml" />
-    <Content Include="Views\Shared\_LimpiarM.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
