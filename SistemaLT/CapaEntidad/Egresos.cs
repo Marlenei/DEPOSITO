@@ -33,7 +33,7 @@ namespace CapaEntidad
         public string Observaciones { get; set; }
         public int IdUsuario { get; set; }
 
-        public Productos oStockActual { get; set; }
+        
 
         public DateTime FechaEgreso { get; set; }
         public int CodigoArea { get; set; }

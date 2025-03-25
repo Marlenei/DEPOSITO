@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+using CapaDatos;
 using CapaEntidad;
 using CapaNegocio;
 using Newtonsoft.Json;
@@ -113,6 +114,18 @@ namespace TonerHP.Controllers
             return View();
         }
 
+        public ActionResult EntregaPedidos()
+        {
+
+            //var userAccessCode = Session["AccesCode"] as int?;
+            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
+            //{
+            //                   return RedirectToAction("Error", "Home");
+
+            //}
+
+            return View();
+        }
 
 
         //INGRESOS
@@ -322,101 +335,6 @@ namespace TonerHP.Controllers
         #endregion
 
 
-        //PEDIDOS
 
-        #region Pedidos
-        [HttpGet]
-        public JsonResult ListarPedidos()
-        {
-            List<SolicitudPedidos> oLista = new List<SolicitudPedidos>();
-            oLista = new CN_SolicitudPedidos().Listar();
-            return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpPost]
-        public JsonResult GuardarPedidos(SolicitudPedidos objeto, CN_SolicitudPedidos _cnSolicitudPedidos)
-        {
-            try
-            {
-                // Validación básica del objeto
-                if (objeto == null)
-                {
-                    return Json(new { resultado = false, mensaje = "No se recibieron datos del pedido" });
-                }
-
-                //// Validar sesión activa
-                //if (Session["CodigoArea"] == null || Session["CodigoSector"] == null)
-                //{
-                //    return Json(new { resultado = false, mensaje = "Sesión expirada. Vuelva a iniciar sesión" });
-                //}
-
-                // Asignar códigos desde la sesión
-                objeto.CodigoArea = (int)Session["CodArea"];
-                objeto.CodigoSector = (int)Session["CodSector"];
-
-                // Validaciones de negocio
-                if (objeto.CantidadPedida <= 0)
-                {
-                    return Json(new { resultado = false, mensaje = "La cantidad pedida debe ser mayor a 0" });
-                }
-
-                if (objeto.oProductos?.IdProducto == 0)
-                {
-                    return Json(new { resultado = false, mensaje = "Seleccione un producto válido" });
-                }
-
-                // Lógica de fechas
-                if (objeto.IdSolicitud == 0) // Nuevo pedido
-                {
-                    objeto.FechaPedido = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                    if (objeto.CantidadEntregada > 0)
-                    {
-                        objeto.FechaEntrega = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    }
-                }
-
-                string mensaje = string.Empty;
-                string nroPedidoGenerado = string.Empty;
-                bool resultadoOperacion;
-
-                // Registrar o Editar
-                if (objeto.IdSolicitud == 0)
-                {
-                    System.Diagnostics.Debug.WriteLine("Registrando nuevo pedido...");
-                    int idGenerado = _cnSolicitudPedidos.Registrar(objeto, out mensaje, out nroPedidoGenerado);
-                    resultadoOperacion = idGenerado > 0;
-
-                    if (resultadoOperacion)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Pedido registrado. ID: {idGenerado}, Nro: {nroPedidoGenerado}");
-                        objeto.NroPedido = nroPedidoGenerado; // Asignar número generado
-                    }
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"Editando pedido ID: {objeto.IdSolicitud}");
-                    resultadoOperacion = _cnSolicitudPedidos.Editar(objeto, out mensaje);
-                }
-
-                return Json(new
-                {
-                    resultado = resultadoOperacion,
-                    mensaje = resultadoOperacion ? "Operación exitosa" : mensaje,
-                    nroPedido = nroPedidoGenerado // Devolver número generado
-                });
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error crítico: {ex.ToString()}");
-                return Json(new
-                {
-                    resultado = false,
-                    mensaje = $"Error interno: {ex.Message}"
-                });
-            }
-        }
-
-        #endregion
     }
 }

@@ -42,7 +42,7 @@ namespace CapaEntidad
 
         public string NombreArea { get; set; }
 
-        public string NombreSector { get; set; }
+        public string Nombre { get; set; }
         public int CodArea { get; set; }
         public int CodSector { get; set; }
     }

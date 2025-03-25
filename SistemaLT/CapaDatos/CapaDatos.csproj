@@ -81,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CD_Egresos.cs" />
+    <Compile Include="CD_EntregaPedidos.cs" />
     <Compile Include="CD_Ingresos.cs" />
     <Compile Include="CD_Productos.cs" />
     <Compile Include="CD_Proveedores.cs" />
