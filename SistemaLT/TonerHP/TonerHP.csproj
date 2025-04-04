@@ -230,6 +230,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\bootstrapselect2.min.css" />
     <Content Include="Content\brands.css" />
     <Content Include="Content\brands.min.css" />
     <Content Include="Content\chosen.min.css" />
@@ -416,6 +417,7 @@
     <Content Include="Content\jquery-ui.theme.min.css" />
     <Content Include="Content\regular.css" />
     <Content Include="Content\regular.min.css" />
+    <Content Include="Content\select2-bootstrap-5-theme.min.css" />
     <Content Include="Content\Select2.css" />
     <Content Include="Content\select2.min.css" />
     <Content Include="Content\solid.css" />
@@ -465,6 +467,7 @@
     <Content Include="Content\images\3d-delivery-list-icon-png.webp" />
     <Content Include="Language\es-ES.json" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
+    <Content Include="Scripts\bootstrapselect2.bundle.min.js" />
     <Content Include="Scripts\buttons.colVis.min.js" />
     <Content Include="Scripts\chosen.jquery.min.js" />
     <Content Include="Scripts\Dark-light.js" />
@@ -594,6 +597,7 @@
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\moment2.min.js" />
+    <Content Include="Scripts\select2.full.min.js" />
     <Content Include="Scripts\Select2.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\sweetalert.min.js" />

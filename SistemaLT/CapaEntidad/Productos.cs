@@ -6,16 +6,6 @@ using System.Threading.Tasks;
 
 namespace CapaEntidad
 {
-//    Productos
-//IdProducto  int (Auto) Clave P
-//IdRubro int Clave F
-//IdTipo  int Clave F
-//Detalle VarChar(50)
-//StockMinimo int
-//StockActual int
-//FechaUltimaModificacoin smalldatetime
-//Activo  bit
-//IdUsuario   int
 
     public class Productos
     {
