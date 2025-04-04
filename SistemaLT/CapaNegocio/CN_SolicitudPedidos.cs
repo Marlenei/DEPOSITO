@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -19,6 +20,8 @@ namespace CapaNegocio
         {
             return objCapaDato.Listar(idUsuario);
         }
+
+
 
         public List<SolicitudPedidos> ObtenerPedidos(int? codArea, int? codSector, string nroPedido, DateTime fechaInicio, DateTime fechaFin, bool soloPendientes)
         {
@@ -115,12 +118,23 @@ namespace CapaNegocio
                     return false;
                 }
 
-                if ((DateTime.Now - pedidoExistente.FechaHoraActualizacion).TotalHours > 24)
+                DateTime fechaPedido;
+                if (!DateTime.TryParseExact(pedidoExistente.FechaPedido, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out fechaPedido))
+                {
+                    mensaje = "Formato de fecha no válido en el pedido.";
+                    return false;
+                }
+
+                if ((DateTime.Now - fechaPedido).TotalHours > 24)
                 {
                     mensaje = "El periodo de modificación ha expirado (24 horas)";
                     return false;
                 }
 
+                // Actualizar la fecha de la última modificación
+                pedidoExistente.FechaHoraActualizacion = DateTime.Now;
+
+                // Llamar a la capa de datos para realizar la actualización
                 return objCapaDato.ActualizarEntrega(pedido, out mensaje);
             }
             catch (Exception ex)
