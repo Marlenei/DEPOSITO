@@ -187,8 +187,10 @@
 
 
         $(document).ready(function () {
+            CargarProductos();
+
             inicializarDataTable();
-            cargarProductos();
+            BotonEditar();
             $('.btn-guardar').click(Guardar);
             editar();
         });
@@ -444,21 +446,26 @@
             $("#cbostockactual").val('');
         });
 
-        function cargarProductos() {
-            $.ajax({
-                url: '@Url.Action("ListarProductos", "Toner")',
-                success: function(data) {
-                    $("#cbodetalle").empty().append('<option value="">Seleccione producto</option>');
-                    $.each(data.data, function(_, producto) {
-                        if (producto.Activo) {
-                            $("#cbodetalle").append(
-                                $('<option></option>').val(producto.IdProducto).text(producto.Detalle)
-                            );
-                        }
-                    });
-                }
-            });
-        }
+           $.ajax({
+               url: '@Url.Action("ListarProductos", "Toner")',
+               type: "GET",
+               data: null,
+               dataType: "json",
+               contentType: "application/json; charset=utf-8",
+               success: function (data) {
+                   $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cbodetalle");
+                   $.each(data.data, function (index, valor) {
+                       if (valor.Activo === true) {
+                           $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
+                       }
+
+                   });
+               },
+               error: function (error) {
+                   console.log(error)
+               },
+           });
+       }
 
         function CargarRubros(urlrubros) {
             $.ajax({

@@ -38,7 +38,19 @@ namespace CapaDatos
                                 oProductos = new Productos() { 
                                     IdProducto = Convert.ToInt32(rdr["IdProducto"]), 
                                     Detalle = rdr["Detalle"].ToString(),
-                                    StockActual = Convert.ToInt32(rdr["StockActual"])
+                                    StockActual = Convert.ToInt32(rdr["StockActual"]),
+                                    CodigoId = rdr["CodigoId"].ToString(),
+                                    oRubros = new Rubros()
+                                    {
+                                        IdRubro = Convert.ToInt32(rdr["IdRubro"]), // Asignar el ID del rubro
+                                        Rubro = rdr["Rubro"].ToString() // Asegúrate de que este campo esté en la consulta
+                                    },
+                                    oTipos = new Tipos()
+                                    {
+                                        IdTipo = Convert.ToInt32(rdr["IdTipo"]), // Asignar el ID del tipo
+                                        Tipo = rdr["Tipo"].ToString() // Asegúrate de que este campo esté en la consulta
+                                    },
+
                                 },
                                 CodigoId = rdr["CodigoId"].ToString(),
                                 NroExpediente = rdr["NroExpediente"].ToString(),
