@@ -181,12 +181,26 @@
 
 
         $(document).ready(function () {
+            CargarProductos();
+
             inicializarDataTable();
-            cargarProductos();
+            BotonEditar();
             $('.btn-guardar').click(Guardar);
+
+             $("#BtnBusqueda").on("click", function () {
+                 var urlrubros = '@Url.Action("ListarRubros", "Toner")'
+                 CargarRubros(urlrubros);
+
+                 var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
+                  CargarCodigosID(urlcodigoid);
+                  LimpiarCampos();
+             });
+                 $('#collapseExample').on('hidden.bs.collapse', function () {
+                    LimpiarCampos();
+                 });
         });
 
-         function abrirModal(json) {
+        function abrirModal(data) {
                  $('#txtArea').val('@Session["NombreArea"]');
                  $('#txtSector').val('@Session["NombreSector"]');
                  $("#txtid").val(0);
@@ -197,38 +211,41 @@
                  $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', new Date()));
                  $("#mensajeError").hide();
 
-                 if (json) {
+            if (data != null) {
                      // Cargar datos para edición
-                     $("#txtid").val(json.IdSolicitud);
-                     $("#cbodetalle").val(json.oProductos.IdProducto);
-                     $("#txtcantidad").val(json.CantidadPedida);
-                     $("#txtobservaciones").val(json.Observaciones);
-                     $("#txtpedido").val(json.NroPedido);
-                     $("#txtfechapedido").val(new Date(json.FechaPedido).toLocaleDateString());
+                     $("#txtid").val(data.IdSolicitud);
+                     $("#cbodetalle").val(data.oProductos.IdProducto);
+                     $("#txtcantidad").val(data.CantidadPedida);
+                     $("#txtobservaciones").val(data.Observaciones);
+                     $("#txtpedido").val(data.NroPedido);
+                     $("#txtfechapedido").val(new Date(data.FechaPedido).toLocaleDateString());
                      $("#txtusuario").val(@Session[" AccesCode"]);
 
                      $("#btnGuardar").text("Actualizar");
-                 } else {
-                     // Generar nuevo número de pedido
-                     $.ajax({
-                         url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")',
-                         success: function(data) {
-                             $("#txtpedido").val(data);
-                         }
-                     });
-                     $("#txtfechapedido").val(new Date().toLocaleDateString());
+            } else {
+                // Generar nuevo número de pedido
+                $.ajax({
+                    url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")',
+                    success: function(data) {
+                        $("#txtpedido").val(data);
+                    }
+                });
+                $("#txtfechapedido").val(new Date().toLocaleDateString());
 
-                     $("#btnGuardar").text("Guardar");
-                 }
+                $("#btnGuardar").text("Guardar");
+            }
 
-                 $("#FormModal").modal("show");
-             }
+            $("#FormModal").modal("show");
+        }
 
-             $("#tabla tbody").on("click", '.btn-editar', function () {
-                 filaSeleccionada = $(this).closest("tr");
-                 var data = tabladata.row(filaSeleccionada).data();
-                 abrirModal(data);
-             });
+        function BotonEditar() {
+            $("#tabla tbody").on("click", '.btn-editar', function () {
+                filaSeleccionada = $(this).closest("tr");
+                var data = tabladata.row(filaSeleccionada).data();
+                abrirModal(data)
+            });
+        }
+
 
              function Guardar() {
                  if ($("#cbodetalle").val() === "") {
@@ -321,7 +338,7 @@
                             }
                         },
                         {
-                            "defaultContent": '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>',
+                            "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>',
                             "orderable": false,
                             "searchable": false,
                             "width": "90px"
@@ -386,38 +403,32 @@
                    }
 
 
-               $("#BtnBusqueda").on("click", function () {
-               var urlrubros = '@Url.Action("ListarRubros", "Toner")'
-               CargarRubros(urlrubros);
-
-               var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
-                CargarCodigosID(urlcodigoid);
-                LimpiarCampos();
-                   $("#cbostockactual").val('');
-               });
-               $('#collapseExample').on('hidden.bs.collapse', function () {
-
-                   LimpiarCampos();
-                   $("#cbostockactual").val('');
-               });
 
 
 
-        function cargarProductos() {
-            $.ajax({
-                url: '@Url.Action("ListarProductos", "Toner")',
-                success: function(data) {
-                    $("#cbodetalle").empty().append('<option value="">Seleccione producto</option>');
-                    $.each(data.data, function(_, producto) {
-                        if (producto.Activo) {
-                            $("#cbodetalle").append(
-                                $('<option></option>').val(producto.IdProducto).text(producto.Detalle)
-                            );
-                        }
-                    });
-                }
-            });
-        }
+
+      function CargarProductos() {
+
+           $.ajax({
+               url: '@Url.Action("ListarProductos", "Toner")',
+               type: "GET",
+               data: null,
+               dataType: "json",
+               contentType: "application/json; charset=utf-8",
+               success: function (data) {
+                   $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cbodetalle");
+                   $.each(data.data, function (index, valor) {
+                       if (valor.Activo === true) {
+                           $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
+                       }
+
+                   });
+               },
+               error: function (error) {
+                   console.log(error)
+               },
+           });
+       }
 
         function CargarRubros(urlrubros) {
             $.ajax({

@@ -59,76 +59,84 @@
                     <input id="txtid" type="hidden" value="" />
                     <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
                     <div class="row g-2" id="contenedor">
-                        
-                        
+
+
                         <div class="col-sm-6">
                             <label class="form-label">Producto </label>
-                            <select id="cbodetalle" class="form-select ProductosS" >
-                            
-                            
+                            <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
                             </select>
                         </div>
 
-                            <div id="contenedor" class="col-sm-6">
+                        <div id="contenedor" class="col-sm-6">
 
-                                <p class="d-inline-flex gap-1">
-                                    <button class="btn btn-outline-success" id="BtnBusqueda" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                        Busqueda Avanzada
-                                    </button>
-                                </p>
-                                <div class="collapse" id="collapseExample">
-                                    <div class="card card-body">
-                                        @Html.Partial("_BusquedaAvan")
-                                    </div>
+                            <p class="d-inline-flex gap-1">
+                                <button class="btn btn-outline-success" id="BtnBusqueda" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                    Busqueda Avanzada
+                                </button>
+                            </p>
+                            <div class="collapse" id="collapseExample">
+                                <div class="card card-body">
+                                    @Html.Partial("_BusquedaAvan")
                                 </div>
-
-
-                            </div>
-                            <div class="col-sm-6">
-                                <label class="form-label">Stock Actual</label>
-                                <input id="cbostockactual" type="text" class="form-control" style="display: none;" readonly />
                             </div>
 
 
-                            <div class="col-sm-6">
-                                <label class="form-label">Razon social</label>
-                                <select id="cboproveedores" class="form-select"> </select>
-                            </div>
+                        </div>
 
-                            <div class="col-sm-6">
-                                <label for="txtcantidad" class="form-label">Cantidad</label>
-                                <input type="number" class="form-control" id="txtcantidad" min="0" required placeholder="Coloque una cantidad" oninput="this.value.replace(/[^0-9]/g, '');">
-                            </div>
 
-                            <div class="col-sm-6">
-                                <label for="txtcodigoid" class="form-label">Codigo ID</label>
-                                <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
-                            </div>
+                        <div class="input-group mb-3 w-50">
+                            <span class="input-group-text">Stock Actual</span>
+                            <input id="cbostockactual" type="text" class="form-control"  readonly>
+                            <span class="input-group-text">Codigo ID</span>
+                            <input id="infocodigoid" type="text" class="form-control"  readonly>
+                        </div>
 
-                            <div class="col-sm-6">
-                                <label for="txtexpediente" class="form-label">N° de Expediente</label>
-                                <input type="text" class="form-control" id="txtexpediente" maxlength="15">
-                            </div>
+                        <div class="input-group mb-3 w-50">
+                            <span class="input-group-text">Rubro</span>
+                            <input id="inforubro" type="text" class="form-control"  readonly>
+                            <span class="input-group-text">Tipo</span>
+                            <input id="infotipo" type="text" class="form-control"  readonly>
+                        </div>
 
-                            <div class="col-sm-6">
-                                <label class="form-label">Tipo de Ingreso</label>
-                                <select id="txttipoingreso" class="form-select">
-                                    <option value="">Seleccionar</option>
-                                    <option value="C">Compra</option>
-                                    <option value="D">Devolucion</option>
-                                    <option value="O">Otro</option>
-                                </select>
-                            </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">Razon social</label>
+                            <select id="cboproveedores" class="form-select"  style="width: 100%"> </select>
+                        </div>
 
-                            <div class="col-sm-6">
-                                <label for="txtfechaingreso" class="form-label">Fecha de Ingreso</label>
-                                <input type="text" class="form-control" id="txtfechaingreso" readonly>
-                            </div>
+                        <div class="col-sm-6">
+                            <label for="txtcantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="txtcantidad" min="1" max="999" required placeholder="Coloque una cantidad" oninput="this.value.replace(/[^0-9]/g, '');">
+                        </div>
 
-                            <div class="col-sm-6">
-                                <label for="txtobservaciones" class="form-label">Observaciones</label>
-                                <input type="text" class="form-control" id="txtobservaciones" maxlength="50">
-                            </div>
+                        <div class="col-sm-6">
+                            <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                            <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label for="txtexpediente" class="form-label">N° de Expediente</label>
+                            <input type="text" class="form-control" id="txtexpediente" maxlength="15">
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label">Tipo de Ingreso</label>
+                            <select id="txttipoingreso" class="form-select">
+                                <option value="">Seleccionar</option>
+                                <option value="C">Compra</option>
+                                <option value="D">Devolucion</option>
+                                <option value="O">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label for="txtfechaingreso" class="form-label">Fecha de Ingreso</label>
+                            <input type="text" class="form-control" id="txtfechaingreso" readonly>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label for="txtobservaciones" class="form-label">Observaciones</label>
+                            <input type="text" class="form-control" id="txtobservaciones" maxlength="50">
+                        </div>
                     </div>
                     @*-------------------------Mensaje de alerta-------------------------*@
                     <div class="row mt-12">
@@ -152,13 +160,12 @@
 
 @section scripts{
     <script>
-
-
         var tabladata;
         var filaSeleccionada;
-        var productos = {};
-
-
+        var stockprod = {};
+        var codigoidprod = {};
+        var rubroprod = {};
+        var tipoprod = {};
 
         //Dataranger - rangos
         $(function () {
@@ -193,7 +200,6 @@
 
         $.fn.dataTable.moment('DD/MM/YYYY');
         $(document).ready(function () {
-
             CargarProductos();
             LimpiarCampos();
             selects2();
@@ -202,26 +208,25 @@
                 placeholder: "Selecciona una opción",
                 allowClear: true,
                 dropdownParent: $('#FormModal'),
-
             });
 
             //Mantener el Producto cuando se cierre el collapse
-            let productoSeleccionado = null;
+                let productoSeleccionado = null;
 
-            $('#collapseExample').on('hide.bs.collapse', function () {
-                productoSeleccionado = $('#cbodetalle').val();
+                $('#collapseExample').on('hide.bs.collapse', function () {
+                    productoSeleccionado = $('#cbodetalle').val();
 
-            });
-            $('#collapseExample').on('hidden.bs.collapse', function () {
-                if (productoSeleccionado) {
-                    $('#cbodetalle').val(productoSeleccionado);
-                }
-            });
-            $(document).ajaxComplete(function () {
-                if (productoSeleccionado) {
-                    $('#cbodetalle').val(productoSeleccionado);
-                }
-            });
+                });
+                $('#collapseExample').on('hidden.bs.collapse', function () {
+                    if (productoSeleccionado) {
+                        $('#cbodetalle').val(productoSeleccionado);
+                    }
+                });
+                $(document).ajaxComplete(function () {
+                    if (productoSeleccionado) {
+                        $('#cbodetalle').val(productoSeleccionado);
+                    }
+                });
 
 
             tabladata = $("#tabla").DataTable({
@@ -263,10 +268,11 @@
                         }
                     },
                    {
-                       "data": "Cantidad",
-                       "render": function (data) {
-                           return data ? data : '';
-                       }
+                       "data": "Cantidad"
+                       //,
+                       //"render": function (data) {
+                       //    return data ? data : '';
+                       //}
                    },
                    {
                        "data": "CodigoId", "render": function (data) {
@@ -327,22 +333,21 @@
 
 
 
-            $("#BtnBusqueda").on("click", function () {
-                    var urlrubros = '@Url.Action("ListarRubros", "Toner")'
-                    CargarRubros(urlrubros);
+                $("#BtnBusqueda").on("click", function () {
+                        var urlrubros = '@Url.Action("ListarRubros", "Toner")'
+                        CargarRubros(urlrubros);
 
-                    var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
-                    CargarCodigosID(urlcodigoid);
+                        var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
+                        CargarCodigosID(urlcodigoid);
 
-            });
+                });
         });
-
 
         $('#collapseExample').on('hidden.bs.collapse', function () {
             CargarProductos();
         });
 
-        //Manejo del Stock Actual
+        //Informacion Stock Actual y Codigo ID del producto
         $('#StockDatos').on('input', function () {
             var inputVal = $(this).val();
             var selectedOption = $('#cbodetalle option').filter(function () {
@@ -351,19 +356,42 @@
 
             if (selectedOption.length) {
                 var idProducto = selectedOption.data('id');
-                var stockActual = productos[idProducto];
 
+                var stockActual = stockprod[valor.IdProducto];
                 if (stockActual !== undefined) {
                     $("#cbostockactual").val(stockActual).show();
-                } else {
+                }
+                else {
                     $("#cbostockactual").val("").hide();
                 }
 
+                var codigoid = codigoidprod[valor.IdProducto];
+                if (codigoid !== undefined) {
+                    $("#infocodigoid").val(codigoid).show();
+                }
+                else {
+                    $("#infocodigoid").val("").hide();
+                }
+
+                var rubro = rubroprod[valor.Rubro];
+                if (rubro !== undefined) {
+                    $("#inforubro").val(rubro).trigger('change').show();
+                }
+                else {
+                    $("#inforubro").val("").hide();
+                }
+
+                var tipo = tipoprod[valor.Tipo];
+                if (tipo !== undefined) {
+                    $("#infotipo").val(tipo).trigger('change').show();
+                }
+                else {
+                    $("#infotipo").val("").hide();
+                }
                 $("#txtidProducto").val(idProducto);
 
             }
         });
-
 
 
         //Listado Proveedores
@@ -402,7 +430,6 @@
 
         //Listado Productos
         function CargarProductos() {
-
             $.ajax({
                 url: '@Url.Action("ListarProductos", "Toner")',
                 type: "GET",
@@ -411,13 +438,37 @@
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
                     $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cbodetalle");
+                    var opciones = [];
                     $.each(data.data, function (index, valor) {
+                        //if (valor.Activo === true) {
+                        //    stockprod[valor.IdProducto] = valor.StockActual;
+                        //    codigoidprod[valor.IdProducto] = valor.CodigoId !== undefined ? valor.CodigoId : null;
+                        //    rubroprod[valor.IdProducto] = (valor.oRubros && valor.oRubros.Rubro) ? valor.oRubros.Rubro : null;
+                        //    tipoprod[valor.IdProducto] = (valor.oTipos && valor.oTipos.Tipo) ? valor.oTipos.Tipo : null;
+                        //    opciones.push({
+                        //        id: valor.IdProducto,
+                        //        text: valor.Detalle
+                        //    });
+                        //}
+
+
                         if (valor.Activo === true) {
-                            productos[valor.IdProducto] = valor.StockActual;
+                            stockprod[valor.IdProducto] = valor.StockActual;
+                            codigoidprod[valor.IdProducto] = valor.CodigoId;
+                            rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                            tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
                             $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
                         }
 
                     });
+
+                    //$('#cbodetalle').select2({
+                    //    data: opciones,
+                    //    placeholder: "Selecciona una opción",
+                    //    allowClear: true,
+                    //    dropdownParent: $('#FormModal'),
+
+                    //});
                 },
                 error: function (error) {
                     console.log(error)
@@ -425,8 +476,9 @@
             });
         }
 
-
         function abrirModal(json) {
+            console.log(json)
+            CargarProductos();
             $('#collapseExample').collapse('hide');
             if (json != null) {
                 var fechaActMatch = json.FechaAct.match(/\/Date\((\d+)\)\//);
@@ -445,15 +497,30 @@
                         confirmButtonText: "Ok",
                     });
                 } else {
+                    var fechaActMatch = json.FechaIngreso.match(/\/Date\((\d+)\)\//);
+                    var timestamp = parseInt(fechaActMatch[1], 10);
+                    var fechaingreso = new Date(timestamp);
+                    var dia = fechaingreso.getDate().toString().padStart(2, '0');
+                    var mes = (fechaingreso.getMonth() + 1).toString().padStart(2, '0');
+                    var anio = fechaingreso.getFullYear();
+                    var fechaFormateada = dia + '/' + mes + '/' + anio;
+
                     $("#txtid").val(json.IdIngreso);
                     $("#cbodetalle").val(json.oProductos.IdProducto).trigger('change');
                     $("#cboproveedores").val(json.oProveedores.IdProveedor).trigger('change');
                     $("#txtcantidad").val(json.Cantidad);
                     $("#cbostockactual").val(json.oProductos.StockActual).show();
+                    $("#infocodigoid").val(json.oProductos.CodigoId).show(); 
+                    $("#inforubro").val(json.oProductos.oRubros.Rubro).show(); 
+                    $("#infotipo").val(json.oProductos.oTipos.Tipo).show(); 
                     $("#txtcodigoid").val(json.CodigoId);
                     $("#txtexpediente").val(json.NroExpediente);
                     $("#txttipoingreso").val(json.TipoIngreso);
-                    $("#txtfechaingreso").val(json.FechaIngreso).prop("readonly", true)
+                    $("#txtfechaingreso").val(fechaFormateada);
+                    $("#txtfechaingreso").datepicker({
+                        minDate: "-30D",
+                        maxDate: 0,
+                    });
                     $("#txtobservaciones").val(json.Observaciones);
                     $("#txtusuario").val(@Session["AccesCode"]);
                     $("#mensajeError").hide();
@@ -461,19 +528,22 @@
                     $("#FormModal").modal("show");
                 }
             } else {
+                CargarProductos();
                  $("#txtid").val(0);
                  $("#cbodetalle").val("");
-                 $("#cbostockactual").val("").hide();
+                 $("#cbostockactual").val("");
                  $("#cboproveedores").val("");
-                 $("#txtcantidad").val("");
+                 $("#txtcantidad").val(1);
                  $("#txtcodigoid").val("");
+                 $("#infocodigoid").val("");
+                 $("#inforubro").val("");
+                 $("#infotipo").val("");
                  $("#txtexpediente").val("");
                  $("#txttipoingreso").val("");
                  $('#txtfechaingreso').val(new Date().toLocaleDateString('es-AR'));
                  $('#txtfechaingreso').datepicker({
                      minDate: "-30D",
                      maxDate: 0,
-
                  });
                  $("#txtobservaciones").val("");
                  $("#txtusuario").val(@Session["AccesCode"]);
@@ -485,51 +555,79 @@
             }
             $("#cbodetalle").change(function () {
                 var idProducto = $(this).val();
+
                 var stockActual = obtenerStockPorId(idProducto);
-
-
                 if (stockActual !== undefined) {
                     $("#cbostockactual").val(stockActual);
                     $("#cbostockactual").show();
                 }
+
+                var codigoid = obtenerCodigoPorId(idProducto);
+                if (codigoid !== undefined) {
+                    $("#infocodigoid").val(codigoid);
+                    $("#infocodigoid").show();
+                }
+
+                var rubro = obtenerRubroPorId(idProducto);
+                if (rubro !== undefined) {
+                    $("#inforubro").val(rubro);
+                    $("#inforubro").show();
+                }
+
+                var tipo = obtenerTipoPorId(idProducto);
+                if (tipo !== undefined) {
+                    $("#infotipo").val(tipo);
+                    $("#infotipo").show();
+                }
             });
 
-
             function obtenerStockPorId(idProducto) {
-                return productos[idProducto];
+                return stockprod[idProducto];
+            }
+
+            function obtenerCodigoPorId(idProducto) {
+                return codigoidprod[idProducto];
+            }
+
+            function obtenerRubroPorId(idProducto) {
+                return rubroprod[idProducto];
+            }
+            function obtenerTipoPorId(idProducto) {
+                return tipoprod[idProducto];
             }
         }
 
-            $("#tabla tbody").on("click", '.btn-editar', function () {
-                filaSeleccionada = $(this).closest("tr");
-                var data = tabladata.row(filaSeleccionada).data();
-                abrirModal(data)
-            });
+        $("#tabla tbody").on("click", '.btn-editar', function () {
+            filaSeleccionada = $(this).closest("tr");
+            var data = tabladata.row(filaSeleccionada).data();
+            abrirModal(data)
+        });
 
-            $("#FormModal .modal-footer").on("click", '.btn-guardar', function () {
-                var cantidad = parseInt($("#txtcantidad").val(), 10);
-                if (cantidad >= 100) {
-                    Swal.fire({
-                        title: "Se cargaron más de 100",
-                        text: "¿Desea cargar el producto?",
-                        icon: "warning",
-                        showCancelButton: true,
-                        customClass: {
-                            confirmButton: 'btn btn-primary' // Usa customClass para el estilo del botón
-                        },
-                        confirmButtonText: "Sí",
-                        cancelButtonText: "No",
-                        closeOnConfirm: true
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Guardar();
-                        }
-                    });
-                } else {
-                    Guardar();
-                }
+        //Guardar
+        $("#FormModal .modal-footer").on("click", '.btn-guardar', function () {
+            var cantidad = parseInt($("#txtcantidad").val(), 10);
+            if (cantidad >= 100) {
+                Swal.fire({
+                    title: "Se cargaron más de 100",
+                    text: "¿Desea cargar el producto?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    customClass: {
+                        confirmButton: 'btn btn-primary'
+                    },
+                    confirmButtonText: "Sí",
+                    cancelButtonText: "No",
+                    closeOnConfirm: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Guardar();
+                    }
+                });
+            } else {
+                Guardar();
+            }
 
-            })
+        })
 
 
 

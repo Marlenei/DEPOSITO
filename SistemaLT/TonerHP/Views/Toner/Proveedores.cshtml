@@ -182,6 +182,8 @@
                     success: function (data) {
                         $(".modal-body").LoadingOverlay("hide");
                         //PROVEEDOR NUEVA
+                        console.log(data.resultado)
+
                         if (Proveedores.IdProveedor == 0) {
                             if (data.resultado != 0) {
                                 Proveedores.IdProveedor = data.resultado;
