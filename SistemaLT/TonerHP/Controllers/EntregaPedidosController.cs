@@ -32,6 +32,8 @@ namespace TonerHP.Controllers
         }
 
 
+
+
      
 
         [HttpGet]
@@ -52,7 +54,7 @@ namespace TonerHP.Controllers
             }
         }
 
-        [HttpPost]
+      [HttpPost]
         public JsonResult ActualizarEntrega(SolicitudPedidos pedido)
         {
             try
@@ -64,6 +66,7 @@ namespace TonerHP.Controllers
                 {
                     return Json(new { resultado = false, mensaje = "Pedido no encontrado" });
                 }
+
 
                 // Asignar los datos necesarios
                 pedido.IdSolicitud = pedidoCompleto.IdSolicitud;

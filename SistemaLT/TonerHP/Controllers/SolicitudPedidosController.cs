@@ -49,23 +49,18 @@ namespace TonerHP.Controllers
         }
 
         [HttpGet]
-        public JsonResult ListarFiltrados(DateTime? fechaInicio = null, DateTime? fechaFin = null, int? codArea = null, int? codSector = null, string nroPedido = null)
+        public JsonResult ListarFiltrados(int? codArea, int? codSector, string nroPedido, DateTime? fechaInicio, DateTime? fechaFin, bool soloPendientes)
+        {
+            var pedidos = _cdPedidos.ListarFiltrados(codArea, codSector, nroPedido, fechaInicio, fechaFin, soloPendientes);
+            return Json(new { data = pedidos }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult ListarFiltradosNro(string nroPedido = null, bool soloPendientes = false)
         {
             try
             {
-                // Establecer valores por defecto si es necesario
-                if (!fechaInicio.HasValue) fechaInicio = DateTime.Now.AddMonths(-1); // Último mes
-                if (!fechaFin.HasValue) fechaFin = DateTime.Now;
-
-                var pedidos = _cdPedidos.ListarFiltrados(
-                    codArea: codArea,
-                    codSector: codSector,
-                    nroPedido: nroPedido,
-                    fechaInicio: fechaInicio.Value,
-                    fechaFin: fechaFin.Value,
-                    soloPendientes: true // Solo pedidos pendientes
-                );
-
+                var pedidos = _cdPedidos.ListarFiltradosNro(nroPedido, soloPendientes);
                 return Json(new { data = pedidos }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -75,11 +70,18 @@ namespace TonerHP.Controllers
         }
 
         [HttpGet]
-        public JsonResult ListarFiltradosNro(string nroPedido = null, bool soloPendientes = false)
+        public JsonResult ListarPendientesPorArea()
         {
             try
             {
-                var pedidos = _cdPedidos.ListarFiltradosNro(nroPedido, soloPendientes);
+                int codArea = Convert.ToInt32(Session["CodArea"]); // Obtener el código del área de la sesión
+                int? codSector = null; // O puedes obtenerlo de la sesión si es necesario
+
+                // Establecer valores por defecto para las fechas
+                DateTime fechaInicio = DateTime.Now.AddMonths(-1); // Último mes
+                DateTime fechaFin = DateTime.Now; // Fecha actual
+
+                var pedidos = _cdPedidos.ListarFiltrados(codArea: codArea, codSector: codSector, nroPedido: null, fechaInicio: fechaInicio, fechaFin: fechaFin, soloPendientes: true);
                 return Json(new { data = pedidos }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -100,33 +102,33 @@ namespace TonerHP.Controllers
             return View(pedido); // O devolver un JsonResult, según sea necesario
         }
 
-        [HttpPost]
-        public JsonResult ActualizarEntrega(SolicitudPedidos pedido)
-        {
-            try
-            {
-                // Obtener el pedido completo desde la base de datos
-                var pedidoCompleto = _cnPedidos.ObtenerPedido(pedido.IdSolicitud);
+        //[HttpPost]
+        //public JsonResult ActualizarEntrega(SolicitudPedidos pedido)
+        //{
+        //    try
+        //    {
+        //        // Obtener el pedido completo desde la base de datos
+        //        var pedidoCompleto = _cnPedidos.ObtenerPedido(pedido.IdSolicitud);
 
-                if (pedidoCompleto == null)
-                {
-                    return Json(new { resultado = false, mensaje = "Pedido no encontrado" });
-                }
+        //        if (pedidoCompleto == null)
+        //        {
+        //            return Json(new { resultado = false, mensaje = "Pedido no encontrado" });
+        //        }
 
-                // Asignar los datos necesarios
-                pedido.oProductos = pedidoCompleto.oProductos;
-                pedido.IdUsuarioPedido = (int)Session["AccesCode"];
+        //        // Asignar los datos necesarios
+        //        pedido.oProductos = pedidoCompleto.oProductos;
+        //        pedido.IdUsuarioPedido = (int)Session["AccesCode"];
 
-                string mensaje;
-                bool resultado = _cnPedidos.ActualizarEntrega(pedido, out mensaje);
+        //        string mensaje;
+        //        bool resultado = _cnPedidos.ActualizarEntrega(pedido, out mensaje);
 
-                return Json(new { resultado, mensaje });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { resultado = false, mensaje = ex.Message });
-            }
-        }
+        //        return Json(new { resultado, mensaje });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Json(new { resultado = false, mensaje = ex.Message });
+        //    }
+        //}
 
         [HttpPost]
         public JsonResult RegistrarVisado(int idPedido)
