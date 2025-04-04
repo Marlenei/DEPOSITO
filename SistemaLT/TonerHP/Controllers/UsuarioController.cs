@@ -21,11 +21,11 @@ namespace TonerHP.Controllers
 
         private readonly HttpClient _httpClient;
 
-        private class AuthResult
-        {
-            public bool Success { get; set; }
-            public int UserId { get; set; }
-        }
+        //private class AuthResult
+        //{
+        //    public bool Success { get; set; }
+        //    public int UserId { get; set; }
+        //}
 
         public UsuarioController()
         {
@@ -167,12 +167,12 @@ namespace TonerHP.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
 
-        //public ActionResult CerrarSesion()
-        //{
-        //    FormsAuthentication.SignOut();
-        //    return RedirectToAction("Login", "Usuario");
-        //}
+        public ActionResult CerrarSesion()
+        {
+            FormsAuthentication.SignOut();
+            return RedirectToAction("Login", "Usuario");
+        }
 
-      
+
     }
 }

@@ -65,7 +65,7 @@ namespace TonerHP.Controllers
         public ActionResult Ingresos()
         {
             var permisos = Session["PermissionsCode"] as List<Permiso>;
-            var tieneAcceso = permisos.Any(p => p.Accesos == 24);
+            var tieneAcceso = permisos.Any(p => p.Accesos == 24 || p.Accesos == 184);
             if (!tieneAcceso)
             {
                 return RedirectToAction("Error", "Home");
