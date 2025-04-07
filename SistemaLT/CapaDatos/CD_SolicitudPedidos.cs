@@ -31,7 +31,7 @@ namespace CapaDatos
                 cmd.Parameters.AddWithValue("@NroPedido", string.IsNullOrEmpty(nroPedido) ? (object)DBNull.Value : nroPedido);
                 cmd.Parameters.AddWithValue("@SoloPendientes", soloPendientes);
 
-                // Manejo de fechas: si no se proporcionan, usar el último mes
+                // Manejo de fechas
                 if (fechaInicio.HasValue && fechaFin.HasValue)
                 {
                     cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio.Value);
@@ -39,10 +39,13 @@ namespace CapaDatos
                 }
                 else
                 {
-                    // Si no se proporcionan fechas, establecerlas para el último mes
+                    // Si no se proporcionan fechas, establecerlas para el mes actual
                     DateTime fechaActual = DateTime.Now;
-                    cmd.Parameters.AddWithValue("@FechaInicio", fechaActual.AddMonths(-1));
-                    cmd.Parameters.AddWithValue("@FechaFin", fechaActual);
+                    DateTime primerDiaDelMes = new DateTime(fechaActual.Year, fechaActual.Month, 1);
+                    DateTime ultimoDiaDelMes = primerDiaDelMes.AddMonths(1).AddDays(-1);
+
+                    cmd.Parameters.AddWithValue("@FechaInicio", primerDiaDelMes);
+                    cmd.Parameters.AddWithValue("@FechaFin", ultimoDiaDelMes);
                 }
 
                 oconexion.Open();
@@ -84,9 +87,11 @@ namespace CapaDatos
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
                     string query = @"SELECT p.IdSolicitud, 
+                            prod.IdProducto,
                             prod.Detalle AS Producto,
                             p.CantidadPedida,
                             p.CantidadEntregada,
+                            p.FechaPedido, 
                             p.FechaEntrega,
                             p.NroPedido,
                             p.Visado
@@ -107,11 +112,18 @@ namespace CapaDatos
                             lista.Add(new SolicitudPedidos()
                             {
                                 IdSolicitud = Convert.ToInt32(rdr["IdSolicitud"]),
-                                oProductos = new Productos { Detalle = rdr["Producto"].ToString() },
+                                oProductos = new Productos
+                                {
+                                    IdProducto = Convert.ToInt32(rdr["IdProducto"]), 
+                                    Detalle = rdr["Producto"].ToString()
+                                },
                                 CantidadPedida = Convert.ToInt32(rdr["CantidadPedida"]),
                                 CantidadEntregada = rdr["CantidadEntregada"] != DBNull.Value
                                                     ? Convert.ToInt32(rdr["CantidadEntregada"])
                                                     : 0,
+                                FechaPedido = rdr["FechaPedido"] != DBNull.Value
+                        ? Convert.ToDateTime(rdr["FechaPedido"]).ToString("yyyy-MM-dd HH:mm:ss")
+                        : string.Empty,
                                 FechaEntrega = rdr["FechaEntrega"] != DBNull.Value ? Convert.ToDateTime(rdr["FechaEntrega"]).ToString("yyyy-MM-dd HH:mm:ss") : null,
                                 NroPedido = rdr["NroPedido"] != DBNull.Value
                                             ? rdr["NroPedido"].ToString()
@@ -130,8 +142,8 @@ namespace CapaDatos
             return lista;
         }
         public List<SolicitudPedidos> ListarFiltradosNro(
-     string nroPedido = null,
-     bool soloPendientes = false)
+        string nroPedido = null,
+         bool soloPendientes = false)
         {
             List<SolicitudPedidos> lista = new List<SolicitudPedidos>();
 
@@ -255,14 +267,27 @@ namespace CapaDatos
             using (SqlConnection conexion = new SqlConnection(Conexion.cn))
             {
                 string query = @"SELECT 
-                p.IdSolicitud,
-                p.IdProducto,
-                p.CantidadEntregada,
-                p.Visado,
-                p.FechaHoraActualizacion,
-                p.IdUsuarioPedido
-                FROM Tonner_Pedidos p
-                WHERE p.IdSolicitud = @IdSolicitud";
+            p.IdSolicitud,
+            p.IdProducto,
+            p.CantidadPedida,
+            p.CantidadEntregada,
+            p.FechaPedido,
+            p.FechaEntrega,
+            p.NroPedido,
+            p.Visado,
+            p.CodigoArea,
+            p.CodigoSector,
+            p.IdUsuarioPedido,
+            p.IdUsuarioEntrega,
+            p.Observaciones,
+            pr.Detalle AS Producto,
+            a.NombreArea,
+            s.Nombre AS NombreSector
+        FROM Tonner_Pedidos p
+        INNER JOIN Tonner_Productos pr ON pr.IdProducto = p.IdProducto
+        INNER JOIN AHS.dbo.Mio_Areas a ON a.CodigoArea = p.CodigoArea
+        INNER JOIN AHS.dbo.Mio_Sectores s ON s.CodigoSector = p.CodigoSector
+        WHERE p.IdSolicitud = @IdSolicitud";
 
                 SqlCommand cmd = new SqlCommand(query, conexion);
                 cmd.Parameters.AddWithValue("@IdSolicitud", idPedido);
@@ -279,22 +304,36 @@ namespace CapaDatos
                                 IdSolicitud = Convert.ToInt32(reader["IdSolicitud"]),
                                 oProductos = new Productos
                                 {
-                                    IdProducto = reader["IdProducto"] != DBNull.Value
-                                                 ? Convert.ToInt32(reader["IdProducto"])
-                                                 : 0
+                                    IdProducto = Convert.ToInt32(reader["IdProducto"]),
+                                    Detalle = reader["Producto"].ToString()
                                 },
+                                CantidadPedida = Convert.ToInt32(reader["CantidadPedida"]),
                                 CantidadEntregada = reader["CantidadEntregada"] != DBNull.Value
-                                                  ? Convert.ToInt32(reader["CantidadEntregada"])
-                                                  : 0,
+                                    ? Convert.ToInt32(reader["CantidadEntregada"])
+                                    : 0,
+                                FechaPedido = reader["FechaPedido"] != DBNull.Value
+                                ? Convert.ToDateTime(reader["FechaPedido"]).ToString("yyyy-MM-dd HH:mm:ss")
+                                : string.Empty,
+                                                            FechaEntrega = reader["FechaEntrega"] != DBNull.Value
+                                ? Convert.ToDateTime(reader["FechaEntrega"]).ToString("yyyy-MM-dd HH:mm:ss")
+                                : string.Empty,
+                                NroPedido = reader["NroPedido"].ToString(),
                                 Visado = reader["Visado"] != DBNull.Value
-                                        ? Convert.ToBoolean(reader["Visado"])
-                                        : false,
-                                FechaHoraActualizacion = reader["FechaHoraActualizacion"] != DBNull.Value
-                                                        ? Convert.ToDateTime(reader["FechaHoraActualizacion"])
-                                                        : DateTime.MinValue,
+                                    ? Convert.ToBoolean(reader["Visado"])
+                                    : false,
+                                CodigoArea = Convert.ToInt32(reader["CodigoArea"]),
+                                CodigoSector = Convert.ToInt32(reader["CodigoSector"]),
                                 IdUsuarioPedido = reader["IdUsuarioPedido"] != DBNull.Value
-                                                 ? Convert.ToInt32(reader["IdUsuarioPedido"])
-                                                 : 0
+                                    ? Convert.ToInt32(reader["IdUsuarioPedido"])
+                                    : 0,
+                                IdUsuarioEntrega = reader["IdUsuarioEntrega"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["IdUsuarioEntrega"])
+                                    : 0,
+                                Observaciones = reader["Observaciones"] != DBNull.Value
+                                    ? reader["Observaciones"].ToString()
+                                    : string.Empty,
+                                NombreArea = reader["NombreArea"].ToString(),
+                                NombreSector = reader["NombreSector"].ToString()
                             };
                         }
                         else
@@ -421,12 +460,14 @@ namespace CapaDatos
                         // Step 5: Update Stock
                         string updateStock = @"
                 UPDATE Tonner_Productos 
-                SET StockActual = StockActual - @Cantidad 
+                SET StockActual = StockActual - @Cantidad , 
+                CodigoId = @CodigoId
                 WHERE IdProducto = @IdProducto";
 
                         using (SqlCommand cmdStock = new SqlCommand(updateStock, conexion, transaction))
                         {
-                            cmdStock.Parameters.AddWithValue("@Cantidad", (int)(diferencia ?? 0)); // Usar el valor absoluto
+                            cmdStock.Parameters.AddWithValue("@Cantidad", (int)(diferencia ?? 0));
+                            cmdStock.Parameters.AddWithValue("@CodigoId", nroPedido);
                             cmdStock.Parameters.AddWithValue("@IdProducto", idProducto);
                             cmdStock.ExecuteNonQuery();
                         }
