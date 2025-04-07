@@ -27,6 +27,7 @@
 
 function CargarTipos(idRubro) {
     var isDevelopment = window.location.hostname === "localhost";
+
     var baseUrl;
 
     if (isDevelopment) {
