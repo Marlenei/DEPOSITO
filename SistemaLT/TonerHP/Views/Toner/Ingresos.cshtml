@@ -203,6 +203,7 @@
             CargarProductos();
             LimpiarCampos();
             selects2();
+            CollapseCargaProd()
 
             $('#cboproveedores').select2({
                 placeholder: "Selecciona una opción",
@@ -343,9 +344,7 @@
                 });
         });
 
-        $('#collapseExample').on('hidden.bs.collapse', function () {
-            CargarProductos();
-        });
+       
 
         //Informacion Stock Actual y Codigo ID del producto
         $('#StockDatos').on('input', function () {
