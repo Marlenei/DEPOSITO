@@ -27,8 +27,22 @@
 
  
 function CargarTipos(idRubro) {
-    var port = window.location.port;
-    var urltipos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/SistemaLT/TonerHP/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
+
+    var baseUrl;
+
+    if (isDevelopment) {
+        baseUrl = 'https://localhost:44347/Toner'; // URL de desarrollo
+    } else {
+        baseUrl = 'http://10.4.50.13/SistemaLT/TonerHP/Toner'; // URL de producción
+    }
+
+    var urltipos = baseUrl + '/ListarTiposPorRubro?idRubro=' + idRubro;
+
+
+
+    //var port = window.location.port;
+    //var urltipos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
+    //var urltipos = 'https://10.4.50.13/SistemaLT/TonerHP/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
     $.ajax({
         url: urltipos,
         type: "GET",
