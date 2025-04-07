@@ -43,6 +43,9 @@ function CargarTipos(idRubro) {
     //var port = window.location.port;
     //var urltipos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
     //var urltipos = 'https://10.4.50.13/SistemaLT/TonerHP/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
+    var port = window.location.port;
+    var urltipos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
+    //var urltipos = 'https://10.4.50.13/SistemaLT/TonerHP/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
     $.ajax({
         url: urltipos,
         type: "GET",
@@ -70,7 +73,8 @@ function CargarTipos(idRubro) {
 
 function CargarProductosporTipo(idTipo) {
     var port = window.location.port;
-    var urlproductos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/SistemaLT/TonerHP/Toner/ListarProductosPorTipo?idTipo=' + idTipo;
+    var urlproductos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/Toner/ListarProductosPorTipo?idTipo=' + idTipo;
+    //var urlproductos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/SistemaLT/TonerHP/Toner/ListarProductosPorTipo?idTipo=' + idTipo;
     $.ajax({
         url: urlproductos,
         type: "GET",
@@ -124,7 +128,8 @@ function CargarCodigosID(urlcodigoid) {
 function CargarProductosporCI(selectElement) {
     var idCodigo = selectElement.options[selectElement.selectedIndex].text;
     var port = window.location.port;
-    var urlproductos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/SistemaLT/TonerHP/Toner/ListarProductosporCI?idCodigo=' + idCodigo;
+       var urlproductos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/Toner/ListarProductosporCI?idCodigo=' + idCodigo;
+ //var urlproductos = window.location.protocol + "//" + window.location.hostname + (port ? ":" + port : "") + '/SistemaLT/TonerHP/Toner/ListarProductosporCI?idCodigo=' + idCodigo;
 
     $.ajax({
         url: urlproductos,
@@ -175,19 +180,10 @@ function selects2() {
 
 function LimpiarCampos() {
     $('.modal').on('hidden.bs.modal', function (e) {
-        $(this).removeData();
-    });
-}
+        $(this).find('input, select, textarea').val(''); 
+        $(this).find('select').val('').trigger('change');
+        $(this).removeData(); 
 
-function LimpiarColapse() {
-    let productoSeleccionado = null;
-    $('#collapseExample').on('hide.bs.collapse', function () {
-        productoSeleccionado = $('#cbodetalle').val();
-    });
-    $('#collapseExample').on('hidden.bs.collapse', function () {
-        if (productoSeleccionado) {
-            $('#cbodetalle').val(productoSeleccionado);
-        }
         CargarProductos();
     });
 }

@@ -53,15 +53,10 @@ namespace CapaNegocio
 
         public bool Editar(Rubros obj, out string Mensaje)
         {
-            List<Rubros> rubrosExistentes = objCapaDato.Listar();
             Mensaje = string.Empty;
             if (!IsAlphanumeric(obj.Rubro))
             {
                 Mensaje = "Ingresar solamente numeros y/o letras";
-            }
-            else if (rubrosExistentes.Any(t => t.Rubro.Equals(obj.Rubro, StringComparison.OrdinalIgnoreCase)))
-            {
-                Mensaje = "El rubro ya existe";
             }
             if (string.IsNullOrEmpty(Mensaje))
             {
