@@ -25,6 +25,7 @@ namespace TonerHP.Controllers
         public ActionResult Index()
         {
             // Obtener códigos de sesión
+
             var codArea = Session["CodArea"] as int? ?? 0;
             var codSector = Session["CodSector"] as int? ?? 0;
 
@@ -102,33 +103,7 @@ namespace TonerHP.Controllers
             return View(pedido); // O devolver un JsonResult, según sea necesario
         }
 
-        //[HttpPost]
-        //public JsonResult ActualizarEntrega(SolicitudPedidos pedido)
-        //{
-        //    try
-        //    {
-        //        // Obtener el pedido completo desde la base de datos
-        //        var pedidoCompleto = _cnPedidos.ObtenerPedido(pedido.IdSolicitud);
-
-        //        if (pedidoCompleto == null)
-        //        {
-        //            return Json(new { resultado = false, mensaje = "Pedido no encontrado" });
-        //        }
-
-        //        // Asignar los datos necesarios
-        //        pedido.oProductos = pedidoCompleto.oProductos;
-        //        pedido.IdUsuarioPedido = (int)Session["AccesCode"];
-
-        //        string mensaje;
-        //        bool resultado = _cnPedidos.ActualizarEntrega(pedido, out mensaje);
-
-        //        return Json(new { resultado, mensaje });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Json(new { resultado = false, mensaje = ex.Message });
-        //    }
-        //}
+      
 
         [HttpPost]
         public JsonResult RegistrarVisado(int idPedido)

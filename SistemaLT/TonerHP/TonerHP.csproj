@@ -396,6 +396,7 @@
     <Content Include="Content\daterangepicker.css" />
     <Content Include="Content\fontawesome.css" />
     <Content Include="Content\fontawesome.min.css" />
+    <Content Include="Content\images\04.png" />
     <Content Include="Content\images\fondohospi.png" />
     <Content Include="Content\images\imagen index.png" />
     <Content Include="Content\images\stock.png" />

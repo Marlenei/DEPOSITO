@@ -94,23 +94,28 @@
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
                 <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body g-2">
+            <div class="modal-body g-2 align-self-md-center">
                 <input id="txtid" type="hidden" value="" />
                 <input type="hidden" id="txtusuario" value="@Session["AccesCode"]" readonly>
                 <input type="text" class="form-control" id="txtusuario" value="@User.Identity.Name" readonly>
 
                 <div class="row g-2" id="contenedor">
-                    <div class="col-12 col-sm-6">
+
+
+
+
+                    <div class="col-12 col-sm-6 gap-3">
                         <label class="form-label">Producto</label>
-                        <select id="cbodetalle" class="form-select ProductosS">
+                        <select id="cbodetalle" class="form-select ProductosS" style="width: 100%" >
                             <option value="">Seleccione un Producto</option>
                         </select>
                     </div>
 
-                    <div class="col-12 col-sm-6">
+                    <div id="contenedor" class="col-sm-8">
+
                         <p class="d-inline-flex gap-1">
                             <button class="btn btn-outline-success" id="BtnBusqueda" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                Búsqueda Avanzada
+                                Busqueda Avanzada
                             </button>
                         </p>
                         <div class="collapse" id="collapseExample">
@@ -127,7 +132,7 @@
 
                     <div class="col-12 col-sm-6">
                         <label for="txtpedido" class="form-label">N° de Pedido</label>
-                        <input type="text" class="form-control" id="txtpedido" maxlength="15" >
+                        <input type="text" class="form-control" id="txtpedido" maxlength="15" placeholder="Ingrese el número de pedido">
                     </div>
 
                     <div class="col-12 col-sm-6">
@@ -147,12 +152,12 @@
 
                     <div class="col-12 col-sm-6">
                         <label for="txtcodigoid" class="form-label">Código ID</label>
-                        <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
+                        <input type="text" class="form-control" id="txtcodigoid" maxlength="30" placeholder="Ingrese el código ID">
                     </div>
 
                     <div class="col-12 col-sm-6">
                         <label for="txtobservaciones" class="form-label">Observaciones</label>
-                        <input type="text" class="form-control" id="txtobservaciones" maxlength="50">
+                        <input type="text" class="form-control" id="txtobservaciones" maxlength="50" placeholder="Ingrese observaciones">
                     </div>
                 </div>
 
@@ -174,7 +179,6 @@
 </div>
 
 
-
 @section scripts{
 
     <script>
@@ -187,10 +191,13 @@
 
 
         $(document).ready(function () {
-            CargarProductos();
+            cargarProductos();
+            LimpiarCampos();
+            selects2();
+            CollapseCargaProd()
 
             inicializarDataTable();
-            BotonEditar();
+
             $('.btn-guardar').click(Guardar);
             editar();
         });
@@ -203,80 +210,75 @@
             });
         }
 
-       function abrirModal(data) {
-            $('#txtArea').val('@Session["NombreArea"]');
-            $('#txtSector').val('@Session["NombreSector"]');
-            $("#txtid").val(0);
-            $("#cbodetalle").val(""); // Limpiar el campo al abrir el modal
-            $("#txtcantidad").val("");
-            $("#txtobservaciones").val("");
-            $("#txtusuario").val('@Session["AccesCode"]');
-            $("#mensajeError").hide();
+        function abrirModal(data) {
+            cargarProductos(function() { // Cargar productos antes de continuar
+                $('#txtArea').val('@Session["NombreArea"]');
+                $('#txtSector').val('@Session["NombreSector"]');
+                $("#txtid").val(0);
+                $("#txtcantidad").val("");
+                $("#txtobservaciones").val("");
+                $("#txtusuario").val('@Session["AccesCode"]');
+                $("#mensajeError").hide();
 
-            // Establecer la fecha de pedido a la fecha actual para nuevos pedidos
-            const fechaActual = new Date();
-            $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaActual));
+                // Resetear campos
+                $("#cbodetalle").val("").prop("disabled", false);
+                $("#txtfechapedido").prop("disabled", false);
 
-            if (data != null) {
-                // Cargar datos para edición
-                $("#txtid").val(data.IdSolicitud);
-                $("#cbodetalle").val(data.oProductos.IdProducto); // Cargar el producto seleccionado
-                $("#txtcantidad").val(data.CantidadPedida);
-                $("#txtobservaciones").val(data.Observaciones);
-                $("#txtpedido").val(data.NroPedido);
-                console.log("Fecha de pedido:", data.FechaPedido); // Verificar el valor
+                // Fecha actual para nuevos pedidos
+                const fechaActual = new Date();
+                $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaActual));
 
-                // Convertir la fecha de pedido a un objeto Date
-                const fechaPedido = new Date(data.FechaPedido);
+                if (data != null) {
+                    // Cargar datos para edición
+                    $("#txtid").val(data.IdSolicitud);
+                    $("#txtcantidad").val(data.CantidadPedida);
+                    $("#txtobservaciones").val(data.Observaciones);
+                    $("#txtpedido").val(data.NroPedido);
 
-                // Verificar si la fecha es válida
-                if (!isNaN(fechaPedido.getTime())) {
-                    $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido)); // Mostrar la fecha del pedido
+                    // Establecer y bloquear producto seleccionado
+                    $("#cbodetalle")
+                        .val(data.oProductos.IdProducto)
+                        .prop("disabled", true)
+                        .trigger('change'); // Forzar actualización visual
+
+                    // Manejo de fecha
+                    const fechaPedido = new Date(data.FechaPedido);
+                    if (!isNaN(fechaPedido.getTime())) {
+                        $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido));
+                    } else {
+                        console.error("Fecha inválida:", data.FechaPedido);
+                        $("#txtfechapedido").val("");
+                    }
+
+                    // Bloquear fecha en edición
+                    $("#txtfechapedido").prop("disabled", true);
+
+                    // Verificar si el número de pedido es válido
+                    if (data.NroPedido && data.NroPedido !== "0") { // Asegurarse de que NroPedido no sea nulo o vacío
+                        $("#btnGuardar").text("Actualizar");
+                        $("#exampleModalLabel").text("Modificar Pedido");
+                        $("#btnImprimir").prop("disabled", false); // Habilitar el botón de imprimir
+                    } else {
+                        $("#btnGuardar").text("Guardar");
+                        $("#exampleModalLabel").text("Nuevo Pedido");
+                        $("#cbodetalle").prop("disabled", false); // Habilitar el select para nuevo pedido
+                        $("#btnImprimir").prop("disabled", true); // Deshabilitar el botón de imprimir
+                    }
                 } else {
-                    console.error("Fecha de pedido no válida:", data.FechaPedido);
-                    $("#txtfechapedido").val(""); // Limpiar el campo si la fecha no es válida
-                }
-
-                // Desactivar el campo de fecha para que no pueda ser editado
-                $("#txtfechapedido").prop("disabled", true);
-
-                // Verificar si el número de pedido es 0
-                if (data.NroPedido === 0) {
+                    // Nuevo pedido
+                    $.ajax({
+                        url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")',
+                        success: function(response) {
+                            $("#txtpedido").val(response);
+                        }
+                    });
                     $("#btnGuardar").text("Guardar");
                     $("#exampleModalLabel").text("Nuevo Pedido");
-                    $("#cbodetalle").prop("disabled", false); // Habilitar el select para nuevo pedido
                     $("#btnImprimir").prop("disabled", true); // Deshabilitar el botón de imprimir
-                } else {
-                    $("#btnGuardar").text("Actualizar");
-                    $("#exampleModalLabel").text("Modificar Pedido");
-                    $("#cbodetalle").prop("disabled", true); // Deshabilitar el select para edición
-
-                    // Condiciones para la cantidad
-                    if (data.CantidadEntregada > 0) {
-                        $("#txtcantidad").prop("disabled", true); // Deshabilitar el campo de cantidad si ya se ha entregado
-                    } else {
-                        $("#txtcantidad").prop("disabled", false); // Habilitar el campo de cantidad si no se ha entregado
-                    }
-
-                    // Activar el botón de imprimir si hay un número de pedido
-                    $("#btnImprimir").prop("disabled", false);
                 }
-            } else {
-                // Generar nuevo número de pedido
-                $.ajax({
-                    url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")',
-                    success: function(data) {
-                        $("#txtpedido").val(data);
-                    }
-                });
-                $("#btnGuardar").text("Guardar");
-                $("#exampleModalLabel").text("Nuevo Pedido");
-                $("#cbodetalle").prop("disabled", false); // Habilitar el select para nuevo pedido
-                $("#btnImprimir").prop("disabled", true); // Deshabilitar el botón de imprimir
-                $("#txtfechapedido").prop("disabled", false); // Habilitar el campo de fecha para nuevo pedido
-            }
 
-            $("#FormModal").modal("show");
+                $("#FormModal").modal("show");
+            });
         }
 
 
@@ -338,92 +340,108 @@
             $("#mensajeError").text(mensaje).show().delay(5000).fadeOut();
         }
 
-        function inicializarDataTable() {
-            tabladata = $('#tabla').DataTable({
-                ajax: {
-                    url: '@Url.Action("Listar", "SolicitudPedidos")',
-                    dataSrc: 'data'
-                },
-                columns: [
-                    { data: "IdSolicitud", visible: false },
-                    { data: "oProductos.Detalle", title: "Producto" },
-                    { data: "CantidadPedida", title: "Cant. Pedida" },
-                    {
-                        data: "CantidadEntregada",
-                        title: "Cant. Entregada",
-                        render: function (data) {
-                            return data || '0';
-                        }
+            function inicializarDataTable() {
+                tabladata = $('#tabla').DataTable({
+
+                    ajax: {
+                        url: '@Url.Action("Listar", "SolicitudPedidos")',
+                        dataSrc: 'data'
                     },
-                    {
-                        data: "FechaEntrega",
-                        title: "Fecha Entrega",
-                        render: function(data) {
-                            return data ? new Date(data).toLocaleDateString() : 'Pendiente';
-                        }
-                    },
-                    { data: "NroPedido", title: "N° Pedido" },
-                    {
-                        data: "Visado",
-                        title: "Visado",
-                        render: function(data) {
-                            return data ? '<i class="fas fa-check-circle text-success"></i>' :
-                                         '<i class="fas fa-times-circle text-danger"></i>';
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function(data, type, row) {
-                            if (!row.Visado && row.CantidadEntregada > 0) {
-                                return `<button class="btn btn-sm btn-warning btn-visar"
-                                        data-id="${row.IdSolicitud}">Visar</button>`;
+                    columns: [
+                        { data: "IdSolicitud", visible: false },
+                        { data: "oProductos.Detalle", title: "Producto" },
+                        { data: "CantidadPedida", title: "Cant. Pedida" },
+                        {
+                            data: "CantidadEntregada",
+                            title: "Cant. Entregada",
+                            render: function (data) {
+                                return data || '0';
                             }
-                            return '';
-                        }
-                    },
-                    {
-                        "data": null,
-                        "render": function (data, type, row) {
-                            return '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>';
                         },
-                        "orderable": false,
-                        "searchable": false,
-                        "width": "90px"
-                    }
-                ],
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json'
-                }
-            });
-
-            $('#tabla tbody').on('click', '.btn-visar', function() {
-                const id = $(this).data('id');
-
-                Swal.fire({
-                    title: '¿Confirmar visado?',
-                    text: "Esta acción no se puede deshacer",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.post('@Url.Action("RegistrarVisado", "SolicitudPedidos")', { idPedido: id })
-                        .done(function(response) {
-                            Swal.fire(response.mensaje);
-                            tabladata.ajax.reload();
-                        });
+                        {
+                            data: "FechaEntrega",
+                            title: "Fecha Entrega",
+                            render: function(data) {
+                                return data ? new Date(data).toLocaleDateString() : 'Pendiente';
+                            }
+                        },
+                        { data: "NroPedido", title: "N° Pedido" },
+                        {
+                            data: "Visado",
+                            title: "Visado",
+                            render: function(data) {
+                                return data ? '<i class="fas fa-check-circle text-success"></i>' :
+                                             '<i class="fas fa-times-circle text-danger"></i>';
+                            }
+                        },
+                        {
+                            data: null,
+                            render: function(data, type, row) {
+                                if (!row.Visado && row.CantidadEntregada > 0) {
+                                    return `<button class="btn btn-sm btn-warning btn-visar"
+                                            data-id="${row.IdSolicitud}">Visar</button>`;
+                                }
+                                return '';
+                            }
+                        },
+                        {
+                            "data": null,
+                            "render": function (data, type, row) {
+                                return '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>';
+                            },
+                            "orderable": false,
+                            "searchable": false,
+                            "width": "90px"
+                        }
+                    ],
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json'
                     }
                 });
-            });
-        }
 
-        function buscarPorNumero() {
-            const nroPedido = $("#txtBuscarPedido").val();
-            tabladata.ajax.url('@Url.Action("ListarFiltradosNro", "SolicitudPedidos")' +
-                '?nroPedido=' + encodeURIComponent(nroPedido) +
-                '&soloPendientes=false').load();
-        }
+                                  $("#BtnBusqueda").on("click", function () {
+                              var urlrubros = '@Url.Action("ListarRubros", "Toner")'
+                              CargarRubros(urlrubros);
+
+                              var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
+                              CargarCodigosID(urlcodigoid);
+
+                  });
+
+
+
+                        $('#tabla tbody').on('click', '.btn-visar', function() {
+                            const id = $(this).data('id');
+
+                            Swal.fire({
+                                title: '¿Confirmar visado?',
+                                text: "Esta acción no se puede deshacer",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $.post('@Url.Action("RegistrarVisado", "SolicitudPedidos")', { idPedido: id })
+                                    .done(function(response) {
+                                        Swal.fire(response.mensaje);
+                                        tabladata.ajax.reload();
+                                    });
+                                }
+                            });
+                        });
+                    }
+
+         function buscarPorNumero() {
+                const nroPedido = $("#txtBuscarPedido").val().trim(); // Obtener valor del input
+                tabladata.ajax.url('@Url.Action("ListarFiltradosNro", "SolicitudPedidos")' +
+                    '?nroPedido=' + encodeURIComponent(nroPedido) +
+                    '&soloPendientes=false').load(function(data) {
+                        if (data.data.length === 0) {
+                            Swal.fire('¡Atención!', 'No se encontraron pedidos con ese número.', 'info');
+                        }
+                    });
+            }
 
        function mostrarPendientes() {
             const codArea = '@Session["CodArea"]'; // Obtén el código del área del usuario desde la sesión
@@ -431,170 +449,32 @@
                 '?codArea=' + encodeURIComponent(codArea)).load();
         }
 
-        $("#BtnBusqueda").on("click", function () {
-            var urlrubros = '@Url.Action("ListarRubros", "Toner")';
-            CargarRubros(urlrubros);
 
-            var urlcodigoid = '@Url.Action("ListarProductos", "Toner")';
-            CargarCodigosID(urlcodigoid);
-            LimpiarCampos();
-            $("#cbostockactual").val('');
-        });
 
-        $('#collapseExample').on('hidden.bs.collapse', function () {
-            LimpiarCampos();
-            $("#cbostockactual").val('');
-        });
 
-           $.ajax({
-               url: '@Url.Action("ListarProductos", "Toner")',
-               type: "GET",
-               data: null,
-               dataType: "json",
-               contentType: "application/json; charset=utf-8",
-               success: function (data) {
-                   $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cbodetalle");
-                   $.each(data.data, function (index, valor) {
-                       if (valor.Activo === true) {
-                           $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
-                       }
-
-                   });
-               },
-               error: function (error) {
-                   console.log(error)
-               },
-           });
-       }
-
-        function CargarRubros(urlrubros) {
-            $.ajax({
-                url: urlrubros,
-                type: "GET",
-                data: null,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#cborubro").empty();
-                    $("#cbostockactual").empty();
-                    $("<option>").attr({ "value": "" }).text("Seleccione un Rubro").appendTo("#cborubro");
-                    $.each(data.data, function (index, valor) {
-                        if (valor.Activo === true) {
-                            $("<option>").attr({ "value": valor.IdRubro }).text(valor.Rubro).appendTo("#cborubro");
+                 //Listado Productos
+            // Función para cargar productos con callback
+                function cargarProductos(callback) {
+                    $.ajax({
+                        url: '@Url.Action("ListarProductos", "Toner")',
+                        success: function(data) {
+                            $("#cbodetalle").empty().append('<option value="">Seleccione producto</option>');
+                            $.each(data.data, function(_, producto) {
+                                if (producto.Activo) {
+                                    $("#cbodetalle").append(
+                                        $('<option></option>')
+                                            .val(producto.IdProducto)
+                                            .text(producto.Detalle)
+                                    );
+                                }
+                            });
+                            if (typeof callback === "function") callback();
                         }
                     });
-                    $("#cbotipo").empty();
-                },
-                error: function (error) {
-                    console.log(error);
-                },
-            });
-        }
+                }
 
-        function CargarTipos(idRubro) {
-            var urltipos = 'https://localhost:44347/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
-            $.ajax({
-                url: urltipos,
-                type: "GET",
-                data: null,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#cbotipo").empty();
-                    $("<option>").attr({ "value": 0 }).text("Seleccionar Tipo").appendTo("#cbotipo");
-                    $.each(data, function (index, valor) {
-                        if (valor.Activo === true) {
-                            $("<option>").attr({ "value": valor.IdTipo }).text(valor.Tipo).appendTo("#cbotipo");
-                        }
-                    });
-                    $("#cbodetalle").empty();
-                    $("<option>").attr({ "value": 0 }).text("Seleccionar producto").appendTo("#cbodetalle");
-                },
-                error: function (error) {
-                    console.log(error);
-                },
-            });
-        }
 
-        function CargarProductosporTipo(idTipo) {
-            var urlproductos = 'https://localhost:44347/Toner/ListarProductosPorTipo?idTipo=' + idTipo;
-            $.ajax({
-                url: urlproductos,
-                type: "GET",
-                data: null,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#cbodetalle").empty();
-                    $("<option>").attr({ "value": 0 }).text("Seleccionar producto").appendTo("#cbodetalle");
-                    $.each(data, function (index, valor) {
-                        if (valor.Activo === true) {
-                            productos[valor.IdProducto] = valor.StockActual;
-                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
-                        }
-                    });
-                },
-                error: function (error) {
-                    console.log(error);
-                },
-            });
-        }
 
-        function CargarProductosporCI(selectElement) {
-            var idCodigo = selectElement.options[selectElement.selectedIndex].text;
-            var urlproductos = 'https://localhost:44347/Toner/ListarProductosporCI?idCodigo=' + idCodigo;
-            $.ajax({
-                url: urlproductos,
-                type: "GET",
-                data: null,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#cbodetalle").empty();
-                    $("<option>").attr({ "value": 0 }).text("Seleccionar producto").appendTo("#cbodetalle");
-
-                    $.each(data, function (index, valor) {
-                        if (valor.Activo === true) {
-                            productos[valor.IdProducto] = valor.StockActual;
-                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
-                        }
-                    });
-                },
-                error: function (error) {
-                    console.log(error);
-                },
-            });
-        }
-
-        function CargarCodigosID(urlcodigoid) {
-            $.ajax({
-                url: urlcodigoid,
-                type: "GET",
-                data: null,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#cbocodigo").empty();
-                    $("#cbostockactual").empty();
-                    $("<option>").attr({ "value": "" }).text("Seleccione un Codigo ID").appendTo("#cbocodigo");
-                    $.each(data.data, function (index, valor) {
-                        if (valor.Activo === true) {
-                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.CodigoId).appendTo("#cbocodigo");
-                        }
-                    });
-                    $("#cbodetalle").empty();
-                },
-                error: function (error) {
-                    console.log(error);
-                },
-            });
-        }
-
-        function LimpiarCampos() {
-            $('.modal').on('hidden.bs.modal', function (e) {
-                $(this).removeData();
-            });
-        }
 
         $("#txtfechapedido").datepicker({
             dateFormat: 'dd/mm/yy',
@@ -677,7 +557,7 @@
                             <p>Fecha: ${pedido.fechaPedido}</p>
                             <p>N° de Pedido: ${pedido.nroPedido}</p>
                         </div>
-                        <img src="/img/logo-institucion.png" class="logo" alt="Logo">
+                        <img src="Content/images/04.png" class="logo" alt="Logo">
                     </div>
 
                     <div class="datos-usuario">
