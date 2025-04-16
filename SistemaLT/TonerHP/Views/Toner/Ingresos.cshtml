@@ -62,41 +62,33 @@
 
 
                         <div class="col-sm-6">
-                            <label class="form-label">Producto </label>
+                            <label class="form-label" style="text-align:center;">Producto </label>
                             <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
                             </select>
+                            <p style="text-align: center; margin-top:5px">Informacion del producto</p>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">Stock Actual</span>
+                                    <input id="cbostockactual" type="text" class="form-control" readonly>
+                                    <span class="input-group-text">Codigo ID</span>
+                                    <input id="infocodigoid" type="text" class="form-control" readonly>
+                                </div>
+
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">Rubro</span>
+                                    <input id="inforubro" type="text" class="form-control" readonly>
+                                    <span class="input-group-text">Tipo</span>
+                                    <input id="infotipo" type="text" class="form-control" readonly>
+                                </div>
+
                         </div>
 
                         <div id="contenedor" class="col-sm-6">
-
-                            <p class="d-inline-flex gap-1">
-                                <button class="btn btn-outline-success" id="BtnBusqueda" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                    Busqueda Avanzada
-                                </button>
-                            </p>
-                            <div class="collapse" id="collapseExample">
-                                <div class="card card-body">
+                            <p style="text-align:center">Filtros de busqueda</p>
                                     @Html.Partial("_BusquedaAvan")
-                                </div>
-                            </div>
-
-
                         </div>
 
 
-                        <div class="input-group mb-3 w-50">
-                            <span class="input-group-text">Stock Actual</span>
-                            <input id="cbostockactual" type="text" class="form-control"  readonly>
-                            <span class="input-group-text">Codigo ID</span>
-                            <input id="infocodigoid" type="text" class="form-control"  readonly>
-                        </div>
-
-                        <div class="input-group mb-3 w-50">
-                            <span class="input-group-text">Rubro</span>
-                            <input id="inforubro" type="text" class="form-control"  readonly>
-                            <span class="input-group-text">Tipo</span>
-                            <input id="infotipo" type="text" class="form-control"  readonly>
-                        </div>
+                       
 
                         <div class="col-sm-6">
                             <label class="form-label">Razon social</label>
@@ -166,6 +158,12 @@
         var codigoidprod = {};
         var rubroprod = {};
         var tipoprod = {};
+        var appSettings = {};
+
+
+        let productoSeleccionado = null;
+
+
 
         //Dataranger - rangos
         $(function () {
@@ -200,35 +198,23 @@
 
         $.fn.dataTable.moment('DD/MM/YYYY');
         $(document).ready(function () {
+
+            var urlrubros = '@Url.Action("ListarRubros", "Toner")'
+            CargarRubros(urlrubros);
+
+            var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
+            CargarCodigosID(urlcodigoid);
+            LimpiarSelects();
             CargarProductos();
             LimpiarCampos();
             selects2();
-            CollapseCargaProd()
+            cargarApiUrls();
 
             $('#cboproveedores').select2({
                 placeholder: "Selecciona una opción",
                 allowClear: true,
                 dropdownParent: $('#FormModal'),
             });
-
-            //Mantener el Producto cuando se cierre el collapse
-                let productoSeleccionado = null;
-
-                $('#collapseExample').on('hide.bs.collapse', function () {
-                    productoSeleccionado = $('#cbodetalle').val();
-
-                });
-                $('#collapseExample').on('hidden.bs.collapse', function () {
-                    if (productoSeleccionado) {
-                        $('#cbodetalle').val(productoSeleccionado);
-                    }
-                });
-                $(document).ajaxComplete(function () {
-                    if (productoSeleccionado) {
-                        $('#cbodetalle').val(productoSeleccionado);
-                    }
-                });
-
 
             tabladata = $("#tabla").DataTable({
                 autoWidth: true,
@@ -270,10 +256,7 @@
                     },
                    {
                        "data": "Cantidad"
-                       //,
-                       //"render": function (data) {
-                       //    return data ? data : '';
-                       //}
+
                    },
                    {
                        "data": "CodigoId", "render": function (data) {
@@ -334,19 +317,13 @@
 
 
 
-                $("#BtnBusqueda").on("click", function () {
-                        var urlrubros = '@Url.Action("ListarRubros", "Toner")'
-                        CargarRubros(urlrubros);
 
-                        var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
-                        CargarCodigosID(urlcodigoid);
-
-                });
         });
 
-       
 
-        //Informacion Stock Actual y Codigo ID del producto
+
+
+        //Informacion del producto
         $('#StockDatos').on('input', function () {
             var inputVal = $(this).val();
             var selectedOption = $('#cbodetalle option').filter(function () {
@@ -427,6 +404,7 @@
                 },
             });
 
+
         //Listado Productos
         function CargarProductos() {
             $.ajax({
@@ -436,37 +414,38 @@
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
+                    $("#cbodetalle").empty();
                     $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cbodetalle");
                     var opciones = [];
                     $.each(data.data, function (index, valor) {
-                        //if (valor.Activo === true) {
-                        //    stockprod[valor.IdProducto] = valor.StockActual;
-                        //    codigoidprod[valor.IdProducto] = valor.CodigoId !== undefined ? valor.CodigoId : null;
-                        //    rubroprod[valor.IdProducto] = (valor.oRubros && valor.oRubros.Rubro) ? valor.oRubros.Rubro : null;
-                        //    tipoprod[valor.IdProducto] = (valor.oTipos && valor.oTipos.Tipo) ? valor.oTipos.Tipo : null;
-                        //    opciones.push({
-                        //        id: valor.IdProducto,
-                        //        text: valor.Detalle
-                        //    });
-                        //}
-
-
                         if (valor.Activo === true) {
+
+                            opciones.push({
+                                id: valor.IdProducto,
+                                text: valor.Detalle
+                            });
                             stockprod[valor.IdProducto] = valor.StockActual;
                             codigoidprod[valor.IdProducto] = valor.CodigoId;
                             rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
                             tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
-                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
                         }
-
                     });
+                    $('#cbodetalle').select2({
+                        placeholder: "Selecciona una opción",
+                        data: opciones,
+                        allowClear: true,
+                        dropdownParent: $('#FormModal'),
+                    }).val(null).trigger('change');
 
-                    //$('#cbodetalle').select2({
-                    //    data: opciones,
-                    //    placeholder: "Selecciona una opción",
-                    //    allowClear: true,
-                    //    dropdownParent: $('#FormModal'),
+                    //$.each(data.data, function (index, valor) {
 
+                    //if (valor.Activo === true) {
+                    //    stockprod[valor.IdProducto] = valor.StockActual;
+                    //    codigoidprod[valor.IdProducto] = valor.CodigoId;
+                    //    rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                    //    tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                    //    $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
+                    //    }
                     //});
                 },
                 error: function (error) {
@@ -476,9 +455,7 @@
         }
 
         function abrirModal(json) {
-            console.log(json)
-            CargarProductos();
-            $('#collapseExample').collapse('hide');
+            //$('#collapseExample').collapse('hide');
             if (json != null) {
                 var fechaActMatch = json.FechaAct.match(/\/Date\((\d+)\)\//);
                 var timestamp = parseInt(fechaActMatch[1], 10);
@@ -509,9 +486,9 @@
                     $("#cboproveedores").val(json.oProveedores.IdProveedor).trigger('change');
                     $("#txtcantidad").val(json.Cantidad);
                     $("#cbostockactual").val(json.oProductos.StockActual).show();
-                    $("#infocodigoid").val(json.oProductos.CodigoId).show(); 
-                    $("#inforubro").val(json.oProductos.oRubros.Rubro).show(); 
-                    $("#infotipo").val(json.oProductos.oTipos.Tipo).show(); 
+                    $("#infocodigoid").val(json.oProductos.CodigoId).show();
+                    $("#inforubro").val(json.oProductos.oRubros.Rubro).show();
+                    $("#infotipo").val(json.oProductos.oTipos.Tipo).show();
                     $("#txtcodigoid").val(json.CodigoId);
                     $("#txtexpediente").val(json.NroExpediente);
                     $("#txttipoingreso").val(json.TipoIngreso);
@@ -527,7 +504,6 @@
                     $("#FormModal").modal("show");
                 }
             } else {
-                CargarProductos();
                  $("#txtid").val(0);
                  $("#cbodetalle").val("");
                  $("#cbostockactual").val("");
@@ -583,17 +559,17 @@
             function obtenerStockPorId(idProducto) {
                 return stockprod[idProducto];
             }
-
             function obtenerCodigoPorId(idProducto) {
                 return codigoidprod[idProducto];
             }
-
             function obtenerRubroPorId(idProducto) {
                 return rubroprod[idProducto];
             }
             function obtenerTipoPorId(idProducto) {
                 return tipoprod[idProducto];
             }
+
+
         }
 
         $("#tabla tbody").on("click", '.btn-editar', function () {

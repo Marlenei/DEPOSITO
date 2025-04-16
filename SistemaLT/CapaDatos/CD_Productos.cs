@@ -18,20 +18,8 @@ namespace CapaDatos
             {
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendLine("SELECT p.IdProducto, ");
-                    sb.AppendLine("r.IdRubro, r.Rubro, ");
-                    sb.AppendLine("t.IdTipo, t.Tipo, ");
-                    sb.AppendLine("COALESCE(p.StockActual, 0) AS StockActual, ");
-                    sb.AppendLine("p.Detalle, p.StockMinimo, p.StockActual, p.Activo, p.IdUsuario, p.CodigoId, p.FechaAlta ");
-                    sb.AppendLine("FROM Tonner_Productos p ");
-                    sb.AppendLine("inner join Tonner_Rubros r on r.IdRubro = p.IdRubro");
-                    sb.AppendLine("inner join Tonner_Tipos t on t.IdTipo = p.IdTipo ");
-                    sb.AppendLine("ORDER BY p.IdProducto DESC");
-
-
-                    SqlCommand cmd = new SqlCommand(sb.ToString(), oconexion);
-                    cmd.CommandType = CommandType.Text;
+                    SqlCommand cmd = new SqlCommand("ListarProductos", oconexion);
+                    cmd.CommandType = CommandType.StoredProcedure;
                     oconexion.Open();
                     using (SqlDataReader rdr = cmd.ExecuteReader())
                     {
