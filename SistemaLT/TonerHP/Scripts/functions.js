@@ -32,6 +32,7 @@ function CargarRubros(urlrubros) {
             $("#cbostockactual").empty();
             $("#cborubro").empty();
             var opciones = [];
+
             $.each(data.data, function (index, valor) {
                 if (valor.Activo === true) {
                     opciones.push({
@@ -187,7 +188,6 @@ function CargarProductosporCI(selectElement) {
         dataType: "json",
         contentType: "application/json; charset=utf-8",
         success: function (data) {
-
             $("#cbodetalle").empty();
             let opciones = [];
             $.each(data, function (index, valor) {
@@ -198,13 +198,12 @@ function CargarProductosporCI(selectElement) {
                     });
                 }
             });
-
-            $('#cbodetalle').empty().select2({
+            $('#cbodetalle').select2({
                 placeholder: "Selecciona una opción",
                 data: opciones,
                 allowClear: true,
                 dropdownParent: $('#FormModal'),
-            }).val(null).trigger('change');
+            }).val(null).trigger('change'); 
         },
         error: function (error) {
             console.log(error)
@@ -232,6 +231,11 @@ function selects2() {
         placeholder: "Selecciona una opción",
         allowClear: true,
         dropdownParent: $('#FormModal'),
+    });
+}
+function CollapseCargaProd(){
+    $('#collapseExample').on('hidden.bs.collapse', function () {
+        CargarProductos();
     });
 }
 

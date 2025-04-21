@@ -1,0 +1,46 @@
+﻿@{ ViewData["Title"] = "Filtrado de PRoductos"; }
+<div class="modal-header bg-dark text-white">
+    <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
+    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body g-3">
+    <div class="row">
+        <div class="col-sm-6">
+            <label class="form-label">Rubro</label>
+            <select id="cborubro" class="form-select" name="idRubro" onchange="CargarTipos(this.value)">
+                <option value="">Seleccione un Rubro</option>
+            </select>
+        </div>
+
+        <div class="col-sm-6">
+            <label class="form-label">Codigo ID</label>
+            <select id="cbocodigo" class="form-select" name="idCodigo" onchange="CargarProductosporCI(this)">
+                <option value="">Seleccione un Codigo ID</option>
+            </select>
+        </div>
+    </div>
+
+
+    <div class="row mt-2">
+        <div class="col-sm-6">
+            <label class="form-label">Tipo</label>
+            <select id="cbotipo" class="form-select" name="idTipo" onchange="CargarProductosporTipo(this.value)">
+            </select>
+        </div>
+    </div>
+
+    <div class="col-sm-6" style="text-align-last: center; justify-self: center">
+        <label class="form-label">Producto</label>
+        <select id="cbodetalle1" class="form-select">
+        </select>
+        <div class="col-sm-6" style="text-align-last: center; justify-self: center">
+            <label class="form-label">Stock Actual</label>
+            <input id="cbostockactual1" type="text" class="form-control" style="display: none;" readonly />
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" onclick="GuardarProducto()">Guardar</button>
+    <button class="btn btn-primary" data-bs-target="#FormModal" data-bs-toggle="modal">Volver</button>
+</div>

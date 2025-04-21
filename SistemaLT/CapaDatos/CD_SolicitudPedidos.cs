@@ -141,6 +141,7 @@ namespace CapaDatos
             }
             return lista;
         }
+
         public List<SolicitudPedidos> ListarFiltradosNro(
         string nroPedido = null,
          bool soloPendientes = false)
@@ -176,7 +177,9 @@ namespace CapaDatos
                             Visado = Convert.ToBoolean(reader["Visado"]),
                             FechaPedido = Convert.ToDateTime(reader["FechaPedido"]).ToString("yyyy-MM-dd HH:mm:ss"),
                             CodigoArea = Convert.ToInt32(reader["CodigoArea"]),
-                            CodigoSector = Convert.ToInt32(reader["CodigoSector"])
+                            CodigoSector = Convert.ToInt32(reader["CodigoSector"]),
+                            NombreArea = reader["NombreArea"].ToString(), // Asegurar que existe en el SP
+                            NombreSector = reader["NombreSector"].ToString() // Asegurar que existe en el SP
                         });
                     }
                 }
@@ -361,7 +364,7 @@ namespace CapaDatos
 
                 try
                 {
-                    // Step 1: Retrieve current values
+                   
                     int cantidadAnterior = 0;
                     int idProducto = 0;
                     string nroPedido = "";
@@ -398,10 +401,10 @@ namespace CapaDatos
                         }
                     }
 
-                    // Step 2: Calculate the difference
+                    // Step 2: Calculate al diferencia
                     int? diferencia = pedido.CantidadEntregada - cantidadAnterior;
 
-                    // Step 3: Update the order
+                    // Step 3: Actualizar 
                     string queryUpdate = @"UPDATE Tonner_Pedidos SET 
                 CantidadEntregada = @CantidadEntregada,
                 FechaEntrega = @FechaEntrega,

@@ -116,12 +116,13 @@ namespace TonerHP.Controllers
         public ActionResult SolicitudPedidos()
         {
 
-            //var userAccessCode = Session["AccesCode"] as int?;
-            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
+            //var permisos = Session["PermissionsCode"] as List<Permiso>;
+            //var tieneAcceso = permisos.Any(p => p.Accesos == 23);
+            //if (!tieneAcceso)
             //{
-            //                   return RedirectToAction("Error", "Home");
-
+            //    return RedirectToAction("Error", "Home");
             //}
+
 
             return View();
         }
@@ -129,12 +130,12 @@ namespace TonerHP.Controllers
         public ActionResult EntregaPedidos()
         {
 
-            //var userAccessCode = Session["AccesCode"] as int?;
-            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
-            //{
-            //                   return RedirectToAction("Error", "Home");
-
-            //}
+            var permisos = Session["PermissionsCode"] as List<Permiso>;
+            var tieneAcceso = permisos.Any(p => p.Accesos == 24 || p.Accesos == 184);
+            if (!tieneAcceso)
+            {
+                return RedirectToAction("Error", "Home");
+            }
 
             return View();
         }
@@ -170,11 +171,29 @@ namespace TonerHP.Controllers
         //RUBROS
         #region RUBROS
         [HttpGet]
-        public JsonResult ListarRubros()
+        public JsonResult ListarRubros(int? allowedRubroId = null) // Parámetro opcional
         {
-            List<Rubros> oLista = new List<Rubros>();
-            oLista = new CN_Rubros().Listar();
-            return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
+            // 1. Obtener la lista completa desde la capa de negocio
+            List<Rubros> oListaCompleta = new CN_Rubros().Listar();
+
+            // --- INICIO CAMBIO: Filtrar por Activo ---
+            // 2. Filtrar la lista para incluir solo los rubros donde Activo es true
+            //    (Asegúrate de que tu clase Rubros tenga la propiedad booleana 'Activo')
+            IEnumerable<Rubros> rubrosActivosQuery = oListaCompleta.Where(r => r.Activo);
+            // --- FIN CAMBIO: Filtrar por Activo ---
+
+            // 3. Aplicar el filtro opcional por Rubro Específico (si se pasó el parámetro)
+            //    Este filtro se aplica sobre la lista que ya contiene solo los activos.
+            if (allowedRubroId.HasValue)
+            {
+                rubrosActivosQuery = rubrosActivosQuery.Where(r => r.IdRubro == allowedRubroId.Value);
+            }
+
+            // 4. Convertir el resultado final a una lista
+            List<Rubros> oListaFiltradaFinal = rubrosActivosQuery.ToList();
+
+            // 5. Devolver la lista filtrada
+            return Json(new { data = oListaFiltradaFinal }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
