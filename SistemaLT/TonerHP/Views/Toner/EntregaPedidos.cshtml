@@ -163,7 +163,7 @@
 
                     <div class="col-sm-6">
                         <label for="txtfechapedido" class="form-label">Fecha de Pedido</label>
-                        <input type="text" class="form-control" id="txtfechapedido" readonly>
+                        <input type="text" class="form-control" id="txtfechapedido" >
                     </div>
 
                     <div class="col-sm-6">
@@ -219,12 +219,15 @@
     </div>
 </div>
 
+<input type="hidden" id="userPermissionsJson" value="@Json.Encode(Session["PermissionsCode"])" />
+
 @section scripts{
     <script>
         // Configuración Inicial
         var tabladata;
         var filaSeleccionada;
         var productos = {};
+        const ID_RUBRO_INFORMATICA = 184;
 
 
 
@@ -368,11 +371,15 @@
 
                         // Función para buscar por número de pedido
                       function buscarPorNumero() {
-                            const nroPedido = $("#txtBuscarPedido").val();
-                            tabladata.ajax.url('@Url.Action("ListarFiltrados", "SolicitudPedidos")' +
-                                '?nroPedido=' + encodeURIComponent(nroPedido) +
-                                '&soloPendientes=false').load();
-                        }
+                    const nroPedido = $("#txtBuscarPedido").val().trim(); // Obtener valor del input
+                    tabladata.ajax.url('@Url.Action("ListarFiltradosNro", "SolicitudPedidos")' +
+                        '?nroPedido=' + encodeURIComponent(nroPedido) +
+                        '&soloPendientes=false').load(function(data) {
+                            if (data.data.length === 0) {
+                                Swal.fire('¡Atención!', 'No se encontraron pedidos con ese número.', 'info');
+                            }
+                        });
+                }
 
                         @*// Función para mostrar pendientes
                         function mostrarPendientes() {
@@ -401,6 +408,7 @@
 
 
 
+
         function cargarProductos() {
             $.ajax({
                 url: '@Url.Action("ListarProductos", "Toner")',
@@ -417,32 +425,82 @@
             });
         }
 
-        function CargarRubros(urlrubros) {
+            function CargarRubros(urlrubros) { // urlrubros es '@Url.Action("ListarRubros", "Toner")'
+            var permissionsJson = $('#userPermissionsJson').val();
+            var permissions = permissionsJson ? JSON.parse(permissionsJson) : [];
+
+            // Determinar permisos relevantes
+            var tienePermisoGeneral = permissions.some(p => p.Accesos == 24);
+            var tienePermisoInformatica = permissions.some(p => p.Accesos == 184);
+
+            var filterRubroId = null;
+            var disableRubroSelect = false;
+
+            // Aplicar filtro solo si NO tiene permiso general PERO SÍ el de informática
+            if (!tienePermisoGeneral && tienePermisoInformatica) {
+                filterRubroId = ID_RUBRO_INFORMATICA; // Usa la constante definida
+                disableRubroSelect = true; // Se deshabilitará el combo
+            }
+
+            // Construir la URL para el AJAX call, añadiendo el parámetro si es necesario
+            var ajaxUrl = urlrubros;
+            if (filterRubroId !== null) {
+                // Añadir parámetro a la URL (asegúrate que la URL base no tenga ya parámetros)
+                ajaxUrl += (ajaxUrl.indexOf('?') > -1 ? '&' : '?') + 'allowedRubroId=' + filterRubroId;
+            }
+
             $.ajax({
-                url: urlrubros,
+                url: ajaxUrl,
                 type: "GET",
-                data: null,
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#cborubro").empty();
-                    $("#cbostockactual").empty();
-                    $("<option>").attr({ "value": "" }).text("Seleccione un Rubro").appendTo("#cborubro"); // Opción por defecto
-                    $.each(data.data, function (index, valor) {
-                        if (valor.Activo === true) {
-                            $("<option>").attr({ "value": valor.IdRubro }).text(valor.Rubro).appendTo("#cborubro");
-                        }
-                    });
-                    $("#cbotipo").empty();
+                success: function (response) { // Cambiado a response para claridad
+                    var $cboRubro = $("#cborubro"); // ID del select de Rubros en _BusquedaAvan
+                    if (!$cboRubro.length) {
+                         console.error("Elemento #cborubro no encontrado en _BusquedaAvan.cshtml");
+                         return; // Salir si el elemento no existe
+                    }
+                    $cboRubro.empty(); // Limpiar opciones previas
 
+                    // Añadir opción por defecto solo si no está deshabilitado o hay más de una opción
+                    if (!disableRubroSelect || (response.data && response.data.length !== 1)) {
+                        $("<option>").attr({ "value": "" }).text("Seleccione un Rubro").appendTo($cboRubro);
+                    }
 
+                    // Poblar con los rubros recibidos
+                    if (response.data) {
+                        $.each(response.data, function (index, rubro) {
+                             // Asumiendo que 'rubro' tiene propiedades 'IdRubro' y 'Rubro'
+                            // Puedes añadir un check 'rubro.Activo' si existe
+                            $("<option>").attr({ "value": rubro.IdRubro }).text(rubro.Rubro).appendTo($cboRubro);
+                        });
+                    }
+
+                    // Ajustar estado del select y cargar tipos si está restringido/deshabilitado
+                    if (disableRubroSelect && filterRubroId !== null) {
+                        $cboRubro.val(filterRubroId); // Seleccionar el único rubro
+                        $cboRubro.prop('disabled', true); // Deshabilitar
+                        CargarTipos(filterRubroId); // Cargar tipos automáticamente para el rubro fijo
+                    } else {
+                        $cboRubro.prop('disabled', false); // Habilitar si no está restringido
+                         // Limpiar dependientes si no hay selección automática
+                         $("#cbotipo").empty().append($("<option>").attr({ "value": "" }).text("Seleccione un Tipo"));
+                         $("#cbodetalle").empty().append($("<option>").attr({ "value": "" }).text("Seleccione un Producto"));
+                    }
                 },
                 error: function (error) {
-                    console.log(error)
-                },
-
+                    console.log("Error cargando Rubros: ", error);
+                    // Mostrar mensaje de error al usuario si es apropiado
+                    $("#mensajeError").text("Error al cargar rubros para búsqueda.").show().delay(5000).fadeOut();
+                }
             });
+
+             // Limpiar campos relacionados que podrían existir en _BusquedaAvan
+             $("#cbostockactual").empty(); // Si existe
+             $("#cbocodigo").empty().append($("<option>").attr({ "value": "" }).text("Seleccione Código ID")); // Si existe
+
         }
+
 
         function CargarTipos(idRubro) {
             var urltipos = 'https://localhost:44347/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
