@@ -1,4 +1,27 @@
-﻿function CargarRubros(urlrubros) {
+﻿function LimpiarSelects() {
+
+    $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo ').val(null).trigger('change');
+
+    CargarProductos();
+}
+function cargarApiUrls() {
+    $.ajax({
+        url: '/Toner/GetApiUrls', 
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+            appSettings.ApiUrlDev = data.ApiUrlDev;
+            appSettings.ApiUrlProd = data.ApiUrlProd;
+            console.log(appSettings.ApiUrlDev);
+            console.log(appSettings.ApiUrlProd);
+
+        },
+        error: function (error) {
+            console.error("Error al cargar las URLs de la API:", error);
+        }
+    });
+}
+function CargarRubros(urlrubros) {
     $.ajax({
         url: urlrubros,
         type: "GET",
@@ -7,11 +30,23 @@
         contentType: "application/json; charset=utf-8",
         success: function (data) {
             $("#cbostockactual").empty();
+            $("#cborubro").empty();
+            var opciones = [];
+
             $.each(data.data, function (index, valor) {
                 if (valor.Activo === true) {
-                    $("<option>").attr({ "value": valor.IdRubro }).text(valor.Rubro).appendTo("#cborubro");
+                    opciones.push({
+                        id: valor.IdRubro,
+                        text: valor.Rubro
+                    });
                 }
             });
+            $('#cborubro').select2({
+                placeholder: "Selecciona una opción",
+                data: opciones,
+                allowClear: true,
+                dropdownParent: $('#FormModal'),
+            }).val(null).trigger('change'); 
             $("#cbotipo").empty(); 
             $("#cbodetalle").empty(); 
 
@@ -27,16 +62,12 @@
 
 function CargarTipos(idRubro) {
     var isDevelopment = window.location.hostname === "localhost";
-
-    var baseUrl;
-
-    if (isDevelopment) {
-        baseUrl = 'https://localhost:44347/Toner'; // URL de desarrollo
-    } else {
-        baseUrl = 'http://10.4.50.13/SistemaLT/TonerHP/Toner'; // URL de producción
+    var baseUrl = isDevelopment ? appSettings.ApiUrlDev : appSettings.ApiUrlProd;
+    var urltipos = baseUrl + '/ListarTiposPorRubro?idRubro=' + idRubro;
+    if (!idRubro) {
+        return;
     }
 
-    var urltipos = baseUrl + '/ListarTiposPorRubro?idRubro=' + idRubro;
     $.ajax({
         url: urltipos,
         type: "GET",
@@ -72,16 +103,11 @@ function CargarTipos(idRubro) {
 
 
 function CargarProductosporTipo(idTipo) {
-
-    var isDevelopment = window.location.hostname === "localhost";
-    var baseUrl;
-
-    if (isDevelopment) {
-        baseUrl = 'https://localhost:44347/Toner'; // URL de desarrollo
-    } else {
-        baseUrl = 'http://10.4.50.13/SistemaLT/TonerHP/Toner'; // URL de producción
+    if (!idTipo) {
+        return;
     }
-
+    var isDevelopment = window.location.hostname === "localhost";
+    var baseUrl = isDevelopment ? appSettings.ApiUrlDev : appSettings.ApiUrlProd;
     var urlproductos = baseUrl + '/ListarProductosPorTipo?idTipo=' + idTipo;
     $.ajax({
         url: urlproductos,
@@ -123,11 +149,23 @@ function CargarCodigosID(urlcodigoid) {
         contentType: "application/json; charset=utf-8",
         success: function (data) {
             $("#cbostockactual").empty();
+            //$("#cbocodigo").empty();
+            var opciones = [];
             $.each(data.data, function (index, valor) {
                 if (valor.Activo === true && valor.CodigoId) {
-                    $("<option>").attr({ "value": valor.IdProducto }).text(valor.CodigoId).appendTo("#cbocodigo");
+                    opciones.push({
+                        id: valor.IdProducto,
+                        text: valor.CodigoId
+                    });
                 }
             });
+            $('#cbocodigo').select2({
+                placeholder: "Selecciona una opción",
+                data: opciones,
+                allowClear: true,
+                dropdownParent: $('#FormModal'),
+            }).val(null).trigger('change'); 
+
             $("#cbodetalle").empty();
         },
         error: function (error) {
@@ -141,14 +179,7 @@ function CargarCodigosID(urlcodigoid) {
 function CargarProductosporCI(selectElement) {
     var idCodigo = selectElement.options[selectElement.selectedIndex].text;
     var isDevelopment = window.location.hostname === "localhost";
-    var baseUrl;
-
-    if (isDevelopment) {
-        baseUrl = 'https://localhost:44347/Toner'; // URL de desarrollo
-    } else {
-        baseUrl = 'http://10.4.50.13/SistemaLT/TonerHP/Toner'; // URL de producción
-    }
-
+    var baseUrl = isDevelopment ? appSettings.ApiUrlDev : appSettings.ApiUrlProd;
     var urlproductos = baseUrl + '/ListarProductosporCI?idCodigo=' + idCodigo;
     $.ajax({
         url: urlproductos,
@@ -158,7 +189,7 @@ function CargarProductosporCI(selectElement) {
         contentType: "application/json; charset=utf-8",
         success: function (data) {
             $("#cbodetalle").empty();
-            var opciones = [];
+            let opciones = [];
             $.each(data, function (index, valor) {
                 if (valor.Activo === true) {
                     opciones.push({
@@ -201,7 +232,6 @@ function selects2() {
         allowClear: true,
         dropdownParent: $('#FormModal'),
     });
-
 }
 function CollapseCargaProd(){
     $('#collapseExample').on('hidden.bs.collapse', function () {
@@ -213,8 +243,7 @@ function LimpiarCampos() {
     $('.modal').on('hidden.bs.modal', function (e) {
         $(this).find('input, select, textarea').val(''); 
         $(this).find('select').val('').trigger('change');
-        $(this).removeData(); 
-
+        $(this).removeData();
         CargarProductos();
     });
 }

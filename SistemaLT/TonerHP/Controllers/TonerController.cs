@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net.Http;
@@ -18,6 +19,17 @@ namespace TonerHP.Controllers
     public class TonerController : Controller
     {
         // GET: Toner
+
+        public JsonResult GetApiUrls()
+        {
+            var apiUrls = new
+            {
+                ApiUrlDev = ConfigurationManager.AppSettings["ApiUrlDev"],
+                ApiUrlProd = ConfigurationManager.AppSettings["ApiUrlProd"]
+            };
+
+            return Json(apiUrls, JsonRequestBehavior.AllowGet);
+        }
 
         public ActionResult _BusAvan()
         {
