@@ -72,7 +72,7 @@ namespace TonerHP.Controllers
                         var permisoJson = await permisoResponse.Content.ReadAsStringAsync();
                         var permisos = JsonConvert.DeserializeObject<List<Permiso>>(permisoJson);
 
-                        var tieneAcceso = permisos.Any(p => p.Accesos == 23 || p.Accesos == 24 || p.Accesos == 25 || p.Accesos == 59);
+                        var tieneAcceso = permisos.Any(p => p.Accesos == 23 || p.Accesos == 24 || p.Accesos == 25 || p.Accesos == 59 || p.Accesos == 182 || p.Accesos == 183 || p.Accesos == 184);
                         if (tieneAcceso)
                         {
                             Session["PermissionsCode"] = permisos;

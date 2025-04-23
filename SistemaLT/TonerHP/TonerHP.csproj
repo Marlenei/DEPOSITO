@@ -640,6 +640,7 @@
     <Content Include="Views\Shared\_BusquedaAvan.cshtml" />
     <Content Include="Views\Toner\SolicitudPedidos.cshtml" />
     <Content Include="Views\Shared\_LimpiarM.cshtml" />
+    <Content Include="Views\Toner\EntregaPedidos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,9 +1,4 @@
-﻿function LimpiarSelects() {
-
-    $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo ').val(null).trigger('change');
-
-    CargarProductos();
-}
+﻿
 function cargarApiUrls() {
     $.ajax({
         url: '/Toner/GetApiUrls', 
@@ -21,7 +16,7 @@ function cargarApiUrls() {
         }
     });
 }
-function CargarRubros(urlrubros) {
+function CargarRubros(urlrubros, permisos) {
     $.ajax({
         url: urlrubros,
         type: "GET",
@@ -32,13 +27,21 @@ function CargarRubros(urlrubros) {
             $("#cbostockactual").empty();
             $("#cborubro").empty();
             var opciones = [];
-
+            var notienetoner = permisos.includes(24) || permisos.includes(25);
+            var tienetoner = permisos.includes(184) || permisos.includes(183);
             $.each(data.data, function (index, valor) {
                 if (valor.Activo === true) {
-                    opciones.push({
-                        id: valor.IdRubro,
-                        text: valor.Rubro
-                    });
+                    if (notienetoner && valor.Rubro !== "Insumos Informaticos") {
+                        opciones.push({
+                            id: valor.IdRubro,
+                            text: valor.Rubro
+                        });
+                    } else if (tienetoner && valor.Rubro === "Insumos Informaticos") {
+                        opciones.push({
+                            id: valor.IdRubro,
+                            text: valor.Rubro
+                        });
+                    }
                 }
             });
             $('#cborubro').select2({
@@ -140,7 +143,7 @@ function CargarProductosporTipo(idTipo) {
 }
 
 
-function CargarCodigosID(urlcodigoid) {
+function CargarCodigosID(urlcodigoid, permisos) {
     $.ajax({
         url: urlcodigoid,
         type: "GET",
@@ -151,12 +154,21 @@ function CargarCodigosID(urlcodigoid) {
             $("#cbostockactual").empty();
             //$("#cbocodigo").empty();
             var opciones = [];
+            var notienetoner = permisos.includes(24) || permisos.includes(25);
+            var tienetoner = permisos.includes(184) || permisos.includes(183);
             $.each(data.data, function (index, valor) {
                 if (valor.Activo === true && valor.CodigoId) {
-                    opciones.push({
-                        id: valor.IdProducto,
-                        text: valor.CodigoId
-                    });
+                    if (notienetoner && valor.oRubros.Rubro !== "Insumos Informaticos") {
+                        opciones.push({
+                            id: valor.IdProducto,
+                            text: valor.CodigoId
+                        });
+                    } else if (tienetoner && valor.oRubros.Rubro === "Insumos Informaticos") {
+                        opciones.push({
+                            id: valor.IdProducto,
+                            text: valor.CodigoId
+                        });
+                    }
                 }
             });
             $('#cbocodigo').select2({
@@ -213,37 +225,30 @@ function CargarProductosporCI(selectElement) {
 
 function selects2() {
     $('#cborubro').select2({
-        placeholder: "Selecciona una opción",
+        placeholder: "Seleccionar una opción",
         allowClear: true,
         dropdownParent: $('#FormModal'),
     });
     $('#cbotipo').select2({
-        placeholder: "Selecciona un rubro",
+        placeholder: "Seleccionar un rubro",
         allowClear: true,
         dropdownParent: $('#FormModal'),
     });
     $('#cbocodigo').select2({
-        placeholder: "Selecciona una opción",
+        placeholder: "Seleccionar una opción",
         allowClear: true,
         dropdownParent: $('#FormModal'),
     });
     $('#cbodetalle').select2({
-        placeholder: "Selecciona una opción",
+        placeholder: "Seleccionar una opción",
         allowClear: true,
         dropdownParent: $('#FormModal'),
     });
 }
-function CollapseCargaProd(){
-    $('#collapseExample').on('hidden.bs.collapse', function () {
-        CargarProductos();
-    });
-}
-
 function LimpiarCampos() {
     $('.modal').on('hidden.bs.modal', function (e) {
         $(this).find('input, select, textarea').val(''); 
         $(this).find('select').val('').trigger('change');
         $(this).removeData();
-        CargarProductos();
     });
 }

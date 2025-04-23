@@ -8,27 +8,26 @@
             </select>
         </div>
 
-
         <div class="col-sm-6">
             <label class="form-label">Tipo</label>
-            <select id="cbotipo" class="form-select" name="idTipo" onchange="CargarProductosporTipo(this.value)">
-            </select>
+            <div class="mt-0">
+                <select id="cbotipo" class="form-select" name="idTipo" onchange="CargarProductosporTipo(this.value)">
+                </select>
+            </div>
         </div>
     </div>
-
-
+    <p>O</p>
     <div class="row mt-2">
         <div class="col-sm-6">
             <label class="form-label">Codigo ID</label>
             <select id="cbocodigo" class="form-select" name="idCodigo" onchange="CargarProductosporCI(this)">
                 <option value="">Seleccione un Codigo ID</option>
             </select>
-
         </div>
-        <button type="button" class="btn btn-primary me-md-2" id="BtnLimpiar" onclick="LimpiarSelects()">
-            Limpiar
-        </button>
+        <div class="col-sm-6 text-center mt-2" style="align-content: center;">
+            <button type="button" class="btn btn-primary mx-auto" id="BtnLimpiar" onclick="LimpiarSelects()">
+                Limpiar busqueda
+            </button>
+        </div>
     </div>
-
-
 </div>

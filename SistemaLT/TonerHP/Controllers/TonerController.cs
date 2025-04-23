@@ -35,11 +35,12 @@ namespace TonerHP.Controllers
         {
             return PartialView("_BusAvan");
         }
+        [Authorize]
 
         public ActionResult Proveedores()
         {
             var permisos = Session["PermissionsCode"] as List<Permiso>;
-            var tieneAcceso = permisos.Any(p => p.Accesos == 24);
+            var tieneAcceso = permisos.Any(p => p.Accesos == 182);
             if (!tieneAcceso)
             {
                 return RedirectToAction("Error", "Home");
@@ -47,29 +48,29 @@ namespace TonerHP.Controllers
 
             return View();
         }
+        [Authorize]
 
         public ActionResult Tipos()
         {
-            //var userAccessCode = Session["AccesCode"] as int?;
-            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
-            //{
-            //                    return RedirectToAction("Error", "Home");
-
-            //}
-
-            //var userAccessCode = Session["AccesCode"] as int?;
+            var permisos = Session["PermissionsCode"] as List<Permiso>;
+            var tieneAcceso = permisos.Any(p => p.Accesos == 182);
+            if (!tieneAcceso)
+            {
+                return RedirectToAction("Error", "Home");
+            }
 
             return View();
         }
+        [Authorize]
 
         public ActionResult Productos()
         {
-            //var userAccessCode = Session["AccesCode"] as int?;
-            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
-            //{
-            //                    return RedirectToAction("Error", "Home");
-
-            //}
+            var permisos = Session["PermissionsCode"] as List<Permiso>;
+            var tieneAcceso = permisos.Any(p => p.Accesos == 182);
+            if (!tieneAcceso)
+            {
+                return RedirectToAction("Error", "Home");
+            }
 
             return View();
         }
@@ -100,15 +101,16 @@ namespace TonerHP.Controllers
 
             return View();
         }
+        [Authorize]
 
         public ActionResult Rubros()
         {
-            //var userAccessCode = Session["AccesCode"] as int?;
-            //if (userAccessCode == null || (userAccessCode != 23 && userAccessCode != 24))
-            //{
-            //                    return RedirectToAction("Error", "Home");
-
-            //}
+            var permisos = Session["PermissionsCode"] as List<Permiso>;
+            var tieneAcceso = permisos.Any(p => p.Accesos == 182);
+            if (!tieneAcceso)
+            {
+                return RedirectToAction("Error", "Home");
+            }
 
             return View();
         }

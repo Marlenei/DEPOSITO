@@ -46,7 +46,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
+                <h1 class="modal-title fs-5" id="titulodinamico">Producto</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body g-2">
@@ -272,17 +272,21 @@
               });
           };
 
-
+        function modalTitle(title) {
+            document.getElementById('titulodinamico').innerText = title;
+        }
 
         function abrirModal(data) {
-             if (data != null) {
+            if (data != null) {
                  var fechaActMatch = data.FechaAlta.match(/\/Date\((\d+)\)\//);
                  var timestamp = parseInt(fechaActMatch[1], 10);
                  var fechaRegistro = new Date(timestamp);
                  var fechaActual = new Date();
                  var diferenciaDias = (fechaActual.getTime() - fechaRegistro.getTime()) / (1000 * 3600 * 24);
 
-                 if (diferenciaDias >= 7) {
+                if (diferenciaDias >= 7) {
+                    modalTitle('Editar');
+
                      $("#txtid").val(data.IdProducto);
                      $("#cbodetalle").val(data.IdProducto).prop('disabled', true).trigger('change');
                      $("#cborubro").val(data.oRubros.IdRubro).prop('disabled', true).trigger('change');
@@ -295,7 +299,9 @@
                      $("#mensajeError").text("Solo se puede modificar el estado activo después de 7 días.").show();
                      $("#FormModal").modal("show");
 
-                 } else {
+                } else {
+                    modalTitle('Editar');
+
                        $("#txtid").val(data.IdProducto);
                         $("#cbodetalle").val(data.IdProducto).trigger('change');
                         $("#cborubro").val(data.oRubros.IdRubro).trigger('change');
@@ -310,18 +316,18 @@
 
                      $("#FormModal").modal("show");
                  }
-             } else {
-                    $("#txtid").val(0);
-                    $("#cbodetalle").val(null).trigger('change');
-                    $("#cbotipo").val(null).trigger('change');
-                    $("#cborubro").val(null).trigger('change');
-                    $("#txtstockminimo").val("");
-                    $("#txtcodigoid").val("");
-                    $("#txtusuario").val(@Session["AccesCode"]);
-                    $("#cboactivo").val(1);
-                    $("#mensajeError").hide();
-
-                 $("#FormModal").modal("show");
+            } else {
+                modalTitle('Crear nuevo');
+                $("#txtid").val(0);
+                $("#cbodetalle").val(null).prop('disabled', false).trigger('change');
+                $("#cbotipo").val(null).prop('disabled', false).trigger('change');
+                $("#cborubro").val(null).prop('disabled', false).trigger('change');
+                $("#txtstockminimo").val("").prop('disabled', false);
+                $("#txtcodigoid").val("").prop('disabled', false);
+                $("#txtusuario").val(@Session["AccesCode"]);
+                $("#cboactivo").val(1);
+                $("#mensajeError").hide();
+                $("#FormModal").modal("show");
 
 
              }
