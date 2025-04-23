@@ -41,7 +41,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Proveedor</h1>
+                <h1 class="modal-title fs-5" id="titulodinamico"></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body g-2">
@@ -140,7 +140,12 @@
                }
            });
 
-            function abrirModal(json) {
+        function modalTitle(title) {
+            document.getElementById('titulodinamico').innerText = title;
+        }
+
+        function abrirModal(json) {
+            modalTitle('Crear nuevo');
                 $("#txtid").val(0);
                 $("#txtusuario").val(@Session["AccesCode"]);
                 $("#cborazonsocial").val(null).trigger('change');
@@ -148,7 +153,9 @@
                 $("#mensajeError").hide();
 
 
-                if (json != null) {
+            if (json != null) {
+                modalTitle('Editar');
+
                     $("#txtid").val(json.IdProveedor);
                     $("#cborazonsocial").val(json.IdProveedor).trigger('change');
                     $("#txtusuario").val(json.IdUsuario);

@@ -42,7 +42,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Tipo</h1>
+                <h1 class="modal-title fs-5" id="titulodinamico"></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body g-2">
@@ -53,22 +53,26 @@
 
                     <div class="col-sm-6">
                         <label for="txtnombres" class="form-label">Tipo</label>
-                        <select id="cbotipo" class="form-select"> </select>
+                        <div class="mt-0">
+
+                            <select id="cbotipo" class="form-select"> </select>
+                        </div>
+
                     </div>
 
-                    <div class="col-sm-6">
-                        <label class="form-label">Rubro</label>
-                        <select id="cborubro" class="form-select"> </select>
-                    </div>
+                        <div class="col-sm-6">
+                            <label class="form-label">Rubro</label>
+                            <select id="cborubro" class="form-select"> </select>
+                        </div>
 
-                    <div class="col-sm-6">
-                        <label for="cboactivo" class="form-label">Activo</label>
-                        <select id="cboactivo" class="form-select">
-                            <option value="1">Si</option>
-                            <option value="0">No</option>
-                        </select>
+                        <div class="col-sm-6">
+                            <label for="cboactivo" class="form-label">Activo</label>
+                            <select id="cboactivo" class="form-select">
+                                <option value="1">Si</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
                 @*Mensaje de alerta*@
                 <div class="row mt-12">
                     <div class="col-12">
@@ -198,7 +202,9 @@
 
         });
 
-
+        function modalTitle(title) {
+            document.getElementById('titulodinamico').innerText = title;
+        }
             function abrirModal(json) {
                 $("#txtid").val(0);
                 $("#cbotipo").val(null).trigger('change');
@@ -206,7 +212,10 @@
                 $("#txtusuario").val(@Session["AccesCode"]);
                 $("#cboactivo").val(1);
                 $("#mensajeError").hide();
-                if (json != null) {
+                modalTitle('Crear nuevo tipo'); 
+
+                    if (json != null) {
+                        modalTitle('Editar');
                     $("#txtid").val(json.IdTipo);
                     $("#cbotipo").val(json.IdTipo).trigger('change');
                     $("#cborubro").val(json.oRubros.IdRubro).trigger('change');

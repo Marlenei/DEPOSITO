@@ -52,106 +52,108 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
+                <h1 class="modal-title fs-5" id="titulodinamico">Producto</h1>
                 <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body g-2">
-                    <input id="txtid" type="hidden" value="" />
-                    <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
-                    <div class="row g-2" id="contenedor">
+            </div>
+            <div class="modal-body g-2">
+                <input id="txtid" type="hidden" value="" />
+                <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
+                <div class="row g-2" id="contenedor">
 
 
-                        <div class="col-sm-6">
-                            <label class="form-label" style="text-align:center;">Producto </label>
-                            <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
-                            </select>
-                            <p style="text-align: center; margin-top:5px">Informacion del producto</p>
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text">Stock Actual</span>
-                                    <input id="cbostockactual" type="text" class="form-control" readonly>
-                                    <span class="input-group-text">Codigo ID</span>
-                                    <input id="infocodigoid" type="text" class="form-control" readonly>
-                                </div>
+                    <div id="contenedor" class="col-sm-6">
+                        <p style="text-align:center">Filtros de busqueda</p>
+                        @Html.Partial("_BusquedaAvan")
+                    </div>
 
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text">Rubro</span>
-                                    <input id="inforubro" type="text" class="form-control" readonly>
-                                    <span class="input-group-text">Tipo</span>
-                                    <input id="infotipo" type="text" class="form-control" readonly>
-                                </div>
 
+                    <div class="col-sm-6">
+                        <label class="form-label" style="text-align:center;">Producto </label>
+                        <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
+                        </select>
+                        <p style="text-align: center; margin-top:5px">Informacion del producto</p>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Stock Actual</span>
+                            <input id="cbostockactual" type="text" class="form-control" readonly>
+                            <span class="input-group-text">Codigo ID</span>
+                            <input id="infocodigoid" type="text" class="form-control" readonly>
                         </div>
 
-                        <div id="contenedor" class="col-sm-6">
-                            <p style="text-align:center">Filtros de busqueda</p>
-                                    @Html.Partial("_BusquedaAvan")
-                        </div>
-
-
-                       
-
-                        <div class="col-sm-6">
-                            <label class="form-label">Razon social</label>
-                            <select id="cboproveedores" class="form-select"  style="width: 100%"> </select>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <label for="txtcantidad" class="form-label">Cantidad</label>
-                            <input type="number" class="form-control" id="txtcantidad" min="1" max="999" required placeholder="Coloque una cantidad" oninput="this.value.replace(/[^0-9]/g, '');">
-                        </div>
-
-                        <div class="col-sm-6">
-                            <label for="txtcodigoid" class="form-label">Codigo ID</label>
-                            <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
-                        </div>
-
-                        <div class="col-sm-6">
-                            <label for="txtexpediente" class="form-label">N° de Expediente</label>
-                            <input type="text" class="form-control" id="txtexpediente" maxlength="15">
-                        </div>
-
-                        <div class="col-sm-6">
-                            <label class="form-label">Tipo de Ingreso</label>
-                            <select id="txttipoingreso" class="form-select">
-                                <option value="">Seleccionar</option>
-                                <option value="C">Compra</option>
-                                <option value="D">Devolucion</option>
-                                <option value="O">Otro</option>
-                            </select>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <label for="txtfechaingreso" class="form-label">Fecha de Ingreso</label>
-                            <input type="text" class="form-control" id="txtfechaingreso" readonly>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <label for="txtobservaciones" class="form-label">Observaciones</label>
-                            <input type="text" class="form-control" id="txtobservaciones" maxlength="50">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Rubro</span>
+                            <input id="inforubro" type="text" class="form-control" readonly>
+                            <span class="input-group-text">Tipo</span>
+                            <input id="infotipo" type="text" class="form-control" readonly>
                         </div>
                     </div>
-                    @*-------------------------Mensaje de alerta-------------------------*@
-                    <div class="row mt-12">
-                        <div class="col-12">
-                            <div id="mensajeError" class="alert alert-danger" role="alert">
 
-                            </div>
+
+
+
+
+                    <div class="col-sm-6">
+                        <label class="form-label">Razon social</label>
+                        <select id="cboproveedores" class="form-select" style="width: 100%"> </select>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtcantidad" class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" id="txtcantidad" min="1" max="999" required placeholder="Coloque una cantidad" oninput="this.value.replace(/[^0-9]/g, '');">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                        <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtexpediente" class="form-label">N° de Expediente</label>
+                        <input type="text" class="form-control" id="txtexpediente" maxlength="15">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label">Tipo de Ingreso</label>
+                        <select id="txttipoingreso" class="form-select">
+                            <option value="">Seleccionar</option>
+                            <option value="C">Compra</option>
+                            <option value="D">Devolucion</option>
+                            <option value="O">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtfechaingreso" class="form-label">Fecha de Ingreso</label>
+                        <input type="text" class="form-control" id="txtfechaingreso" readonly>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtobservaciones" class="form-label">Observaciones</label>
+                        <input type="text" class="form-control" id="txtobservaciones" maxlength="50">
+                    </div>
+                </div>
+                @*-------------------------Mensaje de alerta-------------------------*@
+                <div class="row mt-12">
+                    <div class="col-12">
+                        <div id="mensajeError" class="alert alert-danger" role="alert">
 
                         </div>
 
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
+
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
+            </div>
+        </div>
     </div>
 </div>
 
-
 @section scripts{
     <script>
+        var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
+        console.log(permisos);
         var tabladata;
         var filaSeleccionada;
         var stockprod = {};
@@ -200,12 +202,13 @@
         $(document).ready(function () {
 
             var urlrubros = '@Url.Action("ListarRubros", "Toner")'
-            CargarRubros(urlrubros);
+            CargarRubros(urlrubros, permisos.map(p => p.Accesos));
 
             var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
-            CargarCodigosID(urlcodigoid);
+            CargarCodigosID(urlcodigoid, permisos.map(p => p.Accesos));
+
             LimpiarSelects();
-            CargarProductos();
+            CargarProductos(permisos.map(p => p.Accesos));
             LimpiarCampos();
             selects2();
             cargarApiUrls();
@@ -321,8 +324,13 @@
 
         });
 
+        function LimpiarSelects() {
 
-       
+            $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo ').val(null).trigger('change');
+
+            CargarProductos(permisos.map(p => p.Accesos));
+        }
+
 
 
 
@@ -409,7 +417,7 @@
 
 
         //Listado Productos
-        function CargarProductos() {
+        function CargarProductos(permisos) {
             $.ajax({
                 url: '@Url.Action("ListarProductos", "Toner")',
                 type: "GET",
@@ -420,18 +428,34 @@
                     $("#cbodetalle").empty();
                     $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cbodetalle");
                     var opciones = [];
+                    var tienePermiso24 = permisos.includes(24);
+                    var tienePermiso184 = permisos.includes(184);
                     $.each(data.data, function (index, valor) {
-                        if (valor.Activo === true) {
 
-                            opciones.push({
-                                id: valor.IdProducto,
-                                text: valor.Detalle
-                            });
-                            stockprod[valor.IdProducto] = valor.StockActual;
-                            codigoidprod[valor.IdProducto] = valor.CodigoId;
-                            rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
-                            tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                        if (valor.Activo === true) {
+                            if (tienePermiso24 && valor.oRubros.Rubro !== "Insumos Informaticos") {
+                                opciones.push({
+                                    id: valor.IdProducto,
+                                    text: valor.Detalle
+                                });
+                                stockprod[valor.IdProducto] = valor.StockActual;
+                                codigoidprod[valor.IdProducto] = valor.CodigoId;
+                                rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                                tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                            } else if (tienePermiso184 && valor.oRubros.Rubro === "Insumos Informaticos") {
+                                opciones.push({
+                                    id: valor.IdProducto,
+                                    text: valor.Detalle
+                                });
+                                stockprod[valor.IdProducto] = valor.StockActual;
+                                codigoidprod[valor.IdProducto] = valor.CodigoId;
+                                rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                                tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                            }
                         }
+
+
+
                     });
                     $('#cbodetalle').select2({
                         placeholder: "Selecciona una opción",
@@ -457,7 +481,12 @@
             });
         }
 
+        function modalTitle(title) {
+            document.getElementById('titulodinamico').innerText = title;
+        }
+
         function abrirModal(json) {
+            CargarProductos(permisos.map(p => p.Accesos));
             //$('#collapseExample').collapse('hide');
             if (json != null) {
                 var fechaActMatch = json.FechaAct.match(/\/Date\((\d+)\)\//);
@@ -476,6 +505,8 @@
                         confirmButtonText: "Ok",
                     });
                 } else {
+                    modalTitle('Editar');
+
                     var fechaActMatch = json.FechaIngreso.match(/\/Date\((\d+)\)\//);
                     var timestamp = parseInt(fechaActMatch[1], 10);
                     var fechaingreso = new Date(timestamp);
@@ -507,6 +538,8 @@
                     $("#FormModal").modal("show");
                 }
             } else {
+                modalTitle('Crear nuevo');
+
                  $("#txtid").val(0);
                  $("#cbodetalle").val("");
                  $("#cbostockactual").val("");
