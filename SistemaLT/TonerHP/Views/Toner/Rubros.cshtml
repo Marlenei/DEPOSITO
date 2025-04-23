@@ -42,7 +42,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Rubros</h1>
+                <h1 class="modal-title fs-5" id="titulodinamico"></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -178,8 +178,12 @@
                     },
                 });
 
-        function abrirModal(json) {
+        function modalTitle(title) {
+            document.getElementById('titulodinamico').innerText = title;
+        }
 
+        function abrirModal(json) {
+            modalTitle('Crear nuevo');
                 $("#txtid").val(0);
                 $("#cborubro").val(null).trigger('change');
                 $("#txtcodigoid").val("");
@@ -189,7 +193,7 @@
 
 
             if (json != null) {
-                console.log(json);
+                modalTitle('Editar');
                     $("#txtid").val(json.IdRubro);
                     $("#cborubro").val(json.IdRubro).trigger('change');
                     $("#txtcodigoid").val(json.Codigo);
