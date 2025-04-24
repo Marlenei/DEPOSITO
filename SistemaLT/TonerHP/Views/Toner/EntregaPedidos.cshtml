@@ -37,11 +37,7 @@
             </div>
         }
 
-        @*<div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
-            <button type="button" class="btn btn-success" onclick="abrirModal(null)">
-                <i class="fas fa-plus-circle me-1"></i> Entrega Pedido
-            </button>
-        </div>*@
+      
 
         <div class="row mb-4">
             <div class="col-12 col-md-6">
@@ -207,7 +203,7 @@
     </div>
 </div>
 
-<input type="hidden" id="userPermissionsJson" value="@Json.Encode(Session["PermissionsCode"])" />
+@*<input type="hidden" id="userPermissionsJson" value="@Json.Encode(Session["PermissionsCode"])" />*@
 
 @section scripts{
     <script>
@@ -219,7 +215,7 @@
         var rubroprod = {};
         var tipoprod = {};
         var appSettings = {};
-        const ID_RUBRO_INFORMATICA = 184;
+        var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
 
 
 
@@ -229,10 +225,10 @@
 
 
             var urlrubros = '@Url.Action("ListarRubros", "Toner")'
-            CargarRubros(urlrubros);
+            CargarRubros(urlrubros, permisos.map(p => p.Accesos));
            /* cargarProductos();*/
-            var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
-            CargarCodigosID(urlcodigoid);
+              var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
+            CargarCodigosID(urlcodigoid, permisos.map(p => p.Accesos));
             LimpiarSelects();
             CargarProductos();
             LimpiarCampos();
@@ -250,6 +246,12 @@
             });
         }
 
+        function LimpiarSelects() {
+
+            $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo ').val(null).trigger('change');
+
+            CargarProductos(permisos.map(p => p.Accesos));
+        }
 
         $(document).ready(function () {
         // Cargar áreas al cargar la página
@@ -457,107 +459,60 @@
                         });
                 }
 
-                      
 
 
 
-           function CargarProductos(callback) {
-               $.ajax({
-                   url: '@Url.Action("ListarProductos", "Toner")',
-                   success: function(data) {
-                       $("#cbodetalle").empty().append('<option value="">Seleccione producto</option>');
-                       $.each(data.data, function(_, producto) {
-                           if (producto.Activo) {
-                               $("#cbodetalle").append(
-                                   $('<option></option>')
-                                       .val(producto.IdProducto)
-                                       .text(producto.Detalle)
-                               );
-                           }
-                       });
-                       if (typeof callback === "function") callback();
-                   }
-               });
-           }
 
-            function CargarRubros(urlrubros) { // urlrubros es '@Url.Action("ListarRubros", "Toner")'
-            var permissionsJson = $('#userPermissionsJson').val();
-            var permissions = permissionsJson ? JSON.parse(permissionsJson) : [];
+                   //Listado Productos
+                 function CargarProductos(permisos) {
+                return $.ajax({
+                    url: '@Url.Action("ListarProductos", "Toner")',
+                    type: "GET",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function(data) {
+                        const $select = $("#cbodetalle");
+                        $select.empty().append('<option value="">Seleccionar</option>');
 
-            // Determinar permisos relevantes
-            var tienePermisoGeneral = permissions.some(p => p.Accesos == 24);
-            var tienePermisoInformatica = permissions.some(p => p.Accesos == 184);
+                        // Variables para permisos
+                        const puedeInsumos = permisos.includes(184);
+                        const puedeNoInsumos = permisos.includes(24);
 
-            var filterRubroId = null;
-            var disableRubroSelect = false;
-
-            // Aplicar filtro solo si NO tiene permiso general PERO SÍ el de informática
-            if (!tienePermisoGeneral && tienePermisoInformatica) {
-                filterRubroId = ID_RUBRO_INFORMATICA; // Usa la constante definida
-                disableRubroSelect = true; // Se deshabilitará el combo
-            }
-
-            // Construir la URL para el AJAX call, añadiendo el parámetro si es necesario
-            var ajaxUrl = urlrubros;
-            if (filterRubroId !== null) {
-                // Añadir parámetro a la URL (asegúrate que la URL base no tenga ya parámetros)
-                ajaxUrl += (ajaxUrl.indexOf('?') > -1 ? '&' : '?') + 'allowedRubroId=' + filterRubroId;
-            }
-
-            $.ajax({
-                url: ajaxUrl,
-                type: "GET",
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (response) { // Cambiado a response para claridad
-                    var $cboRubro = $("#cborubro"); // ID del select de Rubros en _BusquedaAvan
-                    if (!$cboRubro.length) {
-                         console.error("Elemento #cborubro no encontrado en _BusquedaAvan.cshtml");
-                         return; // Salir si el elemento no existe
-                    }
-                    $cboRubro.empty(); // Limpiar opciones previas
-
-                    // Añadir opción por defecto solo si no está deshabilitado o hay más de una opción
-                    if (!disableRubroSelect || (response.data && response.data.length !== 1)) {
-                        $("<option>").attr({ "value": "" }).text("Seleccione un Rubro").appendTo($cboRubro);
-                    }
-
-                    // Poblar con los rubros recibidos
-                    if (response.data) {
-                        $.each(response.data, function (index, rubro) {
-                             // Asumiendo que 'rubro' tiene propiedades 'IdRubro' y 'Rubro'
-                            // Puedes añadir un check 'rubro.Activo' si existe
-                            $("<option>").attr({ "value": rubro.IdRubro }).text(rubro.Rubro).appendTo($cboRubro);
+                        // Filtrar y mapear productos
+                        const productosFiltrados = data.data.filter(producto => {
+                            if (!producto.Activo) return false;
+                            const esInsumo = producto.oRubros.Rubro === "Insumos Informaticos";
+                            return (esInsumo && puedeInsumos) || (!esInsumo && puedeNoInsumos);
                         });
+
+                        // Llenar select2 con opciones filtradas
+                        $select.select2({
+                            placeholder: "Selecciona una opción",
+                            data: productosFiltrados.map(p => ({
+                                id: p.IdProducto,
+                                text: p.Detalle
+                            })),
+                            allowClear: true,
+                            dropdownParent: $('#FormModal')
+                        }).val(null).trigger('change');
+
+                        // Almacenar metadatos de productos
+                        productosFiltrados.forEach(p => {
+                            codigoidprod[p.IdProducto] = p.CodigoId;
+                            rubroprod[p.IdProducto] = p.oRubros.Rubro;
+                            tipoprod[p.IdProducto] = p.oTipos.Tipo;
+                        });
+                    },
+                    error: function(error) {
+                        console.error("Error cargando productos:", error);
+                        // Aquí podrías mostrar un mensaje al usuario
                     }
-
-                    // Ajustar estado del select y cargar tipos si está restringido/deshabilitado
-                    if (disableRubroSelect && filterRubroId !== null) {
-                        $cboRubro.val(filterRubroId); // Seleccionar el único rubro
-                        $cboRubro.prop('disabled', true); // Deshabilitar
-                        CargarTipos(filterRubroId); // Cargar tipos automáticamente para el rubro fijo
-                    } else {
-                        $cboRubro.prop('disabled', false); // Habilitar si no está restringido
-                         // Limpiar dependientes si no hay selección automática
-                         $("#cbotipo").empty().append($("<option>").attr({ "value": "" }).text("Seleccione un Tipo"));
-                         $("#cbodetalle").empty().append($("<option>").attr({ "value": "" }).text("Seleccione un Producto"));
-                    }
-                },
-                error: function (error) {
-                    console.log("Error cargando Rubros: ", error);
-                    // Mostrar mensaje de error al usuario si es apropiado
-                    $("#mensajeError").text("Error al cargar rubros para búsqueda.").show().delay(5000).fadeOut();
-                }
-            });
-
-             // Limpiar campos relacionados que podrían existir en _BusquedaAvan
-             $("#cbostockactual").empty(); // Si existe
-             $("#cbocodigo").empty().append($("<option>").attr({ "value": "" }).text("Seleccione Código ID")); // Si existe
-
-        }
+                });
+            }
 
 
-       
+
+
 
 
         $("#txtfechapedido").datepicker({
@@ -567,8 +522,15 @@
         });
 
 
-        function abrirModal(data) {
-             CargarProductos(function() { // Cargar productos antes de continuar
+         async function abrirModal(data) {
+             try {
+                 // Extraer los accesos del usuario
+                 const accesos = permisos.map(p => p.Accesos);
+
+                 // Esperar a que se carguen los productos antes de continuar
+                 await CargarProductos(accesos);
+
+                 // Configuración inicial de campos
                  $('#txtArea').val('@Session["NombreArea"]');
                  $('#txtSector').val('@Session["NombreSector"]');
                  $("#txtid").val(0);
@@ -577,66 +539,60 @@
                  $("#txtusuario").val('@Session["AccesCode"]');
                  $("#mensajeError").hide();
 
-                 // Resetear campos
+                 // Resetear campos dinámicos
                  $("#cbodetalle").val("").prop("disabled", false);
                  $("#txtfechapedido").prop("disabled", false);
 
-                 // Fecha actual para nuevos pedidos
+                 // Configurar fecha actual
                  const fechaActual = new Date();
                  $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaActual));
 
-                 if (data != null) {
-                     // Cargar datos para edición
+                 // Manejo de edición de pedido
+                 if (data) {
                      $("#txtid").val(data.IdSolicitud);
                      $("#txtcantidad").val(data.CantidadPedida);
                      $("#txtobservaciones").val(data.Observaciones);
                      $("#txtpedido").val(data.NroPedido);
 
-                     // Establecer y bloquear producto seleccionado
+                     // Configurar producto seleccionado
                      $("#cbodetalle")
                          .val(data.oProductos.IdProducto)
                          .prop("disabled", true)
-                         .trigger('change'); // Forzar actualización visual
+                         .trigger('change');
 
-                     // Manejo de fecha
+                     // Configurar fecha del pedido
                      const fechaPedido = new Date(data.FechaPedido);
                      if (!isNaN(fechaPedido.getTime())) {
                          $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido));
-                     } else {
-                         console.error("Fecha inválida:", data.FechaPedido);
-                         $("#txtfechapedido").val("");
                      }
 
-                     // Bloquear fecha en edición
                      $("#txtfechapedido").prop("disabled", true);
 
-                     // Verificar si el número de pedido es válido
-                     if (data.NroPedido && data.NroPedido !== "0") { // Asegurarse de que NroPedido no sea nulo o vacío
+                     // Configurar según tipo de pedido
+                     if (data.NroPedido && data.NroPedido !== "0") {
                          $("#btnGuardar").text("Actualizar");
                          $("#exampleModalLabel").text("Modificar Pedido");
-                         $("#btnImprimir").prop("disabled", false); // Habilitar el botón de imprimir
-                     } else {
-                         $("#btnGuardar").text("Guardar");
-                         $("#exampleModalLabel").text("Nuevo Pedido");
-                         $("#cbodetalle").prop("disabled", false); // Habilitar el select para nuevo pedido
-                         $("#btnImprimir").prop("disabled", true); // Deshabilitar el botón de imprimir
+                         $("#btnImprimir").prop("disabled", false);
                      }
                  } else {
-                     // Nuevo pedido
-                     $.ajax({
-                         url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")',
-                         success: function(response) {
-                             $("#txtpedido").val(response);
-                         }
+                     // Generar nuevo número de pedido
+                     const response = await $.ajax({
+                         url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")'
                      });
+                     $("#txtpedido").val(response);
+
                      $("#btnGuardar").text("Guardar");
                      $("#exampleModalLabel").text("Nuevo Pedido");
-                     $("#btnImprimir").prop("disabled", true); // Deshabilitar el botón de imprimir
+                     $("#btnImprimir").prop("disabled", true);
                  }
 
                  $("#FormModal").modal("show");
-             });
+             } catch (error) {
+                 console.error("Error en abrirModal:", error);
+                 // Aquí podrías agregar manejo de errores para el usuario
+             }
          }
+
 
 
         // Modificar la función Guardar para incluir código ID

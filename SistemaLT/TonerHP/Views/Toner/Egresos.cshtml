@@ -72,7 +72,7 @@
 
                     <div class="col-sm-6">
                         <label for="txtcodigoid" class="form-label">Codigo ID</label>
-                        <input type="text" class="form-control" id="txtcodigoid" >
+                        <input type="text" class="form-control" id="txtcodigoid">
                     </div>
 
                     <div class="col-sm-6">
@@ -80,7 +80,7 @@
                         <input type="text" class="form-control" id="txtcantidad">
                     </div>
 
-                  
+
 
                     <div class="col-sm-6">
                         <label for="txtobservaciones" class="form-label">Observaciones</label>
@@ -94,8 +94,14 @@
 
 
                     <div class="col-sm-6">
-                        <label for="txttipoingreso" class="form-label">Tipo de Salida</label>
-                        <input type="text" class="form-control" id="txttipoingreso">
+                        <label class="form-label">Tipo de Salida</label>
+                        <select id="txttipoingreso" class="form-select">
+                            <option value="">Seleccionar</option>
+                            <option value="C">Interna</option>
+                            <option value="D">Externa</option>
+                            <option value="E">Devolucion</option>
+                            <option value="O">Otro</option>
+                        </select>
                     </div>
 
                     <div class="col-sm-6">
@@ -169,7 +175,13 @@
                 },
                 { "data": "CodigoId" },
 
-                { "data": "TipoSalida" },
+                {
+                    "data": "TipoSalida",
+                    "render": function (data) {
+                        return data ? data : '';
+                    }
+
+                },
 
                 {
                     data: 'FechaEgreso',
@@ -283,7 +295,7 @@
         function Guardar() {
             var cantidad = parseInt($("#txtcantidad").val()) || 0;
             var idProducto = $("#cbodetalle option:selected").val();
-            var stockActual = parseInt($("#cbostockactual option:selected").text()) || 0;
+            var stockActual = parseInt($("#cbostockactual option:selected").text()) ;
 
             // Validar stock suficiente
             if (cantidad > stockActual) {
@@ -296,11 +308,11 @@
                 oProductos: {
                     IdProducto: idProducto,
                     Detalle: $("#cbodetalle option:selected").text(),
-                    StockActual: stockActual - cantidad ,
+                   /* StockActual: stockActual - cantidad ,*/
                 },
                 Cantidad: cantidad,
                 CodigoId: $("#txtcodigoid").val(),
-                TipoSalida: $("#txttipoingreso").val(),
+                TipoSalida: $("#txttipoingreso option:selected").val(),
                 FechaEgreso: $('#txtfechaingreso').val(), 
                 Observaciones: $("#txtobservaciones").val(),
                 IdUsuario: $("#txtusuario").val(),

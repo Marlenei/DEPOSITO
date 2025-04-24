@@ -22,8 +22,7 @@ namespace CapaDatos
                     sb.AppendLine("SELECT i.IdEgreso,");
                     sb.AppendLine("i.CodigoId,");
                     sb.AppendLine("prod.IdProducto , prod.Detalle , prod.StockActual ,");
-                    sb.AppendLine("i.CodigoId, i.Cantidad, i.Observaciones, i.IdUsuario, i.TipoSalida, i.FechaEgreso,");
-                    sb.AppendLine("i.CodigoArea, i.CodigoSector "); // Asegúrate de que estos campos existan en la tabla
+                    sb.AppendLine("i.CodigoId, i.Cantidad, i.Observaciones, i.IdUsuario, i.TipoSalida, i.FechaEgreso,i.CodigoArea,i.CodigoSector");
                     sb.AppendLine("FROM Tonner_Egresos i ");
                     sb.AppendLine("INNER JOIN Tonner_Productos prod ON prod.IdProducto = i.IdProducto");
 
