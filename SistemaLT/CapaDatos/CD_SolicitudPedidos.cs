@@ -364,20 +364,24 @@ namespace CapaDatos
 
                 try
                 {
-                   
                     int cantidadAnterior = 0;
                     int idProducto = 0;
                     string nroPedido = "";
                     string observaciones = null;
+                    int cantidadPedida = 0; 
+                    bool? visado = null;    
 
+                    
                     string querySelect = @"
-            SELECT 
-                CantidadEntregada, 
+             SELECT
+                CantidadEntregada,
                 IdProducto,
                 NroPedido,
-                Observaciones
-            FROM Tonner_Pedidos 
-            WHERE IdSolicitud = @IdSolicitud";
+                Observaciones,
+                CantidadPedida, 
+                Visado          
+             FROM Tonner_Pedidos
+             WHERE IdSolicitud = @IdSolicitud";
 
                     using (SqlCommand cmdSelect = new SqlCommand(querySelect, conexion, transaction))
                     {
@@ -387,114 +391,185 @@ namespace CapaDatos
                         {
                             if (reader.Read())
                             {
-                                cantidadAnterior = reader.IsDBNull(0) ? 0 : reader.GetInt32(0);
-                                idProducto = reader.GetInt32(1);
-                                nroPedido = reader.GetString(2);
-                                observaciones = reader.IsDBNull(3) ? null : reader.GetString(3);
+                                cantidadAnterior = reader["CantidadEntregada"] != DBNull.Value ? Convert.ToInt32(reader["CantidadEntregada"]) : 0;
+                                idProducto = Convert.ToInt32(reader["IdProducto"]); // Assuming IdProducto is never null
+                                nroPedido = reader["NroPedido"] != DBNull.Value ? reader["NroPedido"].ToString() : "";
+                                observaciones = reader["Observaciones"] != DBNull.Value ? reader["Observaciones"].ToString() : null;
+                                cantidadPedida = Convert.ToInt32(reader["CantidadPedida"]); // Added
+                                var visadoObj = reader["Visado"]; // Added
+                                visado = visadoObj != DBNull.Value ? (bool?)Convert.ToBoolean(visadoObj) : null; 
+
                             }
                             else
                             {
-                                transaction.Rollback();
+                                
                                 mensaje = "Pedido no encontrado";
-                                return false;
+                            
+                                return false; 
                             }
-                        }
+                        } 
                     }
 
-                    // Step 2: Calculate al diferencia
-                    int? diferencia = pedido.CantidadEntregada - cantidadAnterior;
-
-                    // Step 3: Actualizar 
-                    string queryUpdate = @"UPDATE Tonner_Pedidos SET 
-                CantidadEntregada = @CantidadEntregada,
-                FechaEntrega = @FechaEntrega,
-                FechaHoraActualizacion = GETDATE(),
-                IdUsuarioEntrega = @IdUsuarioEntrega
-                WHERE IdSolicitud = @IdSolicitud AND Visado = 0";
-
-                    using (SqlCommand cmdUpdate = new SqlCommand(queryUpdate, conexion, transaction))
+                 
+                    if (visado == true)
                     {
-                        cmdUpdate.Parameters.AddWithValue("@CantidadEntregada", pedido.CantidadEntregada);
-                        cmdUpdate.Parameters.AddWithValue("@FechaEntrega", DateTime.Now);
-                        cmdUpdate.Parameters.AddWithValue("@IdUsuarioEntrega", pedido.IdUsuarioEntrega);
-                        cmdUpdate.Parameters.AddWithValue("@IdSolicitud", pedido.IdSolicitud);
+                        
+                        mensaje = "No se puede modificar un pedido visado.";
+                        return false;
+                    }
 
-                        int affected = cmdUpdate.ExecuteNonQuery();
-                        if (affected == 0)
+                    
+                    if (pedido.CantidadEntregada < 0)
+                    {
+                        
+                        mensaje = "La cantidad entregada no puede ser negativa.";
+                        return false;
+                    }
+                    if (pedido.CantidadEntregada > cantidadPedida)
+                    {
+                       
+                        mensaje = "La cantidad entregada no puede superar la cantidad pedida (" + cantidadPedida + ").";
+                        return false;
+                    }
+
+
+               
+                    int diferencia = (int)(pedido.CantidadEntregada - cantidadAnterior);
+
+                 
+                    if (diferencia == 0)
+                    {
+                      
+                        mensaje = "No se realizaron cambios en la cantidad entregada.";
+                        return true;
+                    }
+
+                    
+                    if (diferencia > 0)
+                    {
+                        int stockActual = GetCurrentStock(idProducto, conexion, transaction); 
+
+                        if (stockActual < diferencia)
                         {
-                            transaction.Rollback();
-                            mensaje = "No se puede modificar un pedido visado";
+                            transaction.Rollback(); 
+                            mensaje = $"Stock insuficiente para entregar {diferencia} unidad(es) más. Stock actual: {stockActual}.";
                             return false;
                         }
                     }
 
                     
-                    if (diferencia != 0)
+                    string queryUpdate = @"UPDATE Tonner_Pedidos SET
+                 CantidadEntregada = @CantidadEntregada,
+                 FechaEntrega = @FechaEntrega,
+                 FechaHoraActualizacion = GETDATE(),
+                 IdUsuarioEntrega = @IdUsuarioEntrega
+                 WHERE IdSolicitud = @IdSolicitud AND (Visado = 0 OR Visado IS NULL)"; 
+
+                    using (SqlCommand cmdUpdate = new SqlCommand(queryUpdate, conexion, transaction))
                     {
-                        // Insert Egreso
-                        string insertEgreso = @"
-                INSERT INTO Tonner_Egresos (
-                    IdProducto, CodigoId, Cantidad, FechaEgreso, 
-                    Observaciones, IdUsuario, StockActual,FechayHoraAct, CodigoArea, CodigoSector,
-                    TipoSalida
-                ) VALUES (
-                    @IdProducto, @CodigoId, @Cantidad, @FechaEgreso, 
-                    @Observaciones, @IdUsuario, @StockActual, GETDATE(), @CodigoArea, @CodigoSector, 
-                    'P'
-                )";
+                        
+                        cmdUpdate.Parameters.AddWithValue("@CantidadEntregada", pedido.CantidadEntregada);
+                        cmdUpdate.Parameters.AddWithValue("@FechaEntrega", (pedido.CantidadEntregada > 0) ? (object)DateTime.Now : DBNull.Value); 
+                        cmdUpdate.Parameters.AddWithValue("@IdUsuarioEntrega", pedido.IdUsuarioEntrega); 
+                        cmdUpdate.Parameters.AddWithValue("@IdSolicitud", pedido.IdSolicitud);
 
-                        using (SqlCommand cmdEgreso = new SqlCommand(insertEgreso, conexion, transaction))
+                        int affected = cmdUpdate.ExecuteNonQuery();
+                        if (affected == 0)
                         {
-                            int stockActual = GetCurrentStock(idProducto, conexion, transaction);
-
-                            cmdEgreso.Parameters.AddWithValue("@IdProducto", idProducto);
-                            cmdEgreso.Parameters.AddWithValue("@CodigoId", nroPedido);
-                            cmdEgreso.Parameters.AddWithValue("@Cantidad", Math.Abs((int)diferencia)); // Asegúrate de que sea un int
-                            cmdEgreso.Parameters.AddWithValue("@FechaEgreso", DateTime.Now);
-                            cmdEgreso.Parameters.AddWithValue("@Observaciones", observaciones ?? (object)DBNull.Value);
-                            cmdEgreso.Parameters.AddWithValue("@IdUsuario", pedido.IdUsuarioEntrega); // Asegúrate de pasar el ID del usuario correspondiente
-                            cmdEgreso.Parameters.AddWithValue("@StockActual", stockActual); // Asegúrate de que sea un int
-                            cmdEgreso.Parameters.AddWithValue("@CodigoArea", pedido.CodigoArea); // Asegúrate de pasar el código de área correspondiente
-                            cmdEgreso.Parameters.AddWithValue("@CodigoSector", pedido.CodigoSector); // Asegúrate de pasar el código de sector correspondiente
-
-                            cmdEgreso.ExecuteNonQuery();
-                        }
-
-                        // Step 5: Update Stock
-                        string updateStock = @"
-                UPDATE Tonner_Productos 
-                SET StockActual = StockActual - @Cantidad , 
-                CodigoId = @CodigoId
-                WHERE IdProducto = @IdProducto";
-
-                        using (SqlCommand cmdStock = new SqlCommand(updateStock, conexion, transaction))
-                        {
-                            cmdStock.Parameters.AddWithValue("@Cantidad", (int)(diferencia ?? 0));
-                            cmdStock.Parameters.AddWithValue("@CodigoId", nroPedido);
-                            cmdStock.Parameters.AddWithValue("@IdProducto", idProducto);
-                            cmdStock.ExecuteNonQuery();
+                          
+                            transaction.Rollback();
+                            mensaje = "No se pudo actualizar el pedido. Puede que haya sido visado o ya no exista.";
+                            return false;
                         }
                     }
 
+                  
+                    int stockParaEgreso = GetCurrentStock(idProducto, conexion, transaction);
+
+                    string insertEgreso = @"
+             INSERT INTO Tonner_Egresos (
+                 IdProducto, CodigoId, Cantidad, FechaEgreso,
+                 Observaciones, IdUsuario, StockActual, FechayHoraAct, CodigoArea, CodigoSector,
+                 TipoSalida
+             ) VALUES (
+                 @IdProducto, @CodigoId, @Cantidad, @FechaEgreso,
+                 @Observaciones, @IdUsuario, @StockActual, GETDATE(), @CodigoArea, @CodigoSector,
+                 'P' -- Tipo Salida Pedido
+             )";
+
+                    using (SqlCommand cmdEgreso = new SqlCommand(insertEgreso, conexion, transaction))
+                    {
+                        cmdEgreso.Parameters.AddWithValue("@IdProducto", idProducto);
+                        cmdEgreso.Parameters.AddWithValue("@CodigoId", nroPedido); 
+                        cmdEgreso.Parameters.AddWithValue("@Cantidad", Math.Abs(diferencia)); 
+                        cmdEgreso.Parameters.AddWithValue("@FechaEgreso", DateTime.Now);
+                       
+                        cmdEgreso.Parameters.AddWithValue("@Observaciones", observaciones ?? (object)DBNull.Value);
+                        cmdEgreso.Parameters.AddWithValue("@IdUsuario", pedido.IdUsuarioEntrega);
+                        cmdEgreso.Parameters.AddWithValue("@StockActual", stockParaEgreso);
+                        cmdEgreso.Parameters.AddWithValue("@CodigoArea", pedido.CodigoArea); 
+                        cmdEgreso.Parameters.AddWithValue("@CodigoSector", pedido.CodigoSector); 
+
+                        cmdEgreso.ExecuteNonQuery();
+                    }
+
+                  
+                    string updateStock = @"
+             UPDATE Tonner_Productos
+             SET StockActual = StockActual - @Diferencia -- Subtract difference (negative diff means adding)
+             WHERE IdProducto = @IdProducto";
+                   
+
+                    using (SqlCommand cmdStock = new SqlCommand(updateStock, conexion, transaction))
+                    {
+                        cmdStock.Parameters.AddWithValue("@Diferencia", diferencia); 
+                                                                                     
+                        cmdStock.Parameters.AddWithValue("@IdProducto", idProducto);
+
+                        int stockAffected = cmdStock.ExecuteNonQuery();
+                        if (stockAffected == 0)
+                        {
+                            
+                            throw new Exception("Error: No se pudo actualizar el stock del producto (ID: " + idProducto + ").");
+                        }
+                    }
+
+
+                    
                     transaction.Commit();
+                    mensaje = "Entrega actualizada y stock modificado correctamente."; 
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    transaction.Rollback();
-                    mensaje = ex.Message;
+                   
+                    try { transaction?.Rollback(); } catch { /* Log rollback failure */ }
+                    mensaje = "Error al actualizar entrega: " + ex.Message; 
+                                                                            
                     return false;
                 }
-            }
+                
+            } 
         }
 
+       
         private int GetCurrentStock(int idProducto, SqlConnection conexion, SqlTransaction transaction)
         {
             string queryStock = "SELECT StockActual FROM Tonner_Productos WHERE IdProducto = @IdProducto";
+            // *** Reemplaza Tonner_Productos, StockActual, IdProducto si los nombres son diferentes ***
             using (SqlCommand cmdStock = new SqlCommand(queryStock, conexion, transaction))
             {
                 cmdStock.Parameters.AddWithValue("@IdProducto", idProducto);
-                return Convert.ToInt32(cmdStock.ExecuteScalar());
+                object result = cmdStock.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    return Convert.ToInt32(result);
+                }
+                else
+                {
+                    
+                    throw new Exception($"No se pudo obtener el stock para el producto ID: {idProducto}");
+                }
             }
         }
 

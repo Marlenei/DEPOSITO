@@ -106,23 +106,14 @@
 
                     <div class="col-12 col-sm-6 gap-3">
                         <label class="form-label">Producto</label>
-                        <select id="cbodetalle" class="form-select ProductosS" style="width: 100%" >
+                        <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
                             <option value="">Seleccione un Producto</option>
                         </select>
                     </div>
 
-                    <div id="contenedor" class="col-sm-8">
-
-                        <p class="d-inline-flex gap-1">
-                            <button class="btn btn-outline-success" id="BtnBusqueda" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                Busqueda Avanzada
-                            </button>
-                        </p>
-                        <div class="collapse" id="collapseExample">
-                            <div class="card card-body">
-                                @Html.Partial("_BusquedaAvan")
-                            </div>
-                        </div>
+                    <div id="contenedor" class="col-sm-6">
+                        <p style="text-align:center">Filtros de busqueda</p>
+                        @Html.Partial("_BusquedaAvan")
                     </div>
 
                     <div class="col-12 col-sm-6">
@@ -186,18 +177,32 @@
         var tabladata;
         var filaSeleccionada;
         var productos = {};
+        var codigoidprod = {};
+        var rubroprod = {};
+        var tipoprod = {};
+        var appSettings = {};
 
 
 
 
         $(document).ready(function () {
-            cargarProductos();
-            LimpiarCampos();
-            selects2();
-            CollapseCargaProd()
+            //cargarProductos();
+            //LimpiarCampos();
+            //selects2();
+            //CollapseCargaProd()
 
             inicializarDataTable();
 
+            var urlrubros = '@Url.Action("ListarRubros", "Toner")'
+            CargarRubros(urlrubros);
+           /* cargarProductos();*/
+            var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
+            CargarCodigosID(urlcodigoid);
+            LimpiarSelects();
+            CargarProductos();
+            LimpiarCampos();
+            selects2();
+            cargarApiUrls();
             $('.btn-guardar').click(Guardar);
             editar();
         });
@@ -211,7 +216,7 @@
         }
 
         function abrirModal(data) {
-            cargarProductos(function() { // Cargar productos antes de continuar
+            CargarProductos(function() { // Cargar productos antes de continuar
                 $('#txtArea').val('@Session["NombreArea"]');
                 $('#txtSector').val('@Session["NombreSector"]');
                 $("#txtid").val(0);
@@ -359,6 +364,15 @@
                             }
                         },
                         {
+                            data: "FechaPedido",
+                            title: "Fecha Pedido",
+                            render: function (data) {
+                                // Tu formato de fecha en C# es "yyyy-MM-dd HH:mm:ss" que new Date() puede parsear.
+                                // toLocaleDateString() lo mostrará en formato local.
+                                return data ? new Date(data).toLocaleDateString() : '';
+                            }
+                        },
+                        {
                             data: "FechaEntrega",
                             title: "Fecha Entrega",
                             render: function(data) {
@@ -396,7 +410,11 @@
                     ],
                     language: {
                         url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json'
-                    }
+                    },
+
+                    responsive: true, // Para adaptar a pantallas pequeñas
+                    processing: true, // Muestra indicador de carga
+                    serverSide: false 
                 });
 
                                   $("#BtnBusqueda").on("click", function () {
@@ -454,7 +472,7 @@
 
                  //Listado Productos
             // Función para cargar productos con callback
-                function cargarProductos(callback) {
+                function CargarProductos(callback) {
                     $.ajax({
                         url: '@Url.Action("ListarProductos", "Toner")',
                         success: function(data) {

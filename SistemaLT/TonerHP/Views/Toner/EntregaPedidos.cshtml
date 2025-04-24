@@ -37,11 +37,11 @@
             </div>
         }
 
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+        @*<div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
             <button type="button" class="btn btn-success" onclick="abrirModal(null)">
                 <i class="fas fa-plus-circle me-1"></i> Entrega Pedido
             </button>
-        </div>
+        </div>*@
 
         <div class="row mb-4">
             <div class="col-12 col-md-6">
@@ -62,7 +62,7 @@
         <div class="row mb-4">
             <div class="col-12 col-md-3 mb-3 mb-md-0">
                 <label for="cboArea">Área</label>
-                <select id="cboArea" class="form-select" onchange="cargarSectores(this.value)">
+                <select id="cboArea" class="form-select" onchange="">
                     <option value="">Todas las áreas</option>
                     <!-- Aquí se llenarán las áreas desde el servidor -->
                 </select>
@@ -141,20 +141,8 @@
 
 
                     <div id="contenedor" class="col-sm-6">
-
-
-                        <p class="d-inline-flex gap-1">
-                            <button class="btn btn-outline-success" id="BtnBusqueda" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                Busqueda Avanzada
-                            </button>
-                        </p>
-                        <div class="collapse" id="collapseExample">
-                            <div class="card card-body">
-                                @Html.Partial("_BusquedaAvan")
-                            </div>
-                        </div>
-
-
+                        <p style="text-align:center">Filtros de busqueda</p>
+                        @Html.Partial("_BusquedaAvan")
                     </div>
 
 
@@ -227,6 +215,10 @@
         var tabladata;
         var filaSeleccionada;
         var productos = {};
+        var codigoidprod = {};
+        var rubroprod = {};
+        var tipoprod = {};
+        var appSettings = {};
         const ID_RUBRO_INFORMATICA = 184;
 
 
@@ -235,11 +227,29 @@
         $(document).ready(function () {
             inicializarDataTable();
 
-            cargarProductos();
 
+            var urlrubros = '@Url.Action("ListarRubros", "Toner")'
+            CargarRubros(urlrubros);
+           /* cargarProductos();*/
+            var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
+            CargarCodigosID(urlcodigoid);
+            LimpiarSelects();
+            CargarProductos();
+            LimpiarCampos();
+            selects2();
+            cargarApiUrls();
             $('.btn-guardar').click(Guardar);
-
+            editar();
         });
+
+        function editar() {
+            $("#tabla tbody").on("click", '.btn-editar', function () {
+                var filaSeleccionada = $(this).closest("tr");
+                var data = tabladata.row(filaSeleccionada).data();
+                abrirModal(data);
+            });
+        }
+
 
         $(document).ready(function () {
         // Cargar áreas al cargar la página
@@ -287,82 +297,148 @@
 
             tabladata.ajax.url('@Url.Action("ListarFiltrados", "SolicitudPedidos")?' + $.param(filtros)).load();
         }
-                function inicializarDataTable() {
-                    tabladata = $('#tabla').DataTable({
-                        ajax: {
-                            url: '@Url.Action("ListarFiltrados", "SolicitudPedidos")',
-                            data: function (d) {
-                                d.codArea = $('#cboArea').val();
-                                d.codSector = $('#cboSector').val();
-                                d.fechaInicio = $('#txtFechaInicio').val();
-                                d.fechaFin = $('#txtFechaFin').val();
-                                d.nroPedido = $('#txtBuscarPedido').val();
-                                d.soloPendientes = false;
-                            }
-                        },
-                        columns: [
-                            { data: "IdSolicitud", visible: false },
-                            { data: "oProductos.Detalle", title: "Producto" },
-                            { data: "NombreArea" },
-                            { data: "NombreSector" },
-                            { data: "CantidadPedida", title: "Cant. Pedida" },
-                            {
-                                data: "CantidadEntregada",
-                                title: "Cant. Entregada",
-                                render: function (data, type, row) {
-                                    return `<input type="number" class="form-control input-entregado"
-                                                data-id="${row.IdSolicitud}"
-                                                value="${data || 0}"
-                                                min="0"
-                                                max="${row.CantidadPedida}"
-                                                ${row.Visado ? 'disabled' : ''}>`;
-                                }
-                            },
-                            {
-                                data: "FechaEntrega",
-                                title: "Fecha Entrega",
-                                render: function (data) {
-                                    return data ? new Date(data).toLocaleDateString() : 'Pendiente';
-                                }
-                            },
-                            { data: "NroPedido", title: "N° Pedido" },
-                            {
-                                data: "Visado",
-                                title: "Visado",
-                                render: function (data) {
-                                    return data ? '<i class="fas fa-check-circle text-success"></i>' :
-                                                 '<i class="fas fa-times-circle text-danger"></i>';
-                                }
-                            }
-                        ],
-                        language: {
-                            url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json'
+               function inicializarDataTable() {
+             tabladata = $('#tabla').DataTable({
+                 ajax: {
+                     url: '@Url.Action("ListarFiltrados", "SolicitudPedidos")',
+                     data: function (d) {
+                         // Tus parámetros de filtro existentes
+                         d.codArea = $('#cboArea').val();
+                         d.codSector = $('#cboSector').val();
+                         d.fechaInicio = $('#txtFechaInicio').val();
+                         d.fechaFin = $('#txtFechaFin').val();
+                         d.nroPedido = $('#txtBuscarPedido').val();
+                         d.soloPendientes = false; // Asegúrate de que el SP maneje esto correctamente
+                     },
+                     // Es buena práctica añadir manejo de errores AJAX
+                     error: function (jqXHR, textStatus, errorThrown) {
+                         console.error("Error al cargar datos para DataTable:", textStatus, errorThrown);
+                         // Podrías mostrar un mensaje al usuario aquí
+                         alert("Error al cargar la lista de pedidos. Verifique la conexión o contacte al administrador.");
+                     }
+                 },
+                 columns: [
+                     { data: "IdSolicitud", visible: false },
+                     // Añadir columna IdProducto (puede ser invisible, ayuda a DataTables a mapear)
+                     { data: "oProductos.IdProducto", visible: false }, // <-- AÑADIDO (opcional pero recomendado)
+                     { data: "oProductos.Detalle", title: "Producto" },
+                     { data: "NombreArea" },
+                     { data: "NombreSector" },
+                     { data: "CantidadPedida", title: "Cant. Pedida" },
+                     {
+                         data: "CantidadEntregada",
+                         title: "Cant. Entregada",
+                         render: function (data, type, row) {
+                             // Acceder al IdProducto desde el objeto anidado 'oProductos'
+                             // Se añade una comprobación por si oProductos fuera null inesperadamente
+                             const idProducto = row.oProductos ? row.oProductos.IdProducto : '';
+
+                             return `<input type="number" class="form-control input-entregado"
+                                            data-id="${row.IdSolicitud}"
+                                            data-idproducto="${idProducto}"  // <-- MODIFICADO: Añadido data-idproducto
+                                            value="${data || 0}"
+                                            min="0"
+                                            max="${row.CantidadPedida}"
+                                            ${row.Visado ? 'disabled' : ''}>`; // Se asume 'Visado' viene como booleano
+                         }
+                     },
+                     {
+                         data: "FechaPedido",
+                         title: "Fecha Pedido",
+                         render: function (data) {
+                             // Tu formato de fecha en C# es "yyyy-MM-dd HH:mm:ss" que new Date() puede parsear.
+                             // toLocaleDateString() lo mostrará en formato local.
+                             return data ? new Date(data).toLocaleDateString() : '';
+                         }
+                     },
+                     {
+                         data: "FechaEntrega",
+                         title: "Fecha Entrega",
+                         render: function (data) {
+                             // Tu formato de fecha en C# es "yyyy-MM-dd HH:mm:ss" que new Date() puede parsear.
+                             // toLocaleDateString() lo mostrará en formato local.
+                             return data ? new Date(data).toLocaleDateString() : 'Pendiente';
+                         }
+                     },
+                     { data: "NroPedido", title: "N° Pedido" },
+                     {
+                         data: "Visado",
+                         title: "Visado",
+                         render: function (data) {
+                             // Renderizar ícono basado en el valor booleano de Visado
+                             return data ? '<i class="fas fa-check-circle text-success"></i>' :
+                                            '<i class="fas fa-times-circle text-danger"></i>';
+                         }
+                     },
+                     {
+                         data: null, // Columna para botones de acción
+                         render: function (data, type, row) {
+                             // Solo mostrar botón editar si NO está visado (opcional)
+                              if (row.Visado) {
+                                  return ''; // O un botón deshabilitado
+                              }
+                             return '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>';
+                         },
+                         orderable: false,
+                         searchable: false,
+                         width: "90px" // Ajusta según necesidad
+                     }
+                 ],
+                 language: {
+                     // URL para internacionalización en español
+                     url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json'
+                 },
+                 // Otras opciones útiles de DataTables (opcional)
+                  responsive: true, // Para adaptar a pantallas pequeñas
+                  processing: true, // Muestra indicador de carga
+                  serverSide: false // Asumiendo que ListarFiltrados devuelve toda la lista (client-side processing)
+                                   // Si usas paginación/filtrado del lado del servidor, esto debe ser true y ajustar ajax.data
+             });
+            // Evento para actualizar cantidad entregada
+                $('#tabla tbody').on('change', '.input-entregado', function () {
+                    const idSolicitud = $(this).data('id');
+                    const idProducto = $(this).data('idproducto'); // <-- OBTENER IdProducto
+                    const cantidadEntregadaNueva = $(this).val();
+                    const filaActual = $(this).closest('tr'); // Guardar referencia a la fila
+                    const datosFila = tabladata.row(filaActual).data(); // Obtener datos originales de la fila
+
+                    // --- Validación básica opcional en cliente (Buena UX) ---
+                    if (parseInt(cantidadEntregadaNueva) < 0) {
+                         Swal.fire('Error', 'La cantidad entregada no puede ser negativa.', 'warning');
+                         $(this).val(datosFila.CantidadEntregada || 0); // Revertir al valor original
+                         return;
+                    }
+                    if (parseInt(cantidadEntregadaNueva) > parseInt(datosFila.CantidadPedida)) {
+                         Swal.fire('Error', 'La cantidad entregada no puede superar la cantidad pedida.', 'warning');
+                         $(this).val(datosFila.CantidadEntregada || 0); // Revertir al valor original
+                         return;
+                    }
+                    // --- Fin Validación Cliente ---
+
+
+                    $.post('@Url.Action("ActualizarEntrega", "EntregaPedidos")', {
+                        IdSolicitud: idSolicitud,
+                        CantidadEntregada: cantidadEntregadaNueva,
+                        IdProducto: idProducto // <-- ENVIAR IdProducto
+                    }).done(function (response) {
+                        if (response.resultado) {
+                            Swal.fire('¡Éxito!', response.mensaje || 'Cantidad entregada actualizada.', 'success');
+                            // Recargar la tabla o solo la fila para reflejar los cambios
+                            tabladata.ajax.reload(null, false); // Recarga sin resetear paginación
+                        } else {
+                            Swal.fire('Error', response.mensaje, 'error');
+                            // Revertir el valor en el input al original si hubo error en el servidor
+                             $(this).val(datosFila.CantidadEntregada || 0);
                         }
+                    }).fail(function (xhr) {
+                        Swal.fire('Error', 'Ocurrió un error de conexión al actualizar.', 'error');
+                         // Revertir el valor en el input al original si hubo error de conexión
+                         $(this).val(datosFila.CantidadEntregada || 0);
                     });
+                });
+         }
 
-                    // Evento para actualizar cantidad entregada
-                    $('#tabla tbody').on('change', '.input-entregado', function () {
-                        const id = $(this).data('id');
-                        const cantidad = $(this).val();
 
-                        $.post('@Url.Action("ActualizarEntrega", "EntregaPedidos")', {
-                            IdSolicitud: id,
-                            CantidadEntregada: cantidad
-                        }).done(function (response) {
-                            if (response.resultado) {
-                                Swal.fire('¡Éxito!', 'Cantidad entregada actualizada correctamente.', 'success');
-                                // Recargar la tabla para reflejar los cambios
-                                requestAnimationFrame(() => {
-                                    tabladata.ajax.reload();
-                                });
-                            } else {
-                                Swal.fire('Error', response.mensaje, 'error');
-                            }
-                        }).fail(function (xhr) {
-                            Swal.fire('Error', 'Ocurrió un error al actualizar la cantidad entregada.', 'error');
-                        });
-                    });
-                }
 
 
 
@@ -381,49 +457,28 @@
                         });
                 }
 
-                        @*// Función para mostrar pendientes
-                        function mostrarPendientes() {
-                            tabladata.ajax.url('@Url.Action("ListarFiltrados", "SolicitudPedidos")' +
-                                '?soloPendientes=true').load();
-                        }*@
+                      
 
 
 
-
-
-               $("#BtnBusqueda").on("click", function () {
-               var urlrubros = '@Url.Action("ListarRubros", "Toner")'
-               CargarRubros(urlrubros);
-
-               var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
-                CargarCodigosID(urlcodigoid);
-                LimpiarCampos();
-                   $("#cbostockactual").val('');
+           function CargarProductos(callback) {
+               $.ajax({
+                   url: '@Url.Action("ListarProductos", "Toner")',
+                   success: function(data) {
+                       $("#cbodetalle").empty().append('<option value="">Seleccione producto</option>');
+                       $.each(data.data, function(_, producto) {
+                           if (producto.Activo) {
+                               $("#cbodetalle").append(
+                                   $('<option></option>')
+                                       .val(producto.IdProducto)
+                                       .text(producto.Detalle)
+                               );
+                           }
+                       });
+                       if (typeof callback === "function") callback();
+                   }
                });
-               $('#collapseExample').on('hidden.bs.collapse', function () {
-
-                   LimpiarCampos();
-                   $("#cbostockactual").val('');
-               });
-
-
-
-
-        function cargarProductos() {
-            $.ajax({
-                url: '@Url.Action("ListarProductos", "Toner")',
-                success: function(data) {
-                    $("#cbodetalle").empty().append('<option value="">Seleccione producto</option>');
-                    $.each(data.data, function(_, producto) {
-                        if (producto.Activo) {
-                            $("#cbodetalle").append(
-                                $('<option></option>').val(producto.IdProducto).text(producto.Detalle)
-                            );
-                        }
-                    });
-                }
-            });
-        }
+           }
 
             function CargarRubros(urlrubros) { // urlrubros es '@Url.Action("ListarRubros", "Toner")'
             var permissionsJson = $('#userPermissionsJson').val();
@@ -502,116 +557,7 @@
         }
 
 
-        function CargarTipos(idRubro) {
-            var urltipos = 'https://localhost:44347/Toner/ListarTiposPorRubro?idRubro=' + idRubro;
-            $.ajax({
-                url: urltipos,
-                type: "GET",
-                data: null,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#cbotipo").empty();
-                    $("<option>").attr({ "value": 0 }).text("Seleccionar Tipo").appendTo("#cbotipo");
-                    $.each(data, function (index, valor) {
-                        if (valor.Activo === true) {
-                            $("<option>").attr({ "value": valor.IdTipo }).text(valor.Tipo).appendTo("#cbotipo");
-                        }
-                    });
-                    $("#cbodetalle").empty();
-                    $("<option>").attr({ "value": 0 }).text("Seleccionar producto").appendTo("#cbodetalle");
-                },
-                error: function (error) {
-                    console.log(error)
-                },
-            });
-        }
-
-
-
-        function CargarProductosporTipo(idTipo) {
-            var urlproductos = 'https://localhost:44347/Toner/ListarProductosPorTipo?idTipo=' + idTipo;
-            $.ajax({
-                url: urlproductos,
-                type: "GET",
-                data: null,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#cbodetalle").empty();
-                    $("<option>").attr({ "value": 0 }).text("Seleccionar producto").appendTo("#cbodetalle");
-                    $.each(data, function (index, valor) {
-                        if (valor.Activo === true) {
-                            productos[valor.IdProducto] = valor.StockActual;
-                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
-                        }
-                    })
-                },
-                error: function (error) {
-                    console.log(error)
-                },
-            });
-        }
-
-        function CargarProductosporCI(selectElement) {
-            var idCodigo = selectElement.options[selectElement.selectedIndex].text;
-            var urlproductos = 'https://localhost:44347/Toner/ListarProductosporCI?idCodigo=' + idCodigo;
-            $.ajax({
-                url: urlproductos,
-                type: "GET",
-                data: null,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#cbodetalle").empty();
-                    $("<option>").attr({ "value": 0 }).text("Seleccionar producto").appendTo("#cbodetalle");
-
-                    $.each(data, function (index, valor) {
-                        if (valor.Activo === true) {
-                            productos[valor.IdProducto] = valor.StockActual;
-                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
-                        }
-                    })
-                },
-                error: function (error) {
-                    console.log(error)
-                },
-            });
-        }
-
-        function CargarCodigosID(urlcodigoid) {
-            $.ajax({
-                url: urlcodigoid,
-                type: "GET",
-                data: null,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
-                    $("#cbocodigo").empty();
-                    $("#cbostockactual").empty();
-                    $("<option>").attr({ "value": "" }).text("Seleccione un Codigo ID").appendTo("#cbocodigo"); // Opción por defecto
-                    $.each(data.data, function (index, valor) {
-                        if (valor.Activo === true) {
-                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.CodigoId).appendTo("#cbocodigo");
-                        }
-                    });
-                    $("#cbodetalle").empty();
-                },
-                error: function (error) {
-                    console.log(error)
-                },
-
-            });
-        }
-
-
-
-
-        function LimpiarCampos() {
-            $('.modal').on('hidden.bs.modal', function (e) {
-                $(this).removeData();
-            });
-        }
+       
 
 
         $("#txtfechapedido").datepicker({
@@ -621,48 +567,76 @@
         });
 
 
-        function abrirModal(json) {
+        function abrirModal(data) {
+             CargarProductos(function() { // Cargar productos antes de continuar
+                 $('#txtArea').val('@Session["NombreArea"]');
+                 $('#txtSector').val('@Session["NombreSector"]');
+                 $("#txtid").val(0);
+                 $("#txtcantidad").val("");
+                 $("#txtobservaciones").val("");
+                 $("#txtusuario").val('@Session["AccesCode"]');
+                 $("#mensajeError").hide();
 
+                 // Resetear campos
+                 $("#cbodetalle").val("").prop("disabled", false);
+                 $("#txtfechapedido").prop("disabled", false);
 
-             $('#txtArea').val('@Session["NombreArea"]');
-            $('#txtSector').val('@Session["NombreSector"]');
-            $("#txtid").val(0);
-            $("#cbodetalle").val("");
-            $("#txtcantidad").val("");
-            $("#txtobservaciones").val("");
-            $("#txtusuario").val(@Session["AccesCode"]);
-            $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', new Date()));
-            $("#mensajeError").hide();
+                 // Fecha actual para nuevos pedidos
+                 const fechaActual = new Date();
+                 $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaActual));
 
-            if (json) {
-                // Cargar datos para edición
-                $("#txtid").val(json.IdSolicitud);
-                $("#cbodetalle").val(json.oProductos.IdProducto);
-                $("#txtcantidad").val(json.CantidadPedida);
-                $("#txtobservaciones").val(json.Observaciones);
-                $("#txtpedido").val(json.NroPedido);
-                $("#txtfechapedido").val(new Date(json.FechaPedido).toLocaleDateString());
-                $("#txtusuario").val(@Session["AccesCode"]);
-            } else {
-                // Generar nuevo número de pedido
-                $.ajax({
-                    url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")',
-                    success: function(data) {
-                        $("#txtpedido").val(data);
-                    }
-                });
-                $("#txtfechapedido").val(new Date().toLocaleDateString());
-            }
-                $.ajax({
-                     url: '@Url.Action("ObtenerDatosUbicacion", "Usuario")',
-                     type: 'GET',
-                     success: function(data) {
-                         $('#txtArea').val(data.nombreArea);
-                         $('#txtSector').val(data.nombreSector);
+                 if (data != null) {
+                     // Cargar datos para edición
+                     $("#txtid").val(data.IdSolicitud);
+                     $("#txtcantidad").val(data.CantidadPedida);
+                     $("#txtobservaciones").val(data.Observaciones);
+                     $("#txtpedido").val(data.NroPedido);
+
+                     // Establecer y bloquear producto seleccionado
+                     $("#cbodetalle")
+                         .val(data.oProductos.IdProducto)
+                         .prop("disabled", true)
+                         .trigger('change'); // Forzar actualización visual
+
+                     // Manejo de fecha
+                     const fechaPedido = new Date(data.FechaPedido);
+                     if (!isNaN(fechaPedido.getTime())) {
+                         $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido));
+                     } else {
+                         console.error("Fecha inválida:", data.FechaPedido);
+                         $("#txtfechapedido").val("");
                      }
-                 });
-                $("#FormModal").modal("show");
-        }
+
+                     // Bloquear fecha en edición
+                     $("#txtfechapedido").prop("disabled", true);
+
+                     // Verificar si el número de pedido es válido
+                     if (data.NroPedido && data.NroPedido !== "0") { // Asegurarse de que NroPedido no sea nulo o vacío
+                         $("#btnGuardar").text("Actualizar");
+                         $("#exampleModalLabel").text("Modificar Pedido");
+                         $("#btnImprimir").prop("disabled", false); // Habilitar el botón de imprimir
+                     } else {
+                         $("#btnGuardar").text("Guardar");
+                         $("#exampleModalLabel").text("Nuevo Pedido");
+                         $("#cbodetalle").prop("disabled", false); // Habilitar el select para nuevo pedido
+                         $("#btnImprimir").prop("disabled", true); // Deshabilitar el botón de imprimir
+                     }
+                 } else {
+                     // Nuevo pedido
+                     $.ajax({
+                         url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")',
+                         success: function(response) {
+                             $("#txtpedido").val(response);
+                         }
+                     });
+                     $("#btnGuardar").text("Guardar");
+                     $("#exampleModalLabel").text("Nuevo Pedido");
+                     $("#btnImprimir").prop("disabled", true); // Deshabilitar el botón de imprimir
+                 }
+
+                 $("#FormModal").modal("show");
+             });
+         }
 
 
         // Modificar la función Guardar para incluir código ID
