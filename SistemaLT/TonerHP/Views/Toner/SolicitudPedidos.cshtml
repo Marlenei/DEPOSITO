@@ -181,25 +181,23 @@
         var rubroprod = {};
         var tipoprod = {};
         var appSettings = {};
+        var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
 
 
 
 
         $(document).ready(function () {
-            //cargarProductos();
-            //LimpiarCampos();
-            //selects2();
-            //CollapseCargaProd()
+
 
             inicializarDataTable();
 
-            var urlrubros = '@Url.Action("ListarRubros", "Toner")'
-            CargarRubros(urlrubros);
-           /* cargarProductos();*/
-            var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
-            CargarCodigosID(urlcodigoid);
+             var urlrubros = '@Url.Action("ListarRubros", "Toner")'
+             CargarRubros(urlrubros, permisos.map(p => p.Accesos));
+          
+             var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
+            CargarCodigosID(urlcodigoid, permisos.map(p => p.Accesos));
             LimpiarSelects();
-            CargarProductos();
+            CargarProductos(permisos.map(p => p.Accesos));
             LimpiarCampos();
             selects2();
             cargarApiUrls();
@@ -215,76 +213,83 @@
             });
         }
 
-        function abrirModal(data) {
-            CargarProductos(function() { // Cargar productos antes de continuar
-                $('#txtArea').val('@Session["NombreArea"]');
-                $('#txtSector').val('@Session["NombreSector"]');
-                $("#txtid").val(0);
-                $("#txtcantidad").val("");
-                $("#txtobservaciones").val("");
-                $("#txtusuario").val('@Session["AccesCode"]');
-                $("#mensajeError").hide();
+        function LimpiarSelects() {
 
-                // Resetear campos
-                $("#cbodetalle").val("").prop("disabled", false);
-                $("#txtfechapedido").prop("disabled", false);
+            $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo ').val(null).trigger('change');
 
-                // Fecha actual para nuevos pedidos
-                const fechaActual = new Date();
-                $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaActual));
-
-                if (data != null) {
-                    // Cargar datos para edición
-                    $("#txtid").val(data.IdSolicitud);
-                    $("#txtcantidad").val(data.CantidadPedida);
-                    $("#txtobservaciones").val(data.Observaciones);
-                    $("#txtpedido").val(data.NroPedido);
-
-                    // Establecer y bloquear producto seleccionado
-                    $("#cbodetalle")
-                        .val(data.oProductos.IdProducto)
-                        .prop("disabled", true)
-                        .trigger('change'); // Forzar actualización visual
-
-                    // Manejo de fecha
-                    const fechaPedido = new Date(data.FechaPedido);
-                    if (!isNaN(fechaPedido.getTime())) {
-                        $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido));
-                    } else {
-                        console.error("Fecha inválida:", data.FechaPedido);
-                        $("#txtfechapedido").val("");
-                    }
-
-                    // Bloquear fecha en edición
-                    $("#txtfechapedido").prop("disabled", true);
-
-                    // Verificar si el número de pedido es válido
-                    if (data.NroPedido && data.NroPedido !== "0") { // Asegurarse de que NroPedido no sea nulo o vacío
-                        $("#btnGuardar").text("Actualizar");
-                        $("#exampleModalLabel").text("Modificar Pedido");
-                        $("#btnImprimir").prop("disabled", false); // Habilitar el botón de imprimir
-                    } else {
-                        $("#btnGuardar").text("Guardar");
-                        $("#exampleModalLabel").text("Nuevo Pedido");
-                        $("#cbodetalle").prop("disabled", false); // Habilitar el select para nuevo pedido
-                        $("#btnImprimir").prop("disabled", true); // Deshabilitar el botón de imprimir
-                    }
-                } else {
-                    // Nuevo pedido
-                    $.ajax({
-                        url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")',
-                        success: function(response) {
-                            $("#txtpedido").val(response);
-                        }
-                    });
-                    $("#btnGuardar").text("Guardar");
-                    $("#exampleModalLabel").text("Nuevo Pedido");
-                    $("#btnImprimir").prop("disabled", true); // Deshabilitar el botón de imprimir
-                }
-
-                $("#FormModal").modal("show");
-            });
+            CargarProductos(permisos.map(p => p.Accesos));
         }
+
+                    async function abrirModal(data) {
+                        try {
+                            // Extraer los accesos del usuario
+                            const accesos = permisos.map(p => p.Accesos);
+
+                            // Esperar a que se carguen los productos antes de continuar
+                            await CargarProductos(accesos);
+
+                            // Configuración inicial de campos
+                            $('#txtArea').val('@Session["NombreArea"]');
+                            $('#txtSector').val('@Session["NombreSector"]');
+                            $("#txtid").val(0);
+                            $("#txtcantidad").val("");
+                            $("#txtobservaciones").val("");
+                            $("#txtusuario").val('@Session["AccesCode"]');
+                            $("#mensajeError").hide();
+
+                            // Resetear campos dinámicos
+                            $("#cbodetalle").val("").prop("disabled", false);
+                            $("#txtfechapedido").prop("disabled", false);
+
+                            // Configurar fecha actual
+                            const fechaActual = new Date();
+                            $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaActual));
+
+                            // Manejo de edición de pedido
+                            if (data) {
+                                $("#txtid").val(data.IdSolicitud);
+                                $("#txtcantidad").val(data.CantidadPedida);
+                                $("#txtobservaciones").val(data.Observaciones);
+                                $("#txtpedido").val(data.NroPedido);
+
+                                // Configurar producto seleccionado
+                                $("#cbodetalle")
+                                    .val(data.oProductos.IdProducto)
+                                    .prop("disabled", true)
+                                    .trigger('change');
+
+                                // Configurar fecha del pedido
+                                const fechaPedido = new Date(data.FechaPedido);
+                                if (!isNaN(fechaPedido.getTime())) {
+                                    $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido));
+                                }
+
+                                $("#txtfechapedido").prop("disabled", true);
+
+                                // Configurar según tipo de pedido
+                                if (data.NroPedido && data.NroPedido !== "0") {
+                                    $("#btnGuardar").text("Actualizar");
+                                    $("#exampleModalLabel").text("Modificar Pedido");
+                                    $("#btnImprimir").prop("disabled", false);
+                                }
+                            } else {
+                                // Generar nuevo número de pedido
+                                const response = await $.ajax({
+                                    url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")'
+                                });
+                                $("#txtpedido").val(response);
+
+                                $("#btnGuardar").text("Guardar");
+                                $("#exampleModalLabel").text("Nuevo Pedido");
+                                $("#btnImprimir").prop("disabled", true);
+                            }
+
+                            $("#FormModal").modal("show");
+                        } catch (error) {
+                            console.error("Error en abrirModal:", error);
+                            // Aquí podrías agregar manejo de errores para el usuario
+                        }
+                    }
 
 
 
@@ -414,17 +419,10 @@
 
                     responsive: true, // Para adaptar a pantallas pequeñas
                     processing: true, // Muestra indicador de carga
-                    serverSide: false 
+                    serverSide: false
                 });
 
-                                  $("#BtnBusqueda").on("click", function () {
-                              var urlrubros = '@Url.Action("ListarRubros", "Toner")'
-                              CargarRubros(urlrubros);
-
-                              var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
-                              CargarCodigosID(urlcodigoid);
-
-                  });
+                 
 
 
 
@@ -471,25 +469,51 @@
 
 
                  //Listado Productos
-            // Función para cargar productos con callback
-                function CargarProductos(callback) {
-                    $.ajax({
-                        url: '@Url.Action("ListarProductos", "Toner")',
-                        success: function(data) {
-                            $("#cbodetalle").empty().append('<option value="">Seleccione producto</option>');
-                            $.each(data.data, function(_, producto) {
-                                if (producto.Activo) {
-                                    $("#cbodetalle").append(
-                                        $('<option></option>')
-                                            .val(producto.IdProducto)
-                                            .text(producto.Detalle)
-                                    );
-                                }
-                            });
-                            if (typeof callback === "function") callback();
-                        }
+             function CargarProductos(permisos) {
+            return $.ajax({
+                url: '@Url.Action("ListarProductos", "Toner")',
+                type: "GET",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function(data) {
+                    const $select = $("#cbodetalle");
+                    $select.empty().append('<option value="">Seleccionar</option>');
+
+                    // Variables para permisos
+                    const puedeInsumos = permisos.includes(184);
+                    const puedeNoInsumos = permisos.includes(24);
+
+                    // Filtrar y mapear productos
+                    const productosFiltrados = data.data.filter(producto => {
+                        if (!producto.Activo) return false;
+                        const esInsumo = producto.oRubros.Rubro === "Insumos Informaticos";
+                        return (esInsumo && puedeInsumos) || (!esInsumo && puedeNoInsumos);
                     });
+
+                    // Llenar select2 con opciones filtradas
+                    $select.select2({
+                        placeholder: "Selecciona una opción",
+                        data: productosFiltrados.map(p => ({
+                            id: p.IdProducto,
+                            text: p.Detalle
+                        })),
+                        allowClear: true,
+                        dropdownParent: $('#FormModal')
+                    }).val(null).trigger('change');
+
+                    // Almacenar metadatos de productos
+                    productosFiltrados.forEach(p => {
+                        codigoidprod[p.IdProducto] = p.CodigoId;
+                        rubroprod[p.IdProducto] = p.oRubros.Rubro;
+                        tipoprod[p.IdProducto] = p.oTipos.Tipo;
+                    });
+                },
+                error: function(error) {
+                    console.error("Error cargando productos:", error);
+                    // Aquí podrías mostrar un mensaje al usuario
                 }
+            });
+        }
 
 
 
