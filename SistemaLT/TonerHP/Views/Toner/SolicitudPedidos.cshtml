@@ -85,62 +85,79 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
+                <h1 class="modal-title fs-5" id="titulodinamico">Producto</h1>
                 <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body g-2 align-self-md-center">
+            <div class="modal-body">
                 <input id="txtid" type="hidden" value="" />
                 <input type="hidden" id="txtusuario" value="@Session["AccesCode"]" readonly>
-                <input type="text" class="form-control" id="txtusuario" value="@User.Identity.Name" readonly>
+                <input type="text" class="form-control mb-3" id="txtusuario" value="@User.Identity.Name" readonly>
 
-                <div class="row g-2" id="contenedor">
-
-
+                <div class="row g-3">
 
 
-                    <div class="col-12 col-sm-6 gap-3">
-                        <label class="form-label">Producto</label>
+                    <div class="col-12 mb-3">
+                        <div class="border rounded p-3 bg-light">
+                            <label class="form-label fw-bold d-block mb-2">Buscar Producto (Opcional)</label>
+                            @Html.Partial("_BusquedaAvan")
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <label class="form-label" style="text-align:center;">Producto </label>
                         <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
-                            <option value="">Seleccione un Producto</option>
                         </select>
+                        <p style="text-align: center; margin-top:5px">Informacion del producto</p>
+                        <div class="input-group mb-5">
+                            <span class="input-group-text">Stock Actual</span>
+                            <input id="cbostockactual" type="text" class="form-control" readonly>
+                            <span class="input-group-text">Codigo ID</span>
+                            <input id="infocodigoid" type="text" class="form-control" readonly>
+                        </div>
+
+                        <div class="input-group mb-5">
+                            <span class="input-group-text">Rubro</span>
+                            <input id="inforubro" type="text" class="form-control" readonly>
+                            <span class="input-group-text">Tipo</span>
+                            <input id="infotipo" type="text" class="form-control" readonly>
+                        </div>
+                        <button type="button" id="btnAgregar" class="btn btn-primary">AGREGAR</button>
                     </div>
 
-                    <div id="contenedor" class="col-sm-6">
-                        <p style="text-align:center">Filtros de busqueda</p>
-                        @Html.Partial("_BusquedaAvan")
-                    </div>
+                   
 
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-md-6">
                         <label for="txtfechapedido" class="form-label">Fecha de Pedido</label>
                         <input type="text" class="form-control" id="txtfechapedido" readonly>
                     </div>
 
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-md-6">
                         <label for="txtpedido" class="form-label">N° de Pedido</label>
-                        <input type="text" class="form-control" id="txtpedido" maxlength="15" placeholder="Ingrese el número de pedido">
+                        <input type="text" class="form-control" id="txtpedido" maxlength="15" placeholder="Ingrese el número de pedido" required>
                     </div>
 
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-md-6">
                         <label class="form-label">Área</label>
                         <input type="text" class="form-control" id="txtArea" value="@Session["NombreArea"]" readonly>
                     </div>
 
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-md-6">
                         <label class="form-label">Sector</label>
                         <input type="text" class="form-control" id="txtSector" value="@Session["NombreSector"]" readonly>
                     </div>
 
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-md-6">
                         <label for="txtcantidad" class="form-label">Cantidad</label>
                         <input type="number" class="form-control" id="txtcantidad" min="0" required placeholder="Coloque una cantidad">
                     </div>
 
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-md-6">
                         <label for="txtcodigoid" class="form-label">Código ID</label>
                         <input type="text" class="form-control" id="txtcodigoid" maxlength="30" placeholder="Ingrese el código ID">
                     </div>
 
-                    <div class="col-12 col-sm-6">
+                    <div class="col-12 col-md-6">
                         <label for="txtobservaciones" class="form-label">Observaciones</label>
                         <input type="text" class="form-control" id="txtobservaciones" maxlength="50" placeholder="Ingrese observaciones">
                     </div>
@@ -148,14 +165,14 @@
 
                 <div class="row mt-2">
                     <div class="col-12">
-                        <div id="mensajeError" class="alert alert-danger" role="alert"></div>
+                        <div id="mensajeError" class="alert alert-danger d-none" role="alert"></div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary btn-guardar" id="btnGuardar">Guardar</button>
-                <button class="btn btn-secondary btn-lg" onclick="imprimirPedido()" id="btnImprimir" disabled>
+                <button class="btn btn-secondary" onclick="imprimirPedido()" id="btnImprimir" disabled>
                     <i class="fas fa-print me-2"></i> Imprimir
                 </button>
             </div>
@@ -170,13 +187,16 @@
         // Configuración Inicial
         var tabladata;
         var filaSeleccionada;
-        var productos = {};
+        /*var productos = {};*/
         var codigoidprod = {};
+        var stockprod = {};
         var rubroprod = {};
         var tipoprod = {};
         var appSettings = {};
         var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
 
+        let productoSeleccionado = null;
+        var productosAgregados = [];
 
 
 
@@ -187,7 +207,7 @@
 
              var urlrubros = '@Url.Action("ListarRubros", "Toner")'
              CargarRubros(urlrubros, permisos.map(p => p.Accesos));
-          
+
              var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
             CargarCodigosID(urlcodigoid, permisos.map(p => p.Accesos));
             LimpiarSelects();
@@ -197,15 +217,85 @@
             cargarApiUrls();
             $('.btn-guardar').click(Guardar);
             editar();
+            $('#btnAgregar').click(function () {
+                agregarProducto();
+
+
         });
 
-        function editar() {
-            $("#tabla tbody").on("click", '.btn-editar', function () {
-                var filaSeleccionada = $(this).closest("tr");
-                var data = tabladata.row(filaSeleccionada).data();
-                abrirModal(data);
-            });
-        }
+            var stockActual = stockprod[idProducto];
+            if (stockActual !== undefined) {  // <- Faltaba 'undefined'
+                $("#cbostockactual").val(stockActual).show();
+            } else {
+                $("#cbostockactual").val("").hide();
+            }
+
+            function agregarProducto() {
+                var idProducto = $("#cbodetalle").val();
+                var productoTexto = $("#cbodetalle option:selected").text(); // Nuevo
+                var cantidad = parseInt($("#txtcantidad").val());
+                var observaciones = $("#txtobservaciones").val();
+
+                if (!idProducto || cantidad <= 0) {
+                    mostrarError("¡Seleccione un producto y asegúrese de que la cantidad sea mayor que 0!");
+                    return;
+                }
+
+                productosAgregados.push({
+                    IdProducto: idProducto,
+                    Detalle: productoTexto,  // Nuevo campo
+                    Cantidad: cantidad,
+                    Observaciones: observaciones
+                });
+
+                LimpiarCampos();
+                mostrarProductosAgregados();
+            }
+
+            function mostrarProductosAgregados() {
+                var tablaProductos = $("#tablaProductos tbody");
+                tablaProductos.empty(); // Limpiar la tabla antes de mostrar
+
+                productosAgregados.forEach(function (producto, index) {
+                    tablaProductos.append(`
+            <tr>
+                <td>${producto.IdProducto}</td>
+                <td>${producto.Cantidad}</td>
+                <td>${producto.Observaciones}</td>
+                <td><button class="btn btn-danger" onclick="eliminarProducto(${index})">Eliminar</button></td>
+            </tr>
+        `);
+                });
+            }
+            function LimpiarCampos() {
+                $("#txtcantidad").val(1);  // Valor por defecto
+                $("#txtobservaciones").val("");
+                $("#cbodetalle").val(null).trigger('change');
+                $("#cbostockactual").val("");
+                $("#infocodigoid").val("");
+                $("#inforubro").val("");
+                $("#infotipo").val("");
+            }
+
+            function eliminarProducto(index) {
+                productosAgregados.splice(index, 1); // Eliminar el producto de la lista
+                mostrarProductosAgregados(); // Actualizar la tabla
+            }
+
+                  function editar() {
+                $("#tabla tbody").on("click", '.btn-editar', function () {
+                    var filaSeleccionada = $(this).closest("tr");
+                    var data = tabladata.row(filaSeleccionada).data();
+                    abrirModal(data);
+                });
+            }
+            function selects2() {
+                $('#cbodetalle').select2({
+                    placeholder: "Seleccione un producto",
+                    allowClear: true,
+                    dropdownParent: $('#FormModal') // Importante para modales
+                });
+            }
 
         function LimpiarSelects() {
 
@@ -214,131 +304,246 @@
             CargarProductos(permisos.map(p => p.Accesos));
         }
 
-                    async function abrirModal(data) {
-                        try {
-                            // Extraer los accesos del usuario
-                            const accesos = permisos.map(p => p.Accesos);
 
-                            // Esperar a que se carguen los productos antes de continuar
-                            await CargarProductos(accesos);
-
-                            // Configuración inicial de campos
-                            $('#txtArea').val('@Session["NombreArea"]');
-                            $('#txtSector').val('@Session["NombreSector"]');
-                            $("#txtid").val(0);
-                            $("#txtcantidad").val("");
-                            $("#txtobservaciones").val("");
-                            $("#txtusuario").val('@Session["AccesCode"]');
-                            $("#mensajeError").hide();
-
-                            // Resetear campos dinámicos
-                            $("#cbodetalle").val("").prop("disabled", false);
-                            $("#txtfechapedido").prop("disabled", false);
-
-                            // Configurar fecha actual
-                            const fechaActual = new Date();
-                            $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaActual));
-
-                            // Manejo de edición de pedido
-                            if (data) {
-                                $("#txtid").val(data.IdSolicitud);
-                                $("#txtcantidad").val(data.CantidadPedida);
-                                $("#txtobservaciones").val(data.Observaciones);
-                                $("#txtpedido").val(data.NroPedido);
-
-                                // Configurar producto seleccionado
-                                $("#cbodetalle")
-                                    .val(data.oProductos.IdProducto)
-                                    .prop("disabled", true)
-                                    .trigger('change');
-
-                                // Configurar fecha del pedido
-                                const fechaPedido = new Date(data.FechaPedido);
-                                if (!isNaN(fechaPedido.getTime())) {
-                                    $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido));
-                                }
-
-                                $("#txtfechapedido").prop("disabled", true);
-
-                                // Configurar según tipo de pedido
-                                if (data.NroPedido && data.NroPedido !== "0") {
-                                    $("#btnGuardar").text("Actualizar");
-                                    $("#exampleModalLabel").text("Modificar Pedido");
-                                    $("#btnImprimir").prop("disabled", false);
-                                }
-                            } else {
-                                // Generar nuevo número de pedido
-                                const response = await $.ajax({
-                                    url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")'
-                                });
-                                $("#txtpedido").val(response);
-
-                                $("#btnGuardar").text("Guardar");
-                                $("#exampleModalLabel").text("Nuevo Pedido");
-                                $("#btnImprimir").prop("disabled", true);
-                            }
-
-                            $("#FormModal").modal("show");
-                        } catch (error) {
-                            console.error("Error en abrirModal:", error);
-                            // Aquí podrías agregar manejo de errores para el usuario
-                        }
-                    }
-
-
-
-
-
-        function Guardar() {
-            // Validaciones
-            if ($("#cbodetalle").val() === "") {
-                mostrarError("¡Seleccione un producto!");
-                return;
-            }
-            if ($("#txtcantidad").val() === "" || $("#txtcantidad").val() <= 0) {
-                mostrarError("¡La cantidad debe ser mayor que 0!");
-                return;
-            }
-            if ($("#txtobservaciones").val().length > 50) {
-                mostrarError("¡Las observaciones no pueden exceder los 50 caracteres!");
-                return;
-            }
-
-            const pedidoData = {
-                IdSolicitud: $("#txtid").val(),
-                oProductos: {
-                    IdProducto: $("#cbodetalle").val(),
-                    CodigoId: $("#txtcodigoid").val()
-                },
-                CantidadPedida: $("#txtcantidad").val(),
-                Observaciones: $("#txtobservaciones").val(),
-                NroPedido: $("#txtpedido").val(),
-                IdUsuarioPedido: $("#txtusuario").val(),
-            };
-
-            const url = pedidoData.IdSolicitud == 0
-                ? '@Url.Action("GuardarPedidos", "SolicitudPedidos")'
-                : '@Url.Action("Actualizar", "SolicitudPedidos")';
-
-            $.ajax({
-                url: url,
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({ objeto: pedidoData }),
-                success: function(response) {
-                    if (response.resultado) {
-                        Swal.fire('¡Éxito!', response.mensaje, 'success');
-                        $("#FormModal").modal("hide");
-                        tabladata.ajax.reload(null, false);
-                    } else {
-                        mostrarError(response.mensaje);
-                    }
-                },
-                error: function(xhr) {
-                    mostrarError("Error al guardar: " + xhr.responseText);
-                }
+        // Información del producto
+        $('#StockDatos').on('input', function () {
+            var inputVal = $(this).val();
+            var selectedOption = $('#cbodetalle option').filter(function () {
+                return $(this).text() === inputVal;
             });
+
+            if (selectedOption.length) {
+                var idProducto = selectedOption.data('id');
+
+                var stockActual = stockprod[idProducto];
+                if (stockActual !== undefined) {
+                    $("#cbostockactual").val(stockActual).show();
+                } else {
+                    $("#cbostockactual").val("").hide();
+                }
+
+                var codigoid = codigoidprod[idProducto];
+                if (codigoid !== undefined) {
+                    $("#infocodigoid").val(codigoid).show();
+                } else {
+                    $("#infocodigoid").val("").hide();
+                }
+
+                var rubro = rubroprod[idProducto];
+                if (rubro !== undefined) {
+                    $("#inforubro").val(rubro).trigger('change').show();
+                } else {
+                    $("#inforubro").val("").hide();
+                }
+
+                var tipo = tipoprod[idProducto];
+                if (tipo !== undefined) {
+                    $("#infotipo").val(tipo).trigger('change').show();
+                } else {
+                    $("#infotipo").val("").hide();
+                }
+                $("#txtidProducto").val(idProducto);
+            }
+        });
+
+          function CargarProductos(permisos) {
+          $.ajax({
+              url: '@Url.Action("ListarProductos", "Toner")',
+              type: "GET",
+              data: null,
+              dataType: "json",
+              contentType: "application/json; charset=utf-8",
+              success: function (data) {
+                  $("#cbodetalle").empty();
+                  $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cbodetalle");
+                  var opciones = [];
+                  var tienePermiso24 = permisos.includes(24);
+                  var tienePermiso184 = permisos.includes(184);
+                  $.each(data.data, function (index, valor) {
+
+                      if (valor.Activo === true) {
+                          if (tienePermiso24 && valor.oRubros.Rubro !== "Insumos Informaticos") {
+                              opciones.push({
+                                  id: valor.IdProducto,
+                                  text: valor.Detalle
+                              });
+                              stockprod[valor.IdProducto] = valor.StockActual;
+                              codigoidprod[valor.IdProducto] = valor.CodigoId;
+                              rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                              tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                          } else if (tienePermiso184 && valor.oRubros.Rubro === "Insumos Informaticos") {
+                              opciones.push({
+                                  id: valor.IdProducto,
+                                  text: valor.Detalle
+                              });
+                              stockprod[valor.IdProducto] = valor.StockActual;
+                              codigoidprod[valor.IdProducto] = valor.CodigoId;
+                              rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                              tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                          }
+                      }
+
+
+
+                  });
+                  $('#cbodetalle').select2({
+                      placeholder: "Selecciona una opción",
+                      data: opciones,
+                      allowClear: true,
+                      dropdownParent: $('#FormModal'),
+                  }).val(null).trigger('change');
+
+                  //$.each(data.data, function (index, valor) {
+
+                  //if (valor.Activo === true) {
+                  //    stockprod[valor.IdProducto] = valor.StockActual;
+                  //    codigoidprod[valor.IdProducto] = valor.CodigoId;
+                  //    rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                  //    tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                  //    $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
+                  //    }
+                  //});
+              },
+              error: function (error) {
+                  console.log(error)
+              },
+          });
+      }
+
+        function modalTitle(title) {
+            document.getElementById('titulodinamico').innerText = title;
         }
+
+
+
+            async function abrirModal(data) {
+                    try {
+                        // Extraer los accesos del usuario
+                        const accesos = permisos.map(p => p.Accesos);
+
+                        // Esperar a que se carguen los productos antes de continuar
+                        await CargarProductos(accesos);
+
+                        // Configuración inicial de campos
+                        $('#txtArea').val('@Session["NombreArea"]');
+                        $('#txtSector').val('@Session["NombreSector"]');
+                        $("#txtid").val(0);
+                        $("#txtcantidad").val("");
+                        $("#txtobservaciones").val("");
+                        $("#txtusuario").val('@Session["AccesCode"]');
+                        $("#mensajeError").hide();
+
+                        // Resetear campos dinámicos
+                        $("#cbodetalle").val("").prop("disabled", false);
+                        $("#txtfechapedido").prop("disabled", false);
+
+                        // Configurar fecha actual
+                        const fechaActual = new Date();
+                        $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaActual));
+
+                        // Manejo del número de pedido (común para ambos modos)
+                        if (data) {
+                            // Modo Edición: Mostrar número existente
+                            $("#txtpedido").val(data.NroPedido);
+                        } else {
+                            // Modo Creación: Generar nuevo número
+                            const response = await $.ajax({
+                                url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")'
+                            });
+                            $("#txtpedido").val(response);
+                        }
+                        // Siempre hacer el campo de solo lectura
+                        $("#txtpedido").prop("readonly", true);
+
+                        // Manejo específico de edición
+                        if (data) {
+                            modalTitle('Editar');
+                            $("#txtid").val(data.IdSolicitud);
+                            $("#txtcantidad").val(data.CantidadPedida);
+                            $("#txtobservaciones").val(data.Observaciones);
+
+                            // Configurar producto seleccionado
+                            $("#cbodetalle")
+                                .val(data.oProductos.IdProducto)
+                                .prop("disabled", true)
+                                .trigger('change');
+
+                            // Configurar fecha del pedido
+                            const fechaPedido = new Date(data.FechaPedido);
+                            if (!isNaN(fechaPedido.getTime())) {
+                                $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido));
+                            }
+                            $("#txtfechapedido").prop("disabled", true);
+
+                            // Configurar botones
+                            if (data.NroPedido && data.NroPedido !== "0") {
+                                $("#btnGuardar").text("Actualizar");
+                                $("#exampleModalLabel").text("Modificar Pedido");
+                                $("#btnImprimir").prop("disabled", false);
+                            }
+                        } else {
+                            // Configuración específica de creación
+                            modalTitle('Crear nuevo');
+                            $("#btnGuardar").text("Guardar");
+                            $("#txtid").val(0);
+                            $("#txtcantidad").val(1);
+                            // Resetear otros campos según necesidad
+                            $("#cbostockactual").val("");
+                            $("#infocodigoid").val("");
+                            $("#inforubro").val("");
+                            $("#infotipo").val("");
+                            $("#cbostockactual").val("");
+                            // ... (otros reseteos que necesites)
+                        }
+
+                        $("#FormModal").modal("show");
+
+                    } catch (error) {
+                        console.error("Error en abrirModal:", error);
+                        // Manejo de errores para el usuario
+                }
+                $("#cbodetalle").change(function () {
+                    var idProducto = $(this).val();
+
+                    var stockActual = obtenerStockPorId(idProducto);
+                    if (stockActual !== undefined) {
+                        $("#cbostockactual").val(stockActual);
+                        $("#cbostockactual").show();
+                    }
+
+                    var codigoid = obtenerCodigoPorId(idProducto);
+                    if (codigoid !== undefined) {
+                        $("#infocodigoid").val(codigoid);
+                        $("#infocodigoid").show();
+                    }
+
+                    var rubro = obtenerRubroPorId(idProducto);
+                    if (rubro !== undefined) {
+                        $("#inforubro").val(rubro);
+                        $("#inforubro").show();
+                    }
+
+                    var tipo = obtenerTipoPorId(idProducto);
+                    if (tipo !== undefined) {
+                        $("#infotipo").val(tipo);
+                        $("#infotipo").show();
+                    }
+                });
+
+                function obtenerStockPorId(idProducto) {
+                    return stockprod[idProducto];
+                }
+                function obtenerCodigoPorId(idProducto) {
+                    return codigoidprod[idProducto];
+                }
+                function obtenerRubroPorId(idProducto) {
+                    return rubroprod[idProducto];
+                }
+                function obtenerTipoPorId(idProducto) {
+                    return tipoprod[idProducto];
+                }
+                }
+
 
         function mostrarError(mensaje) {
             $("#mensajeError").text(mensaje).show().delay(5000).fadeOut();
@@ -353,7 +558,14 @@
                     },
                     columns: [
                         { data: "IdSolicitud", visible: false },
-                        { data: "oProductos.Detalle", title: "Producto" },
+                        { data: "NroPedido", title: "N° Pedido" },  // Mover a primera posición
+                        {
+                            data: "Productos",
+                            title: "Productos",
+                            render: function (data) {
+                                return data.map(p => p.Detalle).join(', ');
+                            }
+                        },
                         { data: "CantidadPedida", title: "Cant. Pedida" },
                         {
                             data: "CantidadEntregada",
@@ -378,7 +590,7 @@
                                 return data ? new Date(data).toLocaleDateString() : 'Pendiente';
                             }
                         },
-                        { data: "NroPedido", title: "N° Pedido" },
+                      
                         {
                             data: "Visado",
                             title: "Visado",
@@ -416,7 +628,7 @@
                     serverSide: false
                 });
 
-                 
+
 
 
 
@@ -462,52 +674,48 @@
 
 
 
-                 //Listado Productos
-             function CargarProductos(permisos) {
-            return $.ajax({
-                url: '@Url.Action("ListarProductos", "Toner")',
-                type: "GET",
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function(data) {
-                    const $select = $("#cbodetalle");
-                    $select.empty().append('<option value="">Seleccionar</option>');
 
-                    // Variables para permisos
-                    const puedeInsumos = permisos.includes(184);
-                    const puedeNoInsumos = permisos.includes(24);
 
-                    // Filtrar y mapear productos
-                    const productosFiltrados = data.data.filter(producto => {
-                        if (!producto.Activo) return false;
-                        const esInsumo = producto.oRubros.Rubro === "Insumos Informaticos";
-                        return (esInsumo && puedeInsumos) || (!esInsumo && puedeNoInsumos);
-                    });
 
-                    // Llenar select2 con opciones filtradas
-                    $select.select2({
-                        placeholder: "Selecciona una opción",
-                        data: productosFiltrados.map(p => ({
-                            id: p.IdProducto,
-                            text: p.Detalle
-                        })),
-                        allowClear: true,
-                        dropdownParent: $('#FormModal')
-                    }).val(null).trigger('change');
-
-                    // Almacenar metadatos de productos
-                    productosFiltrados.forEach(p => {
-                        codigoidprod[p.IdProducto] = p.CodigoId;
-                        rubroprod[p.IdProducto] = p.oRubros.Rubro;
-                        tipoprod[p.IdProducto] = p.oTipos.Tipo;
-                    });
-                },
-                error: function(error) {
-                    console.error("Error cargando productos:", error);
-                    // Aquí podrías mostrar un mensaje al usuario
+                   function Guardar() {
+                // Validaciones
+                if (productosAgregados.length === 0) {
+                    mostrarError("¡No hay productos para guardar!");
+                    return;
                 }
-            });
-        }
+
+                const pedidoData = {
+                    IdSolicitud: $("#txtid").val(),
+                    Productos: productosAgregados, // Enviar la lista de productos
+                    NroPedido: $("#txtpedido").val(),
+                    IdUsuarioPedido: $("#txtusuario").val(),
+                    FechaPedido: $("#txtfechapedido").val()
+                };
+
+                const url = pedidoData.IdSolicitud == 0
+                    ? '@Url.Action("GuardarPedidos", "SolicitudPedidos")'
+                    : '@Url.Action("Actualizar", "SolicitudPedidos")';
+
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ objeto: pedidoData }),
+                    success: function(response) {
+                        if (response.resultado) {
+                            Swal.fire('¡Éxito!', response.mensaje, 'success');
+                            $("#FormModal").modal("hide");
+                            tabladata.ajax.reload(null, false);
+                            productosAgregados = []; // Limpiar la lista después de guardar
+                        } else {
+                            mostrarError(response.mensaje);
+                        }
+                    },
+                    error: function(xhr) {
+                        mostrarError("Error al guardar: " + xhr.responseText);
+                    }
+                });
+            }
 
 
 
@@ -525,7 +733,7 @@
                 usuario: $("#txtusuario").val(),
                 area: $("#txtArea").val(),
                 sector: $("#txtSector").val(),
-                producto: $("#cbodetalle option:selected").text(),
+                productos: productosAgregados ,
                 cantidad: $("#txtcantidad").val(),
                 observaciones: $("#txtobservaciones").val()
             };
@@ -611,11 +819,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>${pedido.producto}</td>
-                                <td>${pedido.cantidad}</td>
-                                <td style="height: 30px;">&nbsp;</td>
-                            </tr>
+                              ${pedido.productos.map(p => `
+                    <tr>
+                        <td>${p.Detalle}</td>
+                        <td>${p.Cantidad}</td>
+                        <td style="height: 30px;">&nbsp;</td>
+                    </tr>
+                `).join('')}
                         </tbody>
                     </table>
 
