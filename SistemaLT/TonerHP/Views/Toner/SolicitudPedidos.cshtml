@@ -80,7 +80,6 @@
 </div>
 
 <!-- Modal -->
-<!-- Modal -->
 <div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -91,7 +90,45 @@
             <div class="modal-body">
                 <input id="txtid" type="hidden" value="" />
                 <input type="hidden" id="txtusuario" value="@Session["AccesCode"]" readonly>
-                <input type="text" class="form-control mb-3" id="txtusuario" value="@User.Identity.Name" readonly>
+                <div class="row">
+                    <div class="col-1">
+                        Usuario:
+                    </div>
+                    <div class="col-2">
+                        <input type="text" class="form-control mb-3" id="txtusuario" value="@User.Identity.Name" readonly>
+                    </div>
+
+                    <div class="col-1">
+                        <label for="txtpedido" class="form-label">N° de Pedido</label>
+                    </div>
+                    <div class="col-3">
+                        <input type="text" class="form-control" id="txtpedido" maxlength="15" placeholder="Ingrese el número de pedido" required>
+                    </div>
+
+                    <div class="col-1">
+                        <label for="txtfechapedido" class="form-label">Fecha de Pedido</label>
+                    </div>
+                    <div class="col-4">
+                        <input type="text" class="form-control" id="txtfechapedido" readonly>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-2">
+                        <label class="form-label" style="text-align: right;">Áre:</label>
+                    </div>
+                    <div class="col-4">
+                        <input type="text" class="form-control" id="txtArea" value="@Session["NombreArea"]" readonly>
+                    </div>
+
+                    <div class="col-2">
+                        <label class="form-label" style="text-align: right;">Sector:</label>
+                    </div>
+                    <div class="col-4">
+                        <input type="text" class="form-control" id="txtSector" value="@Session["NombreSector"]" readonly>
+                    </div>
+                </div>
 
                 <div class="row g-3">
 
@@ -123,28 +160,6 @@
                             <input id="infotipo" type="text" class="form-control" readonly>
                         </div>
                         <button type="button" id="btnAgregar" class="btn btn-primary">AGREGAR</button>
-                    </div>
-
-                   
-
-                    <div class="col-12 col-md-6">
-                        <label for="txtfechapedido" class="form-label">Fecha de Pedido</label>
-                        <input type="text" class="form-control" id="txtfechapedido" readonly>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <label for="txtpedido" class="form-label">N° de Pedido</label>
-                        <input type="text" class="form-control" id="txtpedido" maxlength="15" placeholder="Ingrese el número de pedido" required>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <label class="form-label">Área</label>
-                        <input type="text" class="form-control" id="txtArea" value="@Session["NombreArea"]" readonly>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <label class="form-label">Sector</label>
-                        <input type="text" class="form-control" id="txtSector" value="@Session["NombreSector"]" readonly>
                     </div>
 
                     <div class="col-12 col-md-6">
@@ -201,9 +216,7 @@
 
 
         $(document).ready(function () {
-
-
-            inicializarDataTable();
+            //inicializarDataTable();
 
              var urlrubros = '@Url.Action("ListarRubros", "Toner")'
              CargarRubros(urlrubros, permisos.map(p => p.Accesos));
@@ -219,16 +232,33 @@
             editar();
             $('#btnAgregar').click(function () {
                 agregarProducto();
-
-
+            });
         });
 
+
+
+
+        $('#StockDatos').on('input', function () {
+            var inputVal = $(this).val();
+            var selectedOption = $('#cbodetalle option').filter(function () {
+                return $(this).text() === inputVal;
+            });
             var stockActual = stockprod[idProducto];
-            if (stockActual !== undefined) {  // <- Faltaba 'undefined'
-                $("#cbostockactual").val(stockActual).show();
-            } else {
-                $("#cbostockactual").val("").hide();
+
+            if (selectedOption.length) {
+
+                if (stockActual !== undefined) {  // <- Faltaba 'undefined'
+                    $("#cbostockactual").val(stockActual).show();
+                } else {
+                    $("#cbostockactual").val("").hide();
+                }
+                $("#txtidProducto").val(idProducto);
             }
+        });
+
+
+
+
 
             function agregarProducto() {
                 var idProducto = $("#cbodetalle").val();
@@ -416,7 +446,7 @@
 
 
 
-            async function abrirModal(data) {
+             async function abrirModal(data) {
                     try {
                         // Extraer los accesos del usuario
                         const accesos = permisos.map(p => p.Accesos);
@@ -549,7 +579,7 @@
             $("#mensajeError").text(mensaje).show().delay(5000).fadeOut();
         }
 
-            function inicializarDataTable() {
+            @*function inicializarDataTable() {
                 tabladata = $('#tabla').DataTable({
 
                     ajax: {
@@ -626,33 +656,33 @@
                     responsive: true, // Para adaptar a pantallas pequeñas
                     processing: true, // Muestra indicador de carga
                     serverSide: false
-                });
+                });*@
 
 
 
 
 
-                        $('#tabla tbody').on('click', '.btn-visar', function() {
-                            const id = $(this).data('id');
+            $('#tabla tbody').on('click', '.btn-visar', function() {
+                const id = $(this).data('id');
 
-                            Swal.fire({
-                                title: '¿Confirmar visado?',
-                                text: "Esta acción no se puede deshacer",
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonColor: '#3085d6',
-                                cancelButtonColor: '#d33'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    $.post('@Url.Action("RegistrarVisado", "SolicitudPedidos")', { idPedido: id })
-                                    .done(function(response) {
-                                        Swal.fire(response.mensaje);
-                                        tabladata.ajax.reload();
-                                    });
-                                }
-                            });
+                Swal.fire({
+                    title: '¿Confirmar visado?',
+                    text: "Esta acción no se puede deshacer",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post('@Url.Action("RegistrarVisado", "SolicitudPedidos")', { idPedido: id })
+                        .done(function(response) {
+                            Swal.fire(response.mensaje);
+                            tabladata.ajax.reload();
                         });
                     }
+                });
+            });
+                    
 
          function buscarPorNumero() {
                 const nroPedido = $("#txtBuscarPedido").val().trim(); // Obtener valor del input
