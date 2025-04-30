@@ -8,152 +8,113 @@
     @Styles.Render("~/Content/css")
 
 </head>
-<body class="sb-nav-fixed bg-dark ">
+<body class="d-flex flex-column min-vh-100 bg-dark ">
     <script src="~/Scripts/functions.js"></script>
-    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <div class="fst-italic" id="fecha" style="color:white; padding-left:15px"></div>
-        <div style="color: white; align-content: center; padding-left:25px">Usuario: @User.Identity.Name</div>
-        <h4 class="fst-italic" style="color: white; margin-left: auto;">Deposito</h4>
-        <!-- Navbar Brand-->
-        <ul class="navbar-nav ms-auto me-0 me-md-3 my-2 my-md-0">
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("CerrarSesion","Usuario")" style="color: #fff;">
-                    <i class="fas fa-user fa-fw"></i> Cerrar sesión
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <header class="fixed-top">
+        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+            <div class="fst-italic" id="fecha" style="color:white; padding-left:15px"></div>
+            <div style="color: white; align-content: center; padding-left:25px">Usuario: @User.Identity.Name</div>
+            <h4 class="fst-italic" style="color: white; margin-left: auto;">Deposito</h4>
+            <!-- Navbar Brand-->
+            <ul class="navbar-nav ms-auto me-0 me-md-3 my-2 my-md-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("CerrarSesion","Usuario")" style="color: #fff;">
+                        <i class="fas fa-user fa-fw"></i> Cerrar sesión
+                    </a>
+                </li>
+            </ul>
+
+        </nav>
+
+        <div class="container-fluid text-center bg-dark" style="padding-top: 10px; padding-bottom:10px;">
+            <div class="row">
+
+                @*--------------------------OPERACIONES----------------------*@
+
+                <div class="col">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#canvaoperaciones" aria-controls="offcanvasScrolling">OPERACIONES</button>
+                    <div style="background-color:black; padding-top:50px" class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="canvaoperaciones" aria-labelledby="offcanvasScrollingLabel">
+                        <div style="padding-bottom:15px">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <a class="nav-link link-light" href="@Url.Action("Egresos","Toner")" >
+                            <div class="sb-nav-link-icon"><i class="fas fa-circle-arrow-up"></i></div>
+                            Egresos/Salidas
+                        </a>
+                        <a class="nav-link link-light" href="@Url.Action("Ingresos","Toner")" >
+                            <div class="sb-nav-link-icon"><i class="fas fa-circle-arrow-down"></i></div>
+                            Ingresos/Entradas
+                        </a>
+                        <a class="nav-link link-light" href="@Url.Action("SolicitudPedidos","Toner")" >
+                            <div class="sb-nav-link-icon"><i class="fas fa-box-open"></i></div>
+                            Solicitud/Pedidos
+                        </a>
+
+                        <a class="nav-link link-light" href="@Url.Action("EntregaPedidos","Toner")" >
+                            <div class="sb-nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                            Entrega/Pedidos
+                        </a>
+                    </div>
+                </div>
+
+
+                @*--------------------------ADMINISTRACION----------------------*@
+            <div class="col">
+                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#canvaadministracion" aria-controls="offcanvasScrolling">ADMINISTRACION</button>
+                <div style="background-color:black; padding-top:50px" class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="canvaadministracion" aria-labelledby="offcanvasScrollingLabel">
+                    <div style="padding-bottom:15px">
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <a class="nav-link  link-light" href="@Url.Action("Productos","Toner")">
+                        <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
+                        Productos
+                    </a>
+                    <a class="nav-link  link-light" href=" @Url.Action("Proveedores", "Toner")">
+                        <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
+                        Proveedores
+                    </a>
+                    <a class="nav-link  link-light" href=" @Url.Action("Rubros", "Toner")">
+                        <div class="sb-nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                        Rubros
+                    </a>
+                    <a class="nav-link  link-light" href=" @Url.Action("Tipos", "Toner")">
+                        <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
+                        Tipos
+                    </a>
+                </div>
+            </div>
+                @*--------------------------REPORTES----------------------*@
+
+                <div class="col">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#canvareportes" aria-controls="offcanvasScrolling">REPORTES</button>
+                    <div style="background-color:black" class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="canvareportes" aria-labelledby="offcanvasScrollingLabel">
+                        <button style="background-color:white" type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
     <div id="layoutSidenav">
-        <div id="layoutSidenav_nav">
-            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                <div class="sb-sidenav-menu">
-                    <div class="nav">
+        <main style="padding-top:120px;">
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+        </main>
 
-                        <div class="accordion " id="accordionExample">
-                            <div class="accordion-item bg-dark">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed  btn-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseone" aria-expanded="false" aria-controls="collapseTwo">
-                                        OPERACIONES
-                                    </button>
-                                </h2>
-                                <div id="collapseone" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                    <div class="accordion-body">
-                                        <a class="nav-link" href="@Url.Action("Egresos","Toner")" )>
-                                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                                            Egresos/Salidas
-                                        </a>
-                                        <a class="nav-link" href="@Url.Action("Ingresos","Toner")" )>
-                                            <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                                            Ingresos/Entradas
-                                        </a>
-                                        <a class="nav-link" href="@Url.Action("SolicitudPedidos","Toner")" )>
-                                            <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                                            Solicitud/Pedidos
-                                        </a>
-
-                                        <a class="nav-link" href="@Url.Action("EntregaPedidos","Toner")" )>
-                                            <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                                            Entrega/Pedidos
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        @*<div class="sb-sidenav-menu-heading">Operaciones</div>
-        <a class="nav-link" href="@Url.Action("Egresos","Toner")" )>
-            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-            Egresos/Salidas
-        </a>
-        <a class="nav-link" href="@Url.Action("Ingresos","Toner")" )>
-            <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-            Ingresos/Entradas
-        </a>
-        <a class="nav-link" href="@Url.Action("SolicitudPedidos","Toner")" )>
-            <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-            Solicitud/Pedidos
-        </a>
-
-        <a class="nav-link" href="@Url.Action("EntregaPedidos","Toner")" )>
-            <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-            Entrega/Pedidos
-        </a>*@
-
-                        <div class="accordion " id="accordionExample">
-                            <div class="accordion-item bg-dark">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed  btn-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                        ADMINISTRACION DE INVENTARIO
-                                    </button>
-                                </h2>
-                                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                    <div class="accordion-body">
-                                        <a class="nav-link" href="@Url.Action("Productos","Toner")" )>
-                                            <div class="sb-nav-link-icon"><i class="fas fa-bookmark"></i></div>
-                                            Productos
-                                        </a>
-                                        <a class="nav-link" href=" @Url.Action("Proveedores", "Toner")" )>
-                                            <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
-                                            Proveedores
-                                        </a>
-                                        <a class="nav-link" href=" @Url.Action("Rubros", "Toner")" )>
-                                            <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
-                                            Rubros
-                                        </a>
-                                        <a class="nav-link" href=" @Url.Action("Tipos", "Toner")" )>
-                                            <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
-                                            Tipos
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        @*--------------------------------------------------------------------------*@
-                        @*<div class="sb-sidenav-menu-heading">Administración de Inventario</div>
-                        <a class="nav-link" href="@Url.Action("Productos","Toner")" )>
-                            <div class="sb-nav-link-icon"><i class="fas fa-bookmark"></i></div>
-                            Productos
-                        </a>
-                        <a class="nav-link" href=" @Url.Action("Proveedores", "Toner")" )>
-                            <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
-                            Proveedores
-                        </a>
-                        <a class="nav-link" href=" @Url.Action("Rubros", "Toner")" )>
-                            <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
-                            Rubros
-                        </a>
-                        <a class="nav-link" href=" @Url.Action("Tipos", "Toner")" )>
-                            <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
-                            Tipos
-                        </a>*@
-                    </div>
-                    </div>
+    </div>
+    <footer class="py-0 bg-dark mt-auto ">
+        <div class="container-fluid px-4">
+            <div class="d-flex align-items-center justify-content-between small">
                 <div class="sb-sidenav-footer text-bg-dark">
                     <div class="small">Hospital Pediatrico</div>
                     Dr. Avelino L. Castelan
                 </div>
-            </nav>
-        </div>
-        <div id="layoutSidenav_content">
-            <main>
-                <div class="container-fluid px-4">
-                    @RenderBody()
-                </div>
-            </main>
-            <footer class="py-4 bg-dark mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-white">Diseñado por Area de Sistemas de Hospital Pediatrico Dr. Avelino L. Castelan</div>
-                        <div class="text-white">Libreria e Insumos Informaticos </div>
+                <div class="text-white">Diseñado por Area de Sistemas de Hospital Pediatrico Dr. Avelino L. Castelan</div>
+                <div class="text-white">Libreria e Insumos Informaticos </div>
 
-                    </div>
-                </div>
-            </footer>
+            </div>
         </div>
-    </div>
-
+    </footer>
 
 
     @Scripts.Render("~/bundles/jquery")
@@ -162,7 +123,7 @@
     @RenderSection("scripts", required: false)
 </body>
 </html>
-
+<script src="~/Scripts/fontawesome-v6/all.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", (event) => {
         const fecha = document.getElementById("fecha");
