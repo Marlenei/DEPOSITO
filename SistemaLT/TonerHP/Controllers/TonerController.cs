@@ -40,6 +40,10 @@ namespace TonerHP.Controllers
         public ActionResult Proveedores()
         {
             var permisos = Session["PermissionsCode"] as List<Permiso>;
+            if (permisos == null)
+            {
+                return RedirectToAction("Login", "Usuario");
+            }
             var tieneAcceso = permisos.Any(p => p.Accesos == 182);
             if (!tieneAcceso)
             {
@@ -53,6 +57,10 @@ namespace TonerHP.Controllers
         public ActionResult Tipos()
         {
             var permisos = Session["PermissionsCode"] as List<Permiso>;
+            if (permisos == null)
+            {
+                return RedirectToAction("Login", "Usuario");
+            }
             var tieneAcceso = permisos.Any(p => p.Accesos == 182);
             if (!tieneAcceso)
             {
@@ -66,6 +74,10 @@ namespace TonerHP.Controllers
         public ActionResult Productos()
         {
             var permisos = Session["PermissionsCode"] as List<Permiso>;
+            if (permisos == null)
+            {
+                return RedirectToAction("Login", "Usuario");
+            }
             var tieneAcceso = permisos.Any(p => p.Accesos == 182);
             if (!tieneAcceso)
             {
@@ -78,6 +90,10 @@ namespace TonerHP.Controllers
         public ActionResult Ingresos()
         {
             var permisos = Session["PermissionsCode"] as List<Permiso>;
+            if (permisos == null)
+            {
+                return RedirectToAction("Login", "Usuario");
+            }
             var tieneAcceso = permisos.Any(p => p.Accesos == 24 || p.Accesos == 184);
             if (!tieneAcceso)
             {
@@ -92,6 +108,10 @@ namespace TonerHP.Controllers
         {
 
             var permisos = Session["PermissionsCode"] as List<Permiso>;
+            if (permisos == null)
+            {
+                return RedirectToAction("Login", "Usuario");
+            }
             var tieneAcceso = permisos.Any(p => p.Accesos == 25);
             if (!tieneAcceso)
             {
@@ -106,6 +126,10 @@ namespace TonerHP.Controllers
         public ActionResult Rubros()
         {
             var permisos = Session["PermissionsCode"] as List<Permiso>;
+            if (permisos == null)
+            {
+                return RedirectToAction("Login", "Usuario");
+            }
             var tieneAcceso = permisos.Any(p => p.Accesos == 182);
             if (!tieneAcceso)
             {
@@ -114,6 +138,24 @@ namespace TonerHP.Controllers
 
             return View();
         }
+
+        public ActionResult Reportes()
+        {
+            var permisos = Session["PermissionsCode"] as List<Permiso>;
+            if (permisos == null)
+            {
+                return RedirectToAction("Login", "Usuario");
+            }
+            var tieneAcceso = permisos.Any(p => p.Accesos == 59);
+            if (!tieneAcceso)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+
+            return View();
+        }
+
+
 
         public ActionResult SolicitudPedidos()
         {
