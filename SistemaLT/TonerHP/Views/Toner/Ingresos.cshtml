@@ -5,7 +5,7 @@
 <div class="card shadow-sm">
     <div class="card-header bg-primary text-white">
         <h5 class="card-title mb-0">
-            <i class="fas fa-boxes me-2"></i>Ingresos
+            <i class="fas fa-circle-arrow-down me-2"></i>Ingresos
         </h5>
     </div>
     <div class="card-body">
@@ -20,7 +20,7 @@
             <h6>Seleccione el rango que desea ver:</h6>
             <input type="text" name="daterange" />
         </div>
-        <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width:100%">
+        <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width: 100% !important; table-layout: fixed;">
             <thead class="table-dark">
                 <tr>
                     <th>Detalle</th>
@@ -221,7 +221,6 @@
             });
 
             tabladata = $("#tabla").DataTable({
-                autoWidth: true,
                responsive: true,
                ordering: true,
                 order: [],
@@ -303,7 +302,6 @@
                         "defaultContent": '<button type="button" class="btn btn-primary btn-sm btn-editar"> <i class="fas fa-pen"></i></button>',
                         "orderable": false,
                         "searchable": false,
-                        "width": "auto"
                     }
 
                 ],

@@ -6,7 +6,7 @@
 <div class="card shadow-sm">
     <div class="card-header bg-primary text-white">
         <h5 class="card-title mb-0">
-            <i class="fas fa-boxes me-2"></i>Tipos
+            <i class="fas fa-list"></i> Tipos
         </h5>
     </div>
     <div class="card-body">
@@ -18,12 +18,18 @@
 
         <hr />
 
-        <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width:100%">
+        <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width: 100% !important; table-layout: fixed;">
             <thead class="table-dark">
                 <tr>
                     <th>Tipo</th>
                     <th>Rubro</th>
                     <th>Activo</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th><input type="text" placeholder="Buscar Tipo" class="form-control form-control-sm" /></th>
+                    <th><input type="text" placeholder="Buscar Rubro" class="form-control form-control-sm" /></th>
+                    <th><input type="text" placeholder="Sí / No" class="form-control form-control-sm" /></th>
                     <th></th>
                 </tr>
             </thead>
@@ -107,6 +113,7 @@
 
 
             tabladata = $("#tabla").DataTable({
+                orderCellsTop: true,
                 responsive: true,
                 ordering: false,
                 "ajax": {
@@ -201,6 +208,18 @@
 
 
         });
+
+        $('#tabla thead tr:eq(1) th').each(function (i) {
+            $('input', this).on('keyup change', function () {
+                if (tabladata.column(i).search() !== this.value) {
+                    tabladata
+                        .column(i)
+                        .search(this.value)
+                        .draw();
+                }
+            })
+        })
+
 
         function modalTitle(title) {
             document.getElementById('titulodinamico').innerText = title;
