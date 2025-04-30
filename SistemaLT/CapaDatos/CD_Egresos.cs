@@ -119,23 +119,22 @@ namespace CapaDatos
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
                     SqlCommand cmd = new SqlCommand("EditarEgresos", oconexion);
-                    cmd.Parameters.AddWithValue("IdEgresos", obj.IdEgreso);
-                    
-                    cmd.Parameters.AddWithValue("IdTipo", obj.oProductos.IdProducto);
+                    cmd.Parameters.AddWithValue("IdEgreso", obj.IdEgreso);
+                    cmd.Parameters.AddWithValue("IdProducto", obj.oProductos.IdProducto);
                     cmd.Parameters.AddWithValue("Cantidad", obj.Cantidad);
-                    cmd.Parameters.AddWithValue("CodigoId", obj.CodigoId);
-                    cmd.Parameters.AddWithValue("Observaciones", obj.Observaciones);
-                    cmd.Parameters.AddWithValue("TipoSalida", obj.CodigoId);
+                    cmd.Parameters.AddWithValue("CodigoId", (object)obj.CodigoId ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("Observaciones", (object)obj.Observaciones ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("TipoSalida", obj.TipoSalida); // Cambié a obj.TipoSalida
                     cmd.Parameters.AddWithValue("IdUsuario", obj.IdUsuario);
                     cmd.Parameters.AddWithValue("FechaEgreso", obj.FechaEgreso);
                     cmd.Parameters.AddWithValue("CodigoArea", obj.CodigoArea);
                     cmd.Parameters.AddWithValue("CodigoSector", obj.CodigoSector);
+                    cmd.Parameters.Add("FechayHoraAct", SqlDbType.SmallDateTime).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     oconexion.Open();
-
                     cmd.ExecuteNonQuery();
                     resultado = Convert.ToBoolean(cmd.Parameters["Resultado"].Value);
                     Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
@@ -147,7 +146,6 @@ namespace CapaDatos
                 Mensaje = ex.Message;
             }
             return resultado;
-
-       }
+        }
     }
 }

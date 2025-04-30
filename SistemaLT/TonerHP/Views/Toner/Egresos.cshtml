@@ -157,6 +157,7 @@
                 dataType: "json"
             },
             "columns": [
+                { data: "IdEgreso", visible: false },
                 {
                     "data": "oProductos",
                     "render": function (data) {
@@ -293,31 +294,30 @@
         });
 
         function Guardar() {
-            var cantidad = parseInt($("#txtcantidad").val()) || 0;
-            var idProducto = $("#cbodetalle option:selected").val();
-            var stockActual = parseInt($("#cbostockactual option:selected").text()) ;
+            //var cantidad = parseInt($("#txtcantidad").val()) || 0;
+            //var idProducto = $("#cbodetalle option:selected").val();
+            //var stockActual = parseInt($("#cbostockactual option:selected").text()) ;
 
-            // Validar stock suficiente
-            if (cantidad > stockActual) {
-                $("#mensajeError").text("¡Stock insuficiente!").show();
-                return;
-            }
+            //// Validar stock suficiente
+            //if (cantidad > stockActual) {
+            //    $("#mensajeError").text("¡Stock insuficiente!").show();
+            //    return;
+            //}
 
             var Egresos = {
-                IdEgreso: $("#txtid").val(), 
+                IdEgreso: $("#txtid").val(),
                 oProductos: {
-                    IdProducto: idProducto,
+                    IdProducto: $("#cbodetalle option:selected").val(),
                     Detalle: $("#cbodetalle option:selected").text(),
-                   /* StockActual: stockActual - cantidad ,*/
                 },
-                Cantidad: cantidad,
+                Cantidad: $("#txtcantidad").val(),
                 CodigoId: $("#txtcodigoid").val(),
                 TipoSalida: $("#txttipoingreso option:selected").val(),
-                FechaEgreso: $('#txtfechaingreso').val(), 
+                FechaEgreso: $('#txtfechaingreso').val(),
                 Observaciones: $("#txtobservaciones").val(),
                 IdUsuario: $("#txtusuario").val(),
-                CodigoArea: $("#txtcodigoarea").val(), 
-                CodigoSector: $("#txtcodigosector").val(), 
+                CodigoArea: $("#txtcodigoarea").val(),
+                CodigoSector: $("#txtcodigosector").val(),
             };
 
             jQuery.ajax({

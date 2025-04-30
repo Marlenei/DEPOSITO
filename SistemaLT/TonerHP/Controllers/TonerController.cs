@@ -132,12 +132,12 @@ namespace TonerHP.Controllers
         public ActionResult EntregaPedidos()
         {
 
-            var permisos = Session["PermissionsCode"] as List<Permiso>;
-            var tieneAcceso = permisos.Any(p => p.Accesos == 24 || p.Accesos == 184);
-            if (!tieneAcceso)
-            {
-                return RedirectToAction("Error", "Home");
-            }
+            //var permisos = Session["PermissionsCode"] as List<Permiso>;
+            //var tieneAcceso = permisos.Any(p => p.Accesos == 24 || p.Accesos == 184);
+            //if (!tieneAcceso)
+            //{
+            //    return RedirectToAction("Error", "Home");
+            //}
 
             return View();
         }

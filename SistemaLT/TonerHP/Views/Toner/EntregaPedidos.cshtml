@@ -127,6 +127,16 @@
 
                 <div class="row g-2" id="contenedor">
 
+
+
+
+                    <div class="col-12 mb-3">
+                        <div class="border rounded p-3 bg-light">
+                            <label class="form-label fw-bold d-block mb-2">Buscar Producto (Opcional)</label>
+                            @Html.Partial("_BusquedaAvan")
+                        </div>
+                    </div>
+
                     <div class="col-sm-6">
                         <label class="form-label">Producto</label>
                         <select id="cbodetalle" class="form-select ProductosS">
@@ -135,19 +145,9 @@
                     </div>
 
 
-
-                    <div id="contenedor" class="col-sm-6">
-                        <p style="text-align:center">Filtros de busqueda</p>
-                        @Html.Partial("_BusquedaAvan")
-                    </div>
-
-
-
-
-
                     <div class="col-sm-6">
                         <label for="txtfechapedido" class="form-label">Fecha de Pedido</label>
-                        <input type="text" class="form-control" id="txtfechapedido" >
+                        <input type="text" class="form-control" id="txtfechapedido">
                     </div>
 
                     <div class="col-sm-6">
