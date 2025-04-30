@@ -14,8 +14,9 @@ namespace TonerHP
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
             bundles.Add(new ScriptBundle("~/bundles/complementos").Include(
-                "~/Scripts/fontawesome/all.min.js",
+                //"~/Scripts/fontawesome/all.min.js",
                 "~/Scripts/dataTables.min.js",
+                //"~/Scripts/jquery-3.7.0.min.js",
                 "~/Scripts/moment.min.js",
                 "~/Scripts/datetime-moment.js",
                 "~/Scripts/DataTables/dataTables.buttons.js",
