@@ -162,6 +162,24 @@
                         <button type="button" id="btnAgregar" class="btn btn-primary">AGREGAR</button>
                     </div>
 
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <table class="table table-bordered" id="tablaProductos">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>Observaciones</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Filas dinámicas aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <div class="col-12 col-md-6">
                         <label for="txtcantidad" class="form-label">Cantidad</label>
                         <input type="number" class="form-control" id="txtcantidad" min="0" required placeholder="Coloque una cantidad">
@@ -228,7 +246,7 @@
             LimpiarCampos();
             selects2();
             cargarApiUrls();
-            $('.btn-guardar').click(Guardar);
+            $('#btnGuardar').click(Guardar);
             editar();
             $('#btnAgregar').click(function () {
                 agregarProducto();
@@ -283,34 +301,30 @@
             }
 
             function mostrarProductosAgregados() {
-                var tablaProductos = $("#tablaProductos tbody");
-                tablaProductos.empty(); // Limpiar la tabla antes de mostrar
-
-                productosAgregados.forEach(function (producto, index) {
-                    tablaProductos.append(`
+            var tabla = $("#tablaProductos tbody");
+            tabla.empty();
+            productosAgregados.forEach((producto, index) => {
+                tabla.append(`
             <tr>
-                <td>${producto.IdProducto}</td>
+                <td>${producto.Detalle}</td>
                 <td>${producto.Cantidad}</td>
                 <td>${producto.Observaciones}</td>
-                <td><button class="btn btn-danger" onclick="eliminarProducto(${index})">Eliminar</button></td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="eliminarProducto(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
             </tr>
         `);
-                });
-            }
-            function LimpiarCampos() {
-                $("#txtcantidad").val(1);  // Valor por defecto
-                $("#txtobservaciones").val("");
-                $("#cbodetalle").val(null).trigger('change');
-                $("#cbostockactual").val("");
-                $("#infocodigoid").val("");
-                $("#inforubro").val("");
-                $("#infotipo").val("");
-            }
+    });
+}
 
             function eliminarProducto(index) {
-                productosAgregados.splice(index, 1); // Eliminar el producto de la lista
-                mostrarProductosAgregados(); // Actualizar la tabla
+                productosAgregados.splice(index, 1);
+                mostrarProductosAgregados();
             }
+
+
 
                   function editar() {
                 $("#tabla tbody").on("click", '.btn-editar', function () {
@@ -334,7 +348,15 @@
             CargarProductos(permisos.map(p => p.Accesos));
         }
 
-
+        function LimpiarCampos() {
+            $("#txtcantidad").val(1);  // Valor por defecto
+            $("#txtobservaciones").val("");
+            $("#cbodetalle").val(null).trigger('change');
+            $("#cbostockactual").val("");
+            $("#infocodigoid").val("");
+            $("#inforubro").val("");
+            $("#infotipo").val("");
+        }
         // Información del producto
         $('#StockDatos').on('input', function () {
             var inputVal = $(this).val();
@@ -453,6 +475,8 @@
 
                         // Esperar a que se carguen los productos antes de continuar
                         await CargarProductos(accesos);
+                        productosAgregados = []; // Resetear productos
+
 
                         // Configuración inicial de campos
                         $('#txtArea').val('@Session["NombreArea"]');
@@ -474,7 +498,9 @@
                         // Manejo del número de pedido (común para ambos modos)
                         if (data) {
                             // Modo Edición: Mostrar número existente
+
                             $("#txtpedido").val(data.NroPedido);
+
                         } else {
                             // Modo Creación: Generar nuevo número
                             const response = await $.ajax({
@@ -488,6 +514,7 @@
                         // Manejo específico de edición
                         if (data) {
                             modalTitle('Editar');
+
                             $("#txtid").val(data.IdSolicitud);
                             $("#txtcantidad").val(data.CantidadPedida);
                             $("#txtobservaciones").val(data.Observaciones);
@@ -620,7 +647,7 @@
                                 return data ? new Date(data).toLocaleDateString() : 'Pendiente';
                             }
                         },
-                      
+
                         {
                             data: "Visado",
                             title: "Visado",
@@ -682,7 +709,7 @@
                     }
                 });
             });
-                    
+
 
          function buscarPorNumero() {
                 const nroPedido = $("#txtBuscarPedido").val().trim(); // Obtener valor del input
@@ -707,46 +734,48 @@
 
 
 
-                   function Guardar() {
-                // Validaciones
-                if (productosAgregados.length === 0) {
-                    mostrarError("¡No hay productos para guardar!");
-                    return;
+                    function Guardar() {
+        if (productosAgregados.length === 0) {
+            mostrarError("¡Agregue al menos un producto!");
+            return;
+        }
+
+        const pedidoData = {
+            IdSolicitud: $("#txtid").val(),
+            Productos: productosAgregados,
+            CantidadPedida: $("#txtcantidad").val(),
+            Observaciones: $("#txtobservaciones").val(),
+            NroPedido: $("#txtpedido").val(),
+            IdUsuarioPedido: $("#txtusuario").val(),
+            FechaPedido: $("#txtfechapedido").val()
+        };
+
+        const url = pedidoData.IdSolicitud === "0"
+            ? '@Url.Action("GuardarPedidos", "SolicitudPedidos")'
+            : '@Url.Action("Actualizar", "SolicitudPedidos")';
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: JSON.stringify({ objeto: pedidoData }),
+            contentType: "application/json",
+            success: function (response) {
+                if (response.resultado) {
+                    $("#txtpedido").val(response.nroPedido);
+                    Swal.fire("¡Éxito!", response.mensaje, "success");
+                    $("#FormModal").modal("hide");
+                    tabladata.ajax.reload();
+                    productosAgregados = [];
+                } else {
+                    mostrarError(response.mensaje);
                 }
-
-                const pedidoData = {
-                    IdSolicitud: $("#txtid").val(),
-                    Productos: productosAgregados, // Enviar la lista de productos
-                    NroPedido: $("#txtpedido").val(),
-                    IdUsuarioPedido: $("#txtusuario").val(),
-                    FechaPedido: $("#txtfechapedido").val()
-                };
-
-                const url = pedidoData.IdSolicitud == 0
-                    ? '@Url.Action("GuardarPedidos", "SolicitudPedidos")'
-                    : '@Url.Action("Actualizar", "SolicitudPedidos")';
-
-                $.ajax({
-                    url: url,
-                    type: "POST",
-                    contentType: "application/json",
-                    data: JSON.stringify({ objeto: pedidoData }),
-                    success: function(response) {
-                        if (response.resultado) {
-                            Swal.fire('¡Éxito!', response.mensaje, 'success');
-                            $("#FormModal").modal("hide");
-                            tabladata.ajax.reload(null, false);
-                            productosAgregados = []; // Limpiar la lista después de guardar
-                        } else {
-                            mostrarError(response.mensaje);
-                        }
-                    },
-                    error: function(xhr) {
-                        mostrarError("Error al guardar: " + xhr.responseText);
-                    }
-                });
             }
+        });
+    }
 
+    function mostrarError(mensaje) {
+        $("#mensajeError").text(mensaje).show().delay(5000).fadeOut();
+    }
 
 
 
