@@ -345,9 +345,9 @@ namespace TonerHP.Controllers
     
 
         [HttpGet]
-        public JsonResult ListarProductosPorTipo(int idTipo)
+        public JsonResult ListarProductosPorTipo(int idTipo, int idRubro)
         {
-            var productos = new CN_Productos().ListarporIDTipos(idTipo);
+            var productos = new CN_Productos().ListarporIDTipos(idTipo, idRubro);
             return Json(productos, JsonRequestBehavior.AllowGet);
         }
 

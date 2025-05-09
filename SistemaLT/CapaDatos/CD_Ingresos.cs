@@ -42,13 +42,13 @@ namespace CapaDatos
                                     CodigoId = rdr["CodigoId"].ToString(),
                                     oRubros = new Rubros()
                                     {
-                                        IdRubro = Convert.ToInt32(rdr["IdRubro"]), // Asignar el ID del rubro
-                                        Rubro = rdr["Rubro"].ToString() // Asegúrate de que este campo esté en la consulta
+                                        IdRubro = Convert.ToInt32(rdr["IdRubro"]), 
+                                        Rubro = rdr["Rubro"].ToString() 
                                     },
                                     oTipos = new Tipos()
                                     {
-                                        IdTipo = Convert.ToInt32(rdr["IdTipo"]), // Asignar el ID del tipo
-                                        Tipo = rdr["Tipo"].ToString() // Asegúrate de que este campo esté en la consulta
+                                        IdTipo = Convert.ToInt32(rdr["IdTipo"]), 
+                                        Tipo = rdr["Tipo"].ToString() 
                                     },
 
                                 },
@@ -89,7 +89,6 @@ namespace CapaDatos
                 cmd.Parameters.AddWithValue("NroExpediente", (object)obj.NroExpediente ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("FechaIngreso", Convert.ToDateTime(obj.FechaIngreso));
                 cmd.Parameters.Add("resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
-                //cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 100).Direction = ParameterDirection.Output;
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 oconexion.Open();
@@ -97,7 +96,6 @@ namespace CapaDatos
                 cmd.ExecuteNonQuery();
 
                 idautogenerado = Convert.ToInt32(cmd.Parameters["resultado"].Value);
-                //Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
             }
             return idautogenerado;
         }

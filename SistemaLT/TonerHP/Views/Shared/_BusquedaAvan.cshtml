@@ -11,7 +11,7 @@
         <div class="col-sm-6">
             <label class="form-label">Tipo</label>
             <div class="mt-0">
-                <select id="cbotipo" class="form-select" name="idTipo" onchange="CargarProductosporTipo(this.value)">
+                <select id="cbotipo" class="form-select" name="idTipo" onchange="CargarProductosporTipo(this.value, document.getElementById('cborubro').value)">
                 </select>
             </div>
         </div>

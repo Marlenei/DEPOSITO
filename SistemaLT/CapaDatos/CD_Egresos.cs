@@ -18,16 +18,10 @@ namespace CapaDatos
             {
                 using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
                 {
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendLine("SELECT i.IdEgreso,");
-                    sb.AppendLine("i.CodigoId,");
-                    sb.AppendLine("prod.IdProducto , prod.Detalle , prod.StockActual ,");
-                    sb.AppendLine("i.CodigoId, i.Cantidad, i.Observaciones, i.IdUsuario, i.TipoSalida, i.FechaEgreso,i.CodigoArea,i.CodigoSector");
-                    sb.AppendLine("FROM Tonner_Egresos i ");
-                    sb.AppendLine("INNER JOIN Tonner_Productos prod ON prod.IdProducto = i.IdProducto");
-
-                    SqlCommand cmd = new SqlCommand(sb.ToString(), oconexion);
-                    cmd.CommandType = CommandType.Text;
+                    SqlCommand cmd = new SqlCommand("ListarEgresos", oconexion)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
                     oconexion.Open();
                     using (SqlDataReader rdr = cmd.ExecuteReader())
                     {
@@ -40,16 +34,28 @@ namespace CapaDatos
                                 {
                                     IdProducto = Convert.ToInt32(rdr["IdProducto"]),
                                     Detalle = rdr["Detalle"].ToString(),
-                                    StockActual = Convert.ToInt32(rdr["StockActual"])
+                                    StockActual = Convert.ToInt32(rdr["StockActual"]),
+                                    CodigoId = rdr["CodigoId"].ToString(),
+                                    oRubros = new Rubros()
+                                    {
+                                        IdRubro = Convert.ToInt32(rdr["IdRubro"]),
+                                        Rubro = rdr["Rubro"].ToString()
+                                    },
+                                    oTipos = new Tipos()
+                                    {
+                                        IdTipo = Convert.ToInt32(rdr["IdTipo"]),
+                                        Tipo = rdr["Tipo"].ToString()
+                                    },
+
                                 },
                                 CodigoId = rdr["CodigoId"].ToString(),
                                 Cantidad = Convert.ToInt32(rdr["Cantidad"]),
-                                CodigoArea = Convert.ToInt32(rdr["CodigoArea"]),
-                                CodigoSector = Convert.ToInt32(rdr["CodigoSector"]),
+                                NombreArea = rdr["NombreArea"].ToString(),
+                                NombreSector = rdr["NombreSector"].ToString(),
                                 Observaciones = rdr["Observaciones"].ToString(),
                                 TipoSalida = Convert.ToChar(rdr["TipoSalida"]),
-                                IdUsuario = Convert.ToInt32(rdr["IdUsuario"]),
-                                FechaEgreso = Convert.ToDateTime(rdr["FechaEgreso"]), // Asegúrate de que sea DateTime
+                                NombreyApellido = rdr["NombreyApellido"].ToString(),
+                                FechaEgreso = Convert.ToDateTime(rdr["FechaEgreso"]), 
                             });
                         }
                     }
@@ -57,9 +63,7 @@ namespace CapaDatos
             }
             catch (Exception ex)
             {
-                // Manejo de excepciones
-                // Puedes registrar el error o lanzar una excepción personalizada
-                throw new Exception("Error al listar egresos: " + ex.Message);
+              throw new Exception("Error al listar egresos: " + ex.Message);
             }
             return lista;
         }
@@ -71,9 +75,7 @@ namespace CapaDatos
             using (SqlConnection oconexion = new SqlConnection(Conexion.cn))
             {
                 SqlCommand cmd = new SqlCommand("T_InsertarEgresos", oconexion);
-                cmd.CommandType = CommandType.StoredProcedure; // Asegúrate de establecer el tipo de comando
-
-                // Asegúrate de que todos los parámetros tengan el símbolo '@'
+                cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@IdProducto", obj.oProductos.IdProducto);
                 cmd.Parameters.AddWithValue("@Cantidad", obj.Cantidad);
                 cmd.Parameters.AddWithValue("@CodigoId", obj.CodigoId);
@@ -83,11 +85,7 @@ namespace CapaDatos
                 cmd.Parameters.AddWithValue("@TipoSalida", obj.TipoSalida);
                 cmd.Parameters.AddWithValue("@CodigoArea", obj.CodigoArea);
                 cmd.Parameters.AddWithValue("@CodigoSector", obj.CodigoSector);
-
-
-
-                // Convertir la cadena a DateTime antes de pasarla
-                DateTime fechaEgresoFinal = fechaEgreso ?? DateTime.Now; // Si fechaEgreso es null, usar DateTime.Now
+                DateTime fechaEgresoFinal = fechaEgreso ?? DateTime.Now; 
                 cmd.Parameters.AddWithValue("@FechaEgreso", fechaEgresoFinal);
 
               
@@ -103,7 +101,6 @@ namespace CapaDatos
                 }
                 catch (Exception ex)
                 {
-                    // Manejo de excepciones
                     throw new Exception("Error al registrar egreso: " + ex.Message);
                 }
             }
@@ -124,7 +121,7 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("Cantidad", obj.Cantidad);
                     cmd.Parameters.AddWithValue("CodigoId", (object)obj.CodigoId ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("Observaciones", (object)obj.Observaciones ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("TipoSalida", obj.TipoSalida); // Cambié a obj.TipoSalida
+                    cmd.Parameters.AddWithValue("TipoSalida", obj.TipoSalida);
                     cmd.Parameters.AddWithValue("IdUsuario", obj.IdUsuario);
                     cmd.Parameters.AddWithValue("FechaEgreso", obj.FechaEgreso);
                     cmd.Parameters.AddWithValue("CodigoArea", obj.CodigoArea);
