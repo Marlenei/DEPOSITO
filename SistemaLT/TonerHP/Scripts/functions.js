@@ -7,9 +7,6 @@ function cargarApiUrls() {
         success: function (data) {
             appSettings.ApiUrlDev = data.ApiUrlDev;
             appSettings.ApiUrlProd = data.ApiUrlProd;
-            console.log(appSettings.ApiUrlDev);
-            console.log(appSettings.ApiUrlProd);
-
         },
         error: function (error) {
             console.error("Error al cargar las URLs de la API:", error);
@@ -105,13 +102,13 @@ function CargarTipos(idRubro) {
 
 
 
-function CargarProductosporTipo(idTipo) {
+function CargarProductosporTipo(idTipo, idRubro) {
     if (!idTipo) {
         return;
     }
     var isDevelopment = window.location.hostname === "localhost";
     var baseUrl = isDevelopment ? appSettings.ApiUrlDev : appSettings.ApiUrlProd;
-    var urlproductos = baseUrl + '/ListarProductosPorTipo?idTipo=' + idTipo;
+    var urlproductos = baseUrl + '/ListarProductosPorTipo?idTipo=' + idTipo + '&idRubro=' + idRubro;
     $.ajax({
         url: urlproductos,
         type: "GET",
@@ -152,7 +149,6 @@ function CargarCodigosID(urlcodigoid, permisos) {
         contentType: "application/json; charset=utf-8",
         success: function (data) {
             $("#cbostockactual").empty();
-            //$("#cbocodigo").empty();
             var opciones = [];
             var notienetoner = permisos.includes(24) || permisos.includes(25);
             var tienetoner = permisos.includes(184) || permisos.includes(183);
@@ -190,6 +186,9 @@ function CargarCodigosID(urlcodigoid, permisos) {
 
 function CargarProductosporCI(selectElement) {
     var idCodigo = selectElement.options[selectElement.selectedIndex].text;
+    if (selectElement.selectedIndex === 0) {
+        return;
+    }
     var isDevelopment = window.location.hostname === "localhost";
     var baseUrl = isDevelopment ? appSettings.ApiUrlDev : appSettings.ApiUrlProd;
     var urlproductos = baseUrl + '/ListarProductosporCI?idCodigo=' + idCodigo;
@@ -251,4 +250,10 @@ function LimpiarCampos() {
         $(this).find('select').val('').trigger('change');
         $(this).removeData();
     });
+}
+
+//INICIALIZADOR DE TOOLTIPS
+function tooltips() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 }

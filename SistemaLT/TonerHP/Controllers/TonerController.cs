@@ -112,7 +112,7 @@ namespace TonerHP.Controllers
             {
                 return RedirectToAction("Login", "Usuario");
             }
-            var tieneAcceso = permisos.Any(p => p.Accesos == 25);
+            var tieneAcceso = permisos.Any(p => p.Accesos == 24 || p.Accesos == 25 || p.Accesos == 183 || p.Accesos == 184);
             if (!tieneAcceso)
             {
                 return RedirectToAction("Error", "Home");
@@ -345,9 +345,9 @@ namespace TonerHP.Controllers
     
 
         [HttpGet]
-        public JsonResult ListarProductosPorTipo(int idTipo)
+        public JsonResult ListarProductosPorTipo(int idTipo, int idRubro)
         {
-            var productos = new CN_Productos().ListarporIDTipos(idTipo);
+            var productos = new CN_Productos().ListarporIDTipos(idTipo, idRubro);
             return Json(productos, JsonRequestBehavior.AllowGet);
         }
 
