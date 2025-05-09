@@ -45,47 +45,63 @@ namespace CapaNegocio
 
 
         // Modificado para incluir el número de pedido generado
-        public int Registrar(SolicitudPedidos obj, out string Mensaje, out string NroPedidoGenerado)
+        public int Registrar(SolicitudPedidos obj, List<SolicitudPedidos> listaProductos, out string mensaje, out string NroPedidoGenerado)
         {
-
-            Mensaje = string.Empty;
+            mensaje = string.Empty;
             NroPedidoGenerado = string.Empty;
 
             try
             {
-                // Validaciones de negocio
                 if (obj == null)
                 {
-                    Mensaje = "El objeto de solicitud no puede ser nulo.";
+                    mensaje = "El objeto de solicitud no puede ser nulo.";
                     return 0;
                 }
 
-                if (obj.CantidadPedida <= 0)
-                    Mensaje += "La cantidad pedida debe ser mayor a 0. ";
-
-                if (obj.oProductos?.IdProducto == 0)
-                    Mensaje += "Seleccionar un producto. ";
-
+                // Validar que la cantidad entregada no sea mayor que la pedida
                 if (obj.CantidadEntregada > obj.CantidadPedida)
-                    Mensaje += "La cantidad entregada no puede ser mayor a la pedida. ";
+                {
+                    mensaje += "La cantidad entregada no puede ser mayor a la pedida. ";
+                }
 
-                if (!string.IsNullOrEmpty(Mensaje))
-                    return 0;
+                // Validar que la lista de productos no esté vacía
+                if (listaProductos == null || listaProductos.Count == 0)
+                {
+                    mensaje += "La lista de productos no puede estar vacía. ";
+                }
 
-                // Llamada a capa de datos con nuevo parámetro
-                int idGenerado = objCapaDato.Registrar(obj, out NroPedidoGenerado);
+                // Validar que cada producto tenga una cantidad pedida válida
+                foreach (var producto in listaProductos)
+                {
+                    if (producto.CantidadPedida <= 0)
+                    {
+                        mensaje += "La cantidad pedida debe ser mayor a 0 para todos los productos. ";
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(mensaje))
+                {
+                    return 0; // Retornar 0 si hay mensajes de error
+                }
+
+                // Llamar a la capa de datos para registrar el pedido
+                int idGenerado = objCapaDato.Registrar(obj, out NroPedidoGenerado, listaProductos);
 
                 if (string.IsNullOrEmpty(NroPedidoGenerado))
+                {
                     throw new Exception("No se pudo generar el número de pedido");
+                }
 
                 return idGenerado;
             }
             catch (Exception ex)
             {
-                Mensaje = $"Error al registrar pedido: {ex.Message}";
+                mensaje = $"Error al registrar pedido: {ex.Message}";
                 return 0;
             }
         }
+
+
         public SolicitudPedidos ObtenerPedido(int idPedido)
         {
             try
@@ -182,7 +198,7 @@ namespace CapaNegocio
             }
         }
 
-        public bool Editar(SolicitudPedidos obj, out string Mensaje)
+        public bool Editar(SolicitudPedidos obj, List<SolicitudPedidos> listaProductos, out string Mensaje)
         {
             Mensaje = string.Empty;
 

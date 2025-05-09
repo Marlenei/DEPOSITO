@@ -24,11 +24,11 @@ namespace CapaEntidad
         public int CodigoSector { get; set; }
        
 
-        public int IdUsuarioEntrega { get; set; }
+        public int? IdUsuarioEntrega { get; set; }
         public string Observaciones { get; set; }
         public string NroPedido { get; set; }
         public bool Visado { get; set; }
-        public int UsuarioVisado { get; set; }
+        public int? UsuarioVisado { get; set; }
         public string NombreArea { get; set; }
         public string NombreSector { get; set; }
         public string CodigoId { get; set; }
