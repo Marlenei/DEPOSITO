@@ -33,9 +33,9 @@ namespace CapaNegocio
             return lista.FirstOrDefault(); // Devuelve el primero o null
         }
 
-        public List<Productos> ListarporIDTipos(int idTipo)
+        public List<Productos> ListarporIDTipos(int idTipo, int idRubro)
         {
-            return objCapaDato.ListarProductosporTipos(idTipo);
+            return objCapaDato.ListarProductosporTipos(idTipo, idRubro);
         }
 
         public List<Productos> ListarProductosporCI(string idCodigo)
