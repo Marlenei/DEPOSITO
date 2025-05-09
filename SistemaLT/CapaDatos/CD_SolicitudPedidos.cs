@@ -11,6 +11,8 @@ using System.Web;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Globalization;
+using Microsoft.Win32;
+using System.Collections;
 
 namespace CapaDatos
 {
@@ -189,7 +191,7 @@ namespace CapaDatos
 
 
 
-        public int Registrar(SolicitudPedidos obj, out string NroPedidoGenerado)
+        public int Registrar(SolicitudPedidos obj, out string NroPedidoGenerado, List<SolicitudPedidos> listaProductos)
         {
             int idautogenerado = 0;
             NroPedidoGenerado = string.Empty;
@@ -207,8 +209,10 @@ namespace CapaDatos
                         using (SqlCommand cmdComprobante = new SqlCommand("Act_ComprobanteDP", oconexion, transaction))
                         {
                             cmdComprobante.CommandType = CommandType.StoredProcedure;
-                            SqlParameter paramNcom = new SqlParameter("@pNcom", SqlDbType.VarChar, 15);
-                            paramNcom.Direction = ParameterDirection.Output;
+                            SqlParameter paramNcom = new SqlParameter("@pNcom", SqlDbType.VarChar, 15)
+                            {
+                                Direction = ParameterDirection.Output
+                            };
                             cmdComprobante.Parameters.Add(paramNcom);
                             cmdComprobante.ExecuteNonQuery();
                             NroPedidoGenerado = paramNcom.Value.ToString();
@@ -220,49 +224,76 @@ namespace CapaDatos
                         {
                             cmd.CommandType = CommandType.StoredProcedure;
 
-                            // Parámetro nuevo
-                            cmd.Parameters.AddWithValue("@IdUsuarioEntrega", DBNull.Value); // Valor por defecto
+                            // Definir parámetros una sola vez
+                            cmd.Parameters.Add("@IdProducto", SqlDbType.Int);
+                            cmd.Parameters.Add("@CantidadPedida", SqlDbType.Int);
+                            cmd.Parameters.Add("@CantidadEntregada", SqlDbType.Int);
+                            cmd.Parameters.Add("@FechaPedido", SqlDbType.DateTime);
+                            cmd.Parameters.Add("@FechaEntrega", SqlDbType.DateTime);
+                            cmd.Parameters.Add("@IdUsuarioPedido", SqlDbType.Int);
+                            cmd.Parameters.Add("@CodigoArea", SqlDbType.Int);
+                            cmd.Parameters.Add("@CodigoSector", SqlDbType.Int);
+                            cmd.Parameters.Add("@IdUsuarioEntrega", SqlDbType.Int);
+                            cmd.Parameters.Add("@Observaciones", SqlDbType.VarChar, 250);
+                            cmd.Parameters.Add("@NroPedido", SqlDbType.VarChar, 15);
+                            cmd.Parameters.Add("@Visado", SqlDbType.Bit);
+                            cmd.Parameters.Add("@UsuarioVisado", SqlDbType.Int);
+                            SqlParameter resultado = cmd.Parameters.Add("@Resultado", SqlDbType.Int);
+                            resultado.Direction = ParameterDirection.Output;
 
-                            // Resto de parámetros existentes
-                            cmd.Parameters.AddWithValue("@IdProducto", obj.oProductos.IdProducto);
-                            cmd.Parameters.AddWithValue("@CantidadPedida", obj.CantidadPedida);
-                            cmd.Parameters.AddWithValue("@CantidadEntregada", DBNull.Value);
-                            cmd.Parameters.AddWithValue("@FechaPedido", DateTime.ParseExact(
-                                obj.FechaPedido, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
-                            cmd.Parameters.AddWithValue("@FechaEntrega", DBNull.Value);
-                            cmd.Parameters.AddWithValue("@IdUsuarioPedido", obj.IdUsuarioPedido);
-                            cmd.Parameters.AddWithValue("@CodigoArea", obj.CodigoArea);
-                            cmd.Parameters.AddWithValue("@CodigoSector", obj.CodigoSector);
-                            cmd.Parameters.AddWithValue("@Observaciones", (object)obj.Observaciones ?? DBNull.Value);
-                            cmd.Parameters.AddWithValue("@NroPedido", obj.NroPedido);
-                            cmd.Parameters.AddWithValue("@Visado", false);
-                            cmd.Parameters.AddWithValue("@UsuarioVisado", DBNull.Value); // Valor por defecto
+                            foreach (var producto in listaProductos)
+                            {
+                                // Establecer valores para el producto actual
+                                cmd.Parameters["@IdProducto"].Value = producto.oProductos.IdProducto;
+                                cmd.Parameters["@CantidadPedida"].Value = producto.CantidadPedida;
+                                cmd.Parameters["@CantidadEntregada"].Value = producto.CantidadEntregada.HasValue ? (object)producto.CantidadEntregada.Value : DBNull.Value;
 
-                            SqlParameter paramResult = new SqlParameter("@Resultado", SqlDbType.Int);
-                            paramResult.Direction = ParameterDirection.Output;
-                            cmd.Parameters.Add(paramResult);
+                                // Usar las propiedades del objeto principal para los datos del pedido
+                                DateTime fechaPedido = DateTime.ParseExact(obj.FechaPedido, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+                                cmd.Parameters["@FechaPedido"].Value = fechaPedido;
+                                cmd.Parameters["@IdUsuarioPedido"].Value = obj.IdUsuarioPedido;
+                                cmd.Parameters["@CodigoArea"].Value = obj.CodigoArea;
+                                cmd.Parameters["@CodigoSector"].Value = obj.CodigoSector;
+                                cmd.Parameters["@IdUsuarioEntrega"].Value = obj.IdUsuarioEntrega ?? (object)DBNull.Value;
+                                cmd.Parameters["@Observaciones"].Value = producto.Observaciones ?? (object)DBNull.Value;
+                                cmd.Parameters["@NroPedido"].Value = obj.NroPedido;
+                                cmd.Parameters["@Visado"].Value = obj.Visado;
+                                cmd.Parameters["@UsuarioVisado"].Value = obj.UsuarioVisado ?? (object)DBNull.Value;
 
-                            cmd.ExecuteNonQuery();
-                            idautogenerado = Convert.ToInt32(paramResult.Value);
+                                // Manejar FechaEntrega como NULL si es necesario
+                                if (obj.FechaEntrega == null)
+                                {
+                                    cmd.Parameters["@FechaEntrega"].Value = DBNull.Value;
+                                }
+                                else
+                                {
+                                    cmd.Parameters["@FechaEntrega"].Value = DateTime.ParseExact(obj.FechaEntrega, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+                                }
+
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            idautogenerado = Convert.ToInt32(resultado.Value);
                         }
 
-                        // Commit the transaction
                         transaction.Commit();
                     }
-                    catch (Exception ex)
+                    catch
                     {
                         transaction.Rollback();
-                        throw new Exception("Error en transacción: " + ex.Message);
+                        throw;
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al registrar solicitud: {ex.Message}", ex);
+                throw new Exception("Error al registrar el pedido: " + ex.Message);
             }
 
             return idautogenerado;
         }
+
+
 
 
         public SolicitudPedidos ObtenerPedido(int idPedido)
@@ -271,7 +302,7 @@ namespace CapaDatos
             {
                 string query = @"SELECT 
             p.IdSolicitud,
-            p.IdProducto,
+            p.IdProducto,       
             p.CantidadPedida,
             p.CantidadEntregada,
             p.FechaPedido,
@@ -287,7 +318,7 @@ namespace CapaDatos
             a.NombreArea,
             s.Nombre AS NombreSector
         FROM Tonner_Pedidos p
-        INNER JOIN Tonner_Productos pr ON pr.IdProducto = p.IdProducto
+        INNER JOIN Tonner_Productos pr ON pr.IdProducto = p.IdProducto      
         INNER JOIN AHS.dbo.Mio_Areas a ON a.CodigoArea = p.CodigoArea
         INNER JOIN AHS.dbo.Mio_Sectores s ON s.CodigoSector = p.CodigoSector
         WHERE p.IdSolicitud = @IdSolicitud";

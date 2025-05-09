@@ -54,10 +54,19 @@
                 <button class="btn btn-warning w-100"
                         onclick="mostrarPendientes()">
                     <i class="fas fa-clipboard-list me-2"></i>
-                    Ver Pendientes de Mi Área
+                    Ver Pedidos Realizados Por Mi
                 </button>
             </div>
         </div>
+
+        <!-- NUEVA SECCIÓN PARA EL TÍTULO -->
+        <div class="row mb-3">
+            <!- mb-3 para un pequeño margen inferior antes de la tabla -->
+            <div class="col-12 text-center">
+                <h4 id="tituloTablaPedidos" class="text-primary">PEDIDOS DE MI ÁREA</h4> <!-- O el texto que prefieras -->
+            </div>
+        </div>
+        <!-- FIN DE LA NUEVA SECCIÓN PARA EL TÍTULO -->
 
         <div class="table-responsive">
             <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width: 100% !important; table-layout: fixed;">
@@ -81,138 +90,187 @@
 
 <!-- Modal -->
 <div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <!-- SIN modal-dialog-scrollable -->
         <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
-                <h1 class="modal-title fs-5" id="titulodinamico">Producto</h1>
-                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-dark text-white py-2">
+                <h1 class="modal-title fs-5" id="titulodinamico">Detalles del Pedido</h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <input id="txtid" type="hidden" value="" />
-                <input type="hidden" id="txtusuario" value="@Session["AccesCode"]" readonly>
-                <div class="row">
-                    <div class="col-1">
-                        Usuario:
-                    </div>
-                    <div class="col-2">
-                        <input type="text" class="form-control mb-3" id="txtusuario" value="@User.Identity.Name" readonly>
-                    </div>
+            <div class="modal-body py-3">
+                <input id="txtid" type="hidden" value="0" />
+                <input type="hidden" id="txtusuarioId" value="@Session["AccesCode"]" readonly>
 
-                    <div class="col-1">
-                        <label for="txtpedido" class="form-label">N° de Pedido</label>
+                <!-- SECCIÓN 1: Información General del Pedido y Usuario -->
+                <fieldset class="mb-3 border p-2">
+                    <legend class="w-auto px-2" style="font-size: 0.9rem; font-weight: 600;">Información General</legend>
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <label class="form-label-sm">Usuario:</label>
+                            <input type="text" class="form-control form-control-sm" id="txtusuarioNombre" value="@User.Identity.Name" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="txtpedido" class="form-label-sm">N° de Pedido:</label>
+                            <input type="text" class="form-control form-control-sm" id="txtpedido" placeholder="Autogenerado" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="txtfechapedido" class="form-label-sm">Fecha Pedido:</label>
+                            <input type="text" class="form-control form-control-sm" id="txtfechapedido" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-sm">Área:</label>
+                            <input type="text" class="form-control form-control-sm" id="txtArea" value="@Session["NombreArea"]" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-sm">Sector:</label>
+                            <input type="text" class="form-control form-control-sm" id="txtSector" value="@Session["NombreSector"]" readonly>
+                        </div>
                     </div>
-                    <div class="col-3">
-                        <input type="text" class="form-control" id="txtpedido" maxlength="15" placeholder="Ingrese el número de pedido" required>
-                    </div>
+                </fieldset>
 
-                    <div class="col-1">
-                        <label for="txtfechapedido" class="form-label">Fecha de Pedido</label>
-                    </div>
-                    <div class="col-4">
-                        <input type="text" class="form-control" id="txtfechapedido" readonly>
-                    </div>
-                </div>
-
-
-                <div class="row">
-                    <div class="col-2">
-                        <label class="form-label" style="text-align: right;">Áre:</label>
-                    </div>
-                    <div class="col-4">
-                        <input type="text" class="form-control" id="txtArea" value="@Session["NombreArea"]" readonly>
-                    </div>
-
-                    <div class="col-2">
-                        <label class="form-label" style="text-align: right;">Sector:</label>
-                    </div>
-                    <div class="col-4">
-                        <input type="text" class="form-control" id="txtSector" value="@Session["NombreSector"]" readonly>
-                    </div>
-                </div>
-
+                <!-- SECCIÓN 2: Agregar Productos y Lista -->
                 <div class="row g-3">
+                    <!-- Columna Izquierda: Selección y Detalles del Producto a Agregar -->
+                    <div class="col-lg-5">
+                        <fieldset class="border p-2 h-100">
+                            <legend class="w-auto px-2" style="font-size: 0.9rem; font-weight: 600;">Agregar Producto</legend>
 
+                            <div class="mb-2">
+                                <label class="form-label-sm fw-bold d-block">Buscar Producto (Opcional)</label>
+                                <div class="border rounded p-2 bg-light">
+                                    @Html.Partial("_BusquedaAvan")
+                                </div>
+                            </div>
 
-                    <div class="col-12 mb-3">
-                        <div class="border rounded p-3 bg-light">
-                            <label class="form-label fw-bold d-block mb-2">Buscar Producto (Opcional)</label>
-                            @Html.Partial("_BusquedaAvan")
-                        </div>
+                            <div class="mb-2">
+                                <label for="cbodetalle" class="form-label-sm">Producto:</label>
+                                <select id="cbodetalle" class="form-select form-select-sm ProductosS" style="width: 100%"></select>
+                            </div>
+
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <label for="txtcantidad" class="form-label-sm">Cantidad:</label>
+                                    <input type="number" class="form-control form-control-sm" id="txtcantidad" min="1" value="1" required>
+                                </div>
+                                @*<div class="col-6">
+                                    <label class="form-label-sm">Stock Actual:</label>
+                                    <input id="cbostockactual" type="text" class="form-control form-control-sm" readonly>
+                                </div>*@
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="txtobservaciones" class="form-label-sm">Observaciones (Producto):</label>
+                                <input type="text" class="form-control form-control-sm" id="txtobservaciones" maxlength="50" placeholder="Opcional">
+                            </div>
+
+                            <p class="mb-1 mt-2 text-muted" style="font-size:0.8em;">Info. adicional del producto seleccionado:</p>
+                            <div class="row g-2 mb-2">
+                                <div class="col-sm-4">
+                                    <label class="form-label-sm">Código ID:</label>
+                                    <input id="infocodigoid" type="text" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="form-label-sm">Rubro:</label>
+                                    <input id="inforubro" type="text" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="form-label-sm">Tipo:</label>
+                                    <input id="infotipo" type="text" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+
+                            <button type="button" id="btnAgregar" class="btn btn-primary btn-sm w-100">
+                                <i class="fas fa-plus-circle me-1"></i> AGREGAR PRODUCTO
+                            </button>
+                        </fieldset>
                     </div>
 
+                    <!-- Columna Derecha: Lista de Productos Agregados -->
+                    <div class="col-lg-7">
+                        <fieldset class="border p-2 h-100">
+                            <legend class="w-auto px-2" style="font-size: 0.9rem; font-weight: 600;">Productos en este Pedido</legend>
+                            <span id="contadorProductos" class="form-text d-block mb-1">Productos agregados: 0</span>
 
-                    <div class="col-md-6">
-                        <label class="form-label" style="text-align:center;">Producto </label>
-                        <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
-                        </select>
-                        <p style="text-align: center; margin-top:5px">Informacion del producto</p>
-                        <div class="input-group mb-5">
-                            <span class="input-group-text">Stock Actual</span>
-                            <input id="cbostockactual" type="text" class="form-control" readonly>
-                            <span class="input-group-text">Codigo ID</span>
-                            <input id="infocodigoid" type="text" class="form-control" readonly>
-                        </div>
-
-                        <div class="input-group mb-5">
-                            <span class="input-group-text">Rubro</span>
-                            <input id="inforubro" type="text" class="form-control" readonly>
-                            <span class="input-group-text">Tipo</span>
-                            <input id="infotipo" type="text" class="form-control" readonly>
-                        </div>
-                        <button type="button" id="btnAgregar" class="btn btn-primary">AGREGAR</button>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <table class="table table-bordered" id="tablaProductos">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Cantidad</th>
-                                        <th>Observaciones</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Filas dinámicas aquí -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <label for="txtcantidad" class="form-label">Cantidad</label>
-                        <input type="number" class="form-control" id="txtcantidad" min="0" required placeholder="Coloque una cantidad">
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <label for="txtcodigoid" class="form-label">Código ID</label>
-                        <input type="text" class="form-control" id="txtcodigoid" maxlength="30" placeholder="Ingrese el código ID">
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <label for="txtobservaciones" class="form-label">Observaciones</label>
-                        <input type="text" class="form-control" id="txtobservaciones" maxlength="50" placeholder="Ingrese observaciones">
+                            <div id="seccionProductos" class="mt-1">
+                                <!-- No se aplica max-height ni overflow -->
+                                <table class="table table-bordered table-sm" id="tablaProductos">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th style="width: 15%;">Cant.</th>
+                                            <th>Observ.</th>
+                                            <th style="width: 20%;">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Filas dinámicas aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="mensajeVacioProductos" class="alert alert-secondary alert-sm mt-2 py-1" role="alert" style="display: block;">
+                                Aún no se han agregado productos.
+                            </div>
+                        </fieldset>
                     </div>
                 </div>
 
+                <!-- Mensaje de Error General -->
                 <div class="row mt-2">
                     <div class="col-12">
-                        <div id="mensajeError" class="alert alert-danger d-none" role="alert"></div>
+                        <div id="mensajeError" class="alert alert-danger alert-sm d-none py-1" role="alert"></div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary btn-guardar" id="btnGuardar">Guardar</button>
-                <button class="btn btn-secondary" onclick="imprimirPedido()" id="btnImprimir" disabled>
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary btn-sm btn-guardar" id="btnGuardar">
+                    <i class="fas fa-save me-1"></i> Guardar Pedido
+                </button>
+                <button class="btn btn-info btn-sm" onclick="imprimirPedido()" id="btnImprimir" disabled>
                     <i class="fas fa-print me-2"></i> Imprimir
                 </button>
             </div>
         </div>
     </div>
 </div>
+<style>
 
+    /* --- Estilos para Modal Compacto --- */
+
+    /* Si la clase form-label-sm de Bootstrap no es suficiente o no existe */
+    #FormModal .form-label,
+    #FormModal .form-label-sm { /* Asegurar que se aplique si usas la clase */
+        font-size: 0.875em;
+        margin-bottom: 0.2rem; /* Reducir margen inferior de etiquetas */
+    }
+
+    #FormModal fieldset {
+        min-width: 0; /* Necesario para fieldsets en flex/grid para evitar desbordamientos */
+    }
+
+    /* Ajustes para Select2 si usas controles -sm */
+    #FormModal .select2-container .select2-selection--single {
+        height: calc(1.5em + 0.5rem + 2px) !important; /* Altura de form-control-sm */
+        padding: 0.25rem 0.5rem !important; /* Padding de form-control-sm */
+        font-size: .875rem !important; /* font-size de form-control-sm */
+        line-height: 1.5 !important;
+    }
+
+        #FormModal .select2-container .select2-selection--single .select2-selection__rendered {
+            line-height: calc(1.5em + 0.5rem - (0.25rem * 2)) !important; /* Ajustar línea de texto */
+            padding-left: 0 !important; /* Select2 suele añadir su propio padding */
+        }
+
+    #FormModal .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: calc(1.5em + 0.5rem) !important; /* Ajustar flecha */
+        top: 1px !important;
+    }
+
+    /* Para que el dropdown de Select2 se vea sobre el modal */
+    .select2-dropdown {
+        z-index: 1061 !important; /* Bootstrap modal z-index es 1050/1055, backdrop 1060 si es static */
+    }
+</style>
 
 @section scripts{
 
@@ -234,7 +292,7 @@
 
 
         $(document).ready(function () {
-            //inicializarDataTable();
+            inicializarDataTable();
 
              var urlrubros = '@Url.Action("ListarRubros", "Toner")'
              CargarRubros(urlrubros, permisos.map(p => p.Accesos));
@@ -251,6 +309,7 @@
             $('#btnAgregar').click(function () {
                 agregarProducto();
             });
+
         });
 
 
@@ -278,51 +337,90 @@
 
 
 
-            function agregarProducto() {
-                var idProducto = $("#cbodetalle").val();
-                var productoTexto = $("#cbodetalle option:selected").text(); // Nuevo
-                var cantidad = parseInt($("#txtcantidad").val());
-                var observaciones = $("#txtobservaciones").val();
+        function agregarProducto() {
+            var idProducto = $("#cbodetalle").val();
+            var productoTexto = $("#cbodetalle option:selected").text();
+            var cantidad = parseInt($("#txtcantidad").val());
+            var observaciones = $("#txtobservaciones").val();
 
-                if (!idProducto || cantidad <= 0) {
-                    mostrarError("¡Seleccione un producto y asegúrese de que la cantidad sea mayor que 0!");
-                    return;
-                }
-
-                productosAgregados.push({
-                    IdProducto: idProducto,
-                    Detalle: productoTexto,  // Nuevo campo
-                    Cantidad: cantidad,
-                    Observaciones: observaciones
-                });
-
-                LimpiarCampos();
-                mostrarProductosAgregados();
+            if (!idProducto || cantidad <= 0) {
+                mostrarError("¡Seleccione un producto y asegúrese de que la cantidad sea mayor que 0!");
+                return;
             }
 
-            function mostrarProductosAgregados() {
+            productosAgregados.push({
+                IdSolicitud: 0,
+                oProductos: {
+                    IdProducto: idProducto,
+                    Detalle: productoTexto
+                },
+                CantidadPedida: cantidad,
+                CantidadEntregada: 0,
+                FechaPedido: $("#txtfechapedido").val(),
+                FechaEntrega: null,
+                IdUsuarioPedido: $("#txtusuario").val(),
+                CodigoArea: $("#txtArea").val(),
+                CodigoSector: $("#txtSector").val(),
+                IdUsuarioEntrega: null,
+                Observaciones: observaciones,
+                NroPedido: $("#txtpedido").val(),
+                Visado: false,
+                NombreArea: $("#txtArea").val(),
+                NombreSector: $("#txtSector").val()
+            });
+
+            LimpiarCampos();
+            mostrarProductosAgregados();
+        }
+
+
+        function mostrarProductosAgregados() {
             var tabla = $("#tablaProductos tbody");
             tabla.empty();
-            productosAgregados.forEach((producto, index) => {
-                tabla.append(`
-            <tr>
-                <td>${producto.Detalle}</td>
-                <td>${producto.Cantidad}</td>
-                <td>${producto.Observaciones}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm" onclick="eliminarProducto(${index})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `);
-    });
-}
 
-            function eliminarProducto(index) {
-                productosAgregados.splice(index, 1);
-                mostrarProductosAgregados();
+            let colorToggle = false;
+
+            productosAgregados.forEach((producto, index) => {
+                const fila = $("<tr>")
+                    .addClass(colorToggle ? "table-primary" : "") // Quité table-light para alternar con el default
+                    .attr("data-producto-id", producto.oProductos.IdProducto);
+
+                const btnEliminar = $("<button>")
+                    .addClass("btn btn-danger btn-sm")
+                    .html('<i class="fas fa-trash"></i> Eliminar') // Texto para claridad
+                    .on("click", () => eliminarProducto(index));
+
+                fila.append(
+                    $("<td>").text(producto.oProductos.Detalle),
+                    $("<td>").text(producto.CantidadPedida),
+                    $("<td>").text(producto.Observaciones || "-"),
+                    $("<td>").append(btnEliminar)
+                );
+
+                tabla.append(fila);
+                colorToggle = !colorToggle;
+            });
+
+            $("#contadorProductos").text(`Productos agregados: ${productosAgregados.length}`);
+
+            if (productosAgregados.length > 0) {
+                $("#seccionProductos").show();
+                $("#mensajeVacioProductos").hide(); // Ocultar mensaje de vacío
+            } else {
+                $("#seccionProductos").hide();
+                $("#mensajeVacioProductos").show(); // Mostrar mensaje de vacío
             }
+        }
+
+
+        function eliminarProducto(index) {
+            if (confirm("¿Eliminar este producto del pedido?")) {
+                productosAgregados.splice(index, 1);
+                mostrarProductosAgregados(); // Actualizar vista
+
+
+            }
+        }
 
 
 
@@ -348,14 +446,11 @@
             CargarProductos(permisos.map(p => p.Accesos));
         }
 
-        function LimpiarCampos() {
-            $("#txtcantidad").val(1);  // Valor por defecto
+        function LimpiarCampos() { // Para limpiar campos de producto individual
+            $("#txtcantidad").val(1);
             $("#txtobservaciones").val("");
-            $("#cbodetalle").val(null).trigger('change');
-            $("#cbostockactual").val("");
-            $("#infocodigoid").val("");
-            $("#inforubro").val("");
-            $("#infotipo").val("");
+            $("#cbodetalle").val(null).trigger('change'); // Esto ya debería limpiar los campos de info
+            // No es necesario limpiar cbostockactual, infocodigoid, etc. aquí si se actualizan con el change de cbodetalle
         }
         // Información del producto
         $('#StockDatos').on('input', function () {
@@ -398,7 +493,7 @@
             }
         });
 
-          function CargarProductos(permisos) {
+         function CargarProductos(permisos) {
           $.ajax({
               url: '@Url.Action("ListarProductos", "Toner")',
               type: "GET",
@@ -468,161 +563,143 @@
 
 
 
-             async function abrirModal(data) {
-                    try {
-                        // Extraer los accesos del usuario
-                        const accesos = permisos.map(p => p.Accesos);
+            async function abrirModal(data) {
+    try {
+        // Extraer los accesos del usuario
+        const accesos = permisos.map(p => p.Accesos);
 
-                        // Esperar a que se carguen los productos antes de continuar
-                        await CargarProductos(accesos);
-                        productosAgregados = []; // Resetear productos
+        // Esperar a que se carguen los productos antes de continuar
+        await CargarProductos(accesos);
+        productosAgregados = []; // Resetear productos
+        mostrarProductosAgregados();
+        // Configuración inicial de campos
+        $('#txtArea').val('@Session["NombreArea"]');
+        $('#txtSector').val('@Session["NombreSector"]');
+        $("#txtid").val(0);
+        $("#txtcantidad").val("");
+        $("#txtobservaciones").val("");
+        $("#txtusuario").val('@Session["AccesCode"]');
+        $("#mensajeError").hide();
 
+        // Resetear campos dinámicos
+        $("#cbodetalle").val("").prop("disabled", false);
+        $("#txtfechapedido").prop("disabled", false);
 
-                        // Configuración inicial de campos
-                        $('#txtArea').val('@Session["NombreArea"]');
-                        $('#txtSector').val('@Session["NombreSector"]');
-                        $("#txtid").val(0);
-                        $("#txtcantidad").val("");
-                        $("#txtobservaciones").val("");
-                        $("#txtusuario").val('@Session["AccesCode"]');
-                        $("#mensajeError").hide();
+        // Configurar fecha actual en el formato correcto
+        const fechaActual = new Date();
+        $("#txtfechapedido").val($.datepicker.formatDate('yy-mm-dd', fechaActual));
+        console.log("Fecha de pedido:", $("#txtfechapedido").val());
 
-                        // Resetear campos dinámicos
-                        $("#cbodetalle").val("").prop("disabled", false);
-                        $("#txtfechapedido").prop("disabled", false);
+        // Siempre hacer el campo de solo lectura
+        $("#txtpedido").prop("readonly", true);
 
-                        // Configurar fecha actual
-                        const fechaActual = new Date();
-                        $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaActual));
+        // Manejo específico de edición
+        if (data) {
+            modalTitle('Editar');
 
-                        // Manejo del número de pedido (común para ambos modos)
-                        if (data) {
-                            // Modo Edición: Mostrar número existente
+            $("#txtid").val(data.IdSolicitud);
+            $("#txtcantidad").val(data.CantidadPedida);
+            $("#txtobservaciones").val(data.Observaciones);
 
-                            $("#txtpedido").val(data.NroPedido);
+            // Configurar producto seleccionado
+            $("#cbodetalle")
+                .val(data.oProductos.IdProducto)
+                .prop("disabled", true)
+                .trigger('change');
 
-                        } else {
-                            // Modo Creación: Generar nuevo número
-                            const response = await $.ajax({
-                                url: '@Url.Action("GenerarNumeroPedido", "SolicitudPedidos")'
-                            });
-                            $("#txtpedido").val(response);
-                        }
-                        // Siempre hacer el campo de solo lectura
-                        $("#txtpedido").prop("readonly", true);
+            // Configurar fecha del pedido
+            const fechaPedido = new Date(data.FechaPedido);
+            if (!isNaN(fechaPedido.getTime())) {
+                $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido));
+            }
+            $("#txtfechapedido").prop("disabled", true);
 
-                        // Manejo específico de edición
-                        if (data) {
-                            modalTitle('Editar');
+            // Configurar botones
+            if (data.NroPedido && data.NroPedido !== "0") {
+                $("#btnGuardar").text("Actualizar");
+                $("#exampleModalLabel").text("Modificar Pedido");
+                $("#btnImprimir").prop("disabled", false);
+            }
+        } else {
+            // Configuración específica de creación
+            modalTitle('Crear nuevo');
 
-                            $("#txtid").val(data.IdSolicitud);
-                            $("#txtcantidad").val(data.CantidadPedida);
-                            $("#txtobservaciones").val(data.Observaciones);
+            $("#btnGuardar").text("Guardar");
+            $("#txtid").val(0);
+            $("#txtcantidad").val(1);
+            // Resetear otros campos según necesidad
+            $("#cbostockactual").val("");
+            $("#infocodigoid").val("");
+            $("#inforubro").val("");
+            $("#infotipo").val("");
+            $("#cbostockactual").val("");
+            productosAgregados = []; // Limpiar la lista de productos
+            mostrarProductosAgregados(); // Actualizar la tabla (debería mostrarla vacía y el mensaje)
+            LimpiarCampos();
+        }
 
-                            // Configurar producto seleccionado
-                            $("#cbodetalle")
-                                .val(data.oProductos.IdProducto)
-                                .prop("disabled", true)
-                                .trigger('change');
+        $("#FormModal").modal("show");
 
-                            // Configurar fecha del pedido
-                            const fechaPedido = new Date(data.FechaPedido);
-                            if (!isNaN(fechaPedido.getTime())) {
-                                $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido));
-                            }
-                            $("#txtfechapedido").prop("disabled", true);
+    } catch (error) {
+        console.error("Error en abrirModal:", error);
+    }
+}
 
-                            // Configurar botones
-                            if (data.NroPedido && data.NroPedido !== "0") {
-                                $("#btnGuardar").text("Actualizar");
-                                $("#exampleModalLabel").text("Modificar Pedido");
-                                $("#btnImprimir").prop("disabled", false);
-                            }
-                        } else {
-                            // Configuración específica de creación
-                            modalTitle('Crear nuevo');
-                            $("#btnGuardar").text("Guardar");
-                            $("#txtid").val(0);
-                            $("#txtcantidad").val(1);
-                            // Resetear otros campos según necesidad
-                            $("#cbostockactual").val("");
-                            $("#infocodigoid").val("");
-                            $("#inforubro").val("");
-                            $("#infotipo").val("");
-                            $("#cbostockactual").val("");
-                            // ... (otros reseteos que necesites)
-                        }
+        $("#cbodetalle").change(function () {
+            var idProducto = $(this).val();
 
-                        $("#FormModal").modal("show");
+            var stockActual = obtenerStockPorId(idProducto);
+            if (stockActual !== undefined) {
+                $("#cbostockactual ").val(stockActual);
+                $("#cbostockactual").show();
+            }
 
-                    } catch (error) {
-                        console.error("Error en abrirModal:", error);
-                        // Manejo de errores para el usuario
-                }
-                $("#cbodetalle").change(function () {
-                    var idProducto = $(this).val();
+            var codigoid = obtenerCodigoPorId(idProducto);
+            if (codigoid !== undefined) {
+                $("#infocodigoid").val(codigoid);
+                $("#infocodigoid").show();
+            }
 
-                    var stockActual = obtenerStockPorId(idProducto);
-                    if (stockActual !== undefined) {
-                        $("#cbostockactual").val(stockActual);
-                        $("#cbostockactual").show();
-                    }
+            var rubro = obtenerRubroPorId(idProducto);
+            if (rubro !== undefined) {
+                $("#inforubro").val(rubro);
+                $("#inforubro").show();
+            }
 
-                    var codigoid = obtenerCodigoPorId(idProducto);
-                    if (codigoid !== undefined) {
-                        $("#infocodigoid").val(codigoid);
-                        $("#infocodigoid").show();
-                    }
+            var tipo = obtenerTipoPorId(idProducto);
+            if (tipo !== undefined) {
+                $("#infotipo").val(tipo);
+                $("#infotipo").show();
+            }
+        });
 
-                    var rubro = obtenerRubroPorId(idProducto);
-                    if (rubro !== undefined) {
-                        $("#inforubro").val(rubro);
-                        $("#inforubro").show();
-                    }
-
-                    var tipo = obtenerTipoPorId(idProducto);
-                    if (tipo !== undefined) {
-                        $("#infotipo").val(tipo);
-                        $("#infotipo").show();
-                    }
-                });
-
-                function obtenerStockPorId(idProducto) {
-                    return stockprod[idProducto];
-                }
-                function obtenerCodigoPorId(idProducto) {
-                    return codigoidprod[idProducto];
-                }
-                function obtenerRubroPorId(idProducto) {
-                    return rubroprod[idProducto];
-                }
-                function obtenerTipoPorId(idProducto) {
-                    return tipoprod[idProducto];
-                }
-                }
-
+        function obtenerStockPorId(idProducto) {
+            return stockprod[idProducto];
+        }
+        function obtenerCodigoPorId(idProducto) {
+            return codigoidprod[idProducto];
+        }
+        function obtenerRubroPorId(idProducto) {
+            return rubroprod[idProducto];
+        }
+        function obtenerTipoPorId(idProducto) {
+            return tipoprod[idProducto];
+        }
 
         function mostrarError(mensaje) {
             $("#mensajeError").text(mensaje).show().delay(5000).fadeOut();
         }
 
-            @*function inicializarDataTable() {
+                   function inicializarDataTable() {
                 tabladata = $('#tabla').DataTable({
-
                     ajax: {
-                        url: '@Url.Action("Listar", "SolicitudPedidos")',
+                        url: '@Url.Action("ListarPendientesPorArea", "SolicitudPedidos")',
                         dataSrc: 'data'
                     },
                     columns: [
                         { data: "IdSolicitud", visible: false },
-                        { data: "NroPedido", title: "N° Pedido" },  // Mover a primera posición
-                        {
-                            data: "Productos",
-                            title: "Productos",
-                            render: function (data) {
-                                return data.map(p => p.Detalle).join(', ');
-                            }
-                        },
+                        { data: "NroPedido", title: "N° Pedido" }, // Mover a primera posición
+                        { data: "oProductos.Detalle", title: "Producto" },
                         { data: "CantidadPedida", title: "Cant. Pedida" },
                         {
                             data: "CantidadEntregada",
@@ -635,80 +712,90 @@
                             data: "FechaPedido",
                             title: "Fecha Pedido",
                             render: function (data) {
-                                // Tu formato de fecha en C# es "yyyy-MM-dd HH:mm:ss" que new Date() puede parsear.
-                                // toLocaleDateString() lo mostrará en formato local.
                                 return data ? new Date(data).toLocaleDateString() : '';
                             }
                         },
                         {
                             data: "FechaEntrega",
                             title: "Fecha Entrega",
-                            render: function(data) {
+                            render: function (data) {
                                 return data ? new Date(data).toLocaleDateString() : 'Pendiente';
                             }
                         },
-
                         {
                             data: "Visado",
                             title: "Visado",
-                            render: function(data) {
+                            render: function (data) {
                                 return data ? '<i class="fas fa-check-circle text-success"></i>' :
-                                             '<i class="fas fa-times-circle text-danger"></i>';
+                                    '<i class="fas fa-times-circle text-danger"></i>';
                             }
                         },
                         {
                             data: null,
-                            render: function(data, type, row) {
+                            render: function (data, type, row) {
                                 if (!row.Visado && row.CantidadEntregada > 0) {
                                     return `<button class="btn btn-sm btn-warning btn-visar"
-                                            data-id="${row.IdSolicitud}">Visar</button>`;
+                                 data-id="${row.IdSolicitud}">Visar</button>`;
                                 }
                                 return '';
                             }
                         },
+
+
                         {
                             "data": null,
                             "render": function (data, type, row) {
                                 return '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>';
                             },
+
                             "orderable": false,
                             "searchable": false,
                             "width": "90px"
                         }
                     ],
+
+                    order: [
+                        [5, 'desc'], // Ordena por la 6ª columna (índice 5, "Fecha Pedido") en orden descendente
+                        [0, 'desc']  // Opcional: Luego por la 1ª columna (índice 0, "IdSolicitud") descendente
+                        // Ajusta el índice de la columna 'IdSolicitud' si no es la primera visible/invisible.
+                        // Si IdSolicitud está visible y es la primera, sería [0, 'desc']
+                        // Si está invisible como en tu ejemplo, y quieres usarla, asegúrate que esté en `columns`.
+                    ],
+
                     language: {
                         url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json'
                     },
-
                     responsive: true, // Para adaptar a pantallas pequeñas
                     processing: true, // Muestra indicador de carga
                     serverSide: false
-                });*@
-
-
-
-
-
-            $('#tabla tbody').on('click', '.btn-visar', function() {
-                const id = $(this).data('id');
-
-                Swal.fire({
-                    title: '¿Confirmar visado?',
-                    text: "Esta acción no se puede deshacer",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.post('@Url.Action("RegistrarVisado", "SolicitudPedidos")', { idPedido: id })
-                        .done(function(response) {
-                            Swal.fire(response.mensaje);
-                            tabladata.ajax.reload();
-                        });
-                    }
                 });
-            });
+
+                  $('#tabla tbody').on('click', '.btn-visar', function() {
+                  const id = $(this).data('id');
+
+                  Swal.fire({
+                      title: '¿Confirmar visado?',
+                      text: "Esta acción no se puede deshacer",
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '#d33'
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          $.post('@Url.Action("RegistrarVisado", "SolicitudPedidos")', { idPedido: id })
+                          .done(function(response) {
+                              Swal.fire(response.mensaje);
+                              tabladata.ajax.reload();
+                          });
+                      }
+                  });
+              });
+
+            }
+
+
+
+
 
 
          function buscarPorNumero() {
@@ -722,65 +809,83 @@
                     });
             }
 
-       function mostrarPendientes() {
-            const codArea = '@Session["CodArea"]'; // Obtén el código del área del usuario desde la sesión
-            tabladata.ajax.url('@Url.Action("ListarPendientesPorArea", "SolicitudPedidos")' +
-                '?codArea=' + encodeURIComponent(codArea)).load();
-        }
+function mostrarPendientes() {
+    if (typeof tabladata !== 'undefined' && tabladata !== null) {
+        // 1. Establece la URL
+        tabladata.ajax.url('@Url.Action("Listar", "SolicitudPedidos")');
+
+        // 2. Recarga los datos
+        tabladata.ajax.reload(null, false);
+    } else {
+        console.error("La instancia de DataTable 'tabladata' no está definida o es nula.");
+    }
+}
 
 
 
 
+ function Guardar() {
+    if (productosAgregados.length === 0) {
+        mostrarError("¡Agregue al menos un producto!");
+        return;
+    }
 
+    const solicitud = {
+        IdSolicitud: $("#txtid").val(),
+        NroPedido: $("#txtpedido").val(),
+        FechaPedido: $("#txtfechapedido").val(),
+        IdUsuarioPedido: $("#txtusuario").val(),
+        CodigoArea: $("#txtArea").val(),
+        CodigoSector: $("#txtSector").val()
+    };
 
+    const listaProductos = productosAgregados.map(producto => ({
+        IdSolicitud: solicitud.IdSolicitud,
+        oProductos: {
+            IdProducto: producto.oProductos.IdProducto,
+            Detalle: producto.oProductos.Detalle
+        },
+        CantidadPedida: producto.CantidadPedida,
+        Observaciones: producto.Observaciones
+    }));
 
-                    function Guardar() {
-        if (productosAgregados.length === 0) {
-            mostrarError("¡Agregue al menos un producto!");
-            return;
-        }
+    const url = solicitud.IdSolicitud === "0"
+        ? '@Url.Action("GuardarPedidos", "SolicitudPedidos")'
+        : '@Url.Action("Actualizar", "SolicitudPedidos")';
 
-        const pedidoData = {
-            IdSolicitud: $("#txtid").val(),
-            Productos: productosAgregados,
-            CantidadPedida: $("#txtcantidad").val(),
-            Observaciones: $("#txtobservaciones").val(),
-            NroPedido: $("#txtpedido").val(),
-            IdUsuarioPedido: $("#txtusuario").val(),
-            FechaPedido: $("#txtfechapedido").val()
-        };
-
-        const url = pedidoData.IdSolicitud === "0"
-            ? '@Url.Action("GuardarPedidos", "SolicitudPedidos")'
-            : '@Url.Action("Actualizar", "SolicitudPedidos")';
-
-        $.ajax({
-            url: url,
-            type: "POST",
-            data: JSON.stringify({ objeto: pedidoData }),
-            contentType: "application/json",
-            success: function (response) {
-                if (response.resultado) {
-                    $("#txtpedido").val(response.nroPedido);
-                    Swal.fire("¡Éxito!", response.mensaje, "success");
-                    $("#FormModal").modal("hide");
-                    tabladata.ajax.reload();
-                    productosAgregados = [];
-                } else {
-                    mostrarError(response.mensaje);
-                }
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: JSON.stringify({
+            objeto: solicitud,
+            listaProductos: listaProductos
+        }),
+        contentType: "application/json",
+        success: function (response) {
+            if (response.resultado) {
+                $("#txtpedido").val(response.nroPedido);
+                Swal.fire("¡Éxito!", response.mensaje, "success");
+                $("#FormModal").modal("hide");
+                tabladata.ajax.reload();
+                productosAgregados = [];
+            } else {
+                mostrarError(response.mensaje);
             }
-        });
-    }
+        },
+        error: function (xhr, status, error) {
+            mostrarError("Error en la solicitud: " + error);
+        }
+    });
+}
 
-    function mostrarError(mensaje) {
-        $("#mensajeError").text(mensaje).show().delay(5000).fadeOut();
-    }
+
+
+
 
 
 
         $("#txtfechapedido").datepicker({
-            dateFormat: 'dd/mm/yy',
+            dateFormat: 'yy-mm-dd',
             minDate: -7,
             maxDate: +7
         });
