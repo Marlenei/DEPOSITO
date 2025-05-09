@@ -12,64 +12,96 @@
     <div class="card-body">
         <div class="row">
             <div class="col-12">
-                <button type="button" class="btn btn-success" onclick="abrirModal(null)"> Ingresar stock </button>
+                <button type="button" class="btn btn-success" onclick="abrirModal(null)"> Salida de stock </button>
             </div>
         </div>
 
         <hr />
-        @*<div class="container">*@
-        <div class="table-responsive">
-            <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width: 100% !important; table-layout: fixed;">
-                <thead>
-                    <tr>
-                        <th>Detalle</th>
-                        <th>Cantidad</th>
-                        <th>Stock Actual</th>
-                        <th>Codigo ID</th>
-                        <th>Tipo Salida</th>
-                        <th>Fecha de Egreso</th>
-                        <th>Observaciones</th>
-                        <th>ID Usuario</th>
-                        <th>Codigo Area</th>
-                        <th>Codigo Sector</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody style="text-align:center">
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
+        <div style="justify-self:center">
+            <h6>Seleccione el rango que desea ver:</h6>
+            <input type="text" name="daterange" />
         </div>
-        @*</div>*@
+
+
+        <div id="filterContainer">
+            <label for="filterRubroSelect">Filtrar por Rubro:</label>
+            <select id="filterRubroSelect" style="width: 20%;">
+                <option value="">Todos</option>
+            </select>
+        </div>
+
+        <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width: 100% !important; table-layout: fixed;">
+            <thead class="table-dark">
+                <tr>
+                    <th>Detalle</th>
+                    <th>Cantidad</th>
+                    <th>Codigo ID</th>
+                    <th>Tipo Salida</th>
+                    <th>Fecha de Egreso</th>
+                    <th>Observaciones</th>
+                    <th>Usuario</th>
+                    <th>Area</th>
+                    <th>Sector</th>
+                    <th>Rubro</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog">
+    <div class="modal-dialog  modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Producto</h1>
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Salida de stock</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body g-2">
-                <input id="txtid" type="hidden" value="0" />
+                <input id="txtid" type="hidden" value="" />
+                <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
+                <div class="col-sm-3" style="justify-self: center;">
+                    <label for="txtfechaegreso" class="form-label">Fecha de Egreso</label>
+                    <input type="text" class="form-control" id="txtfechaegreso" readonly>
+                </div>
                 <div class="row g-2" id="contenedor">
+                    <div id="contenedor" class="col-sm-6">
+                        <p style="text-align:center">Filtros de busqueda</p>
+                        @Html.Partial("_BusquedaAvan")
+                    </div>
+
 
                     <div class="col-sm-6">
-                        <label class="form-label">Producto</label>
-                        <select id="cbodetalle" class="form-select"> </select>
+                        <label class="form-label" style="text-align:center;">Producto </label>
+                        <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
+                        </select>
+                        <p style="text-align: center; margin-top:5px">Informacion del producto</p>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Stock Actual</span>
+                            <input id="cbostockactual" type="text" class="form-control" readonly>
+                            <span class="input-group-text">Codigo ID</span>
+                            <input id="infocodigoid" type="text" class="form-control" readonly>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Rubro</span>
+                            <input id="inforubro" type="text" class="form-control" readonly>
+                            <span class="input-group-text">Tipo</span>
+                            <input id="infotipo" type="text" class="form-control" readonly>
+                        </div>
                     </div>
 
                     <div class="col-sm-6">
@@ -90,12 +122,6 @@
                     </div>
 
                     <div class="col-sm-6">
-                        <label for="txtusuario" class="form-label">IdUsuario</label>
-                        <input type="text" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
-                    </div>
-
-
-                    <div class="col-sm-6">
                         <label class="form-label">Tipo de Salida</label>
                         <select id="txttipoingreso" class="form-select">
                             <option value="">Seleccionar</option>
@@ -107,17 +133,13 @@
                     </div>
 
                     <div class="col-sm-6">
-                        <label for="txtfechaingreso" class="form-label">Fecha de Egreso</label>
-                        <input type="text" class="form-control" id="txtfechaingreso" readonly>
+                        <label for="txtcodigoarea" class="form-label">Area</label>
+                        <select id="txtcodigoarea" class="form-select" name="codArea" onchange="CargarSectores(this.value)">
+                        </select>
                     </div>
 
                     <div class="col-sm-6">
-                        <label for="txtcodigoarea" class="form-label">Codigo Area</label>
-                        <input type="text" class="form-control" id="txtcodigoarea">
-                    </div>
-
-                    <div class="col-sm-6">
-                        <label for="txtcodigosector" class="form-label">Codigo Sector</label>
+                        <label for="txtcodigosector" class="form-label">Sector</label>
                         <input type="text" class="form-control" id="txtcodigosector">
                     </div>
 
@@ -146,123 +168,311 @@
 </div>
 @section scripts{
     <script>
-
+        var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
         var tabladata;
         var filaSeleccionada;
+        var stockprod = {};
+        var codigoidprod = {};
+        var rubroprod = {};
+        var tipoprod = {};
+        var appSettings = {};
 
-        tabladata = $("#tabla").DataTable({
-            responsive: true,
-            ordering: false,
-            "ajax": {
-                url: '@Url.Action("ListarEgresos", "Toner")',
-                type: "GET",
-                dataType: "json"
-            },
-            "columns": [
-                { data: "IdEgreso", visible: false },
-                {
-                    "data": "oProductos",
-                    "render": function (data) {
-                        return data.Detalle;
-                    },
-                    "title": "Producto"
-                },
 
-                { "data": "Cantidad" },
-                {
-                    "data": "oProductos",
-                    "render": function (data) {
-                        return data.StockActual;
-                    },
-                    "title": "Stock Actual"
-                },
-                { "data": "CodigoId" },
 
-                {
-                    "data": "TipoSalida",
-                    "render": function (data) {
-                        return data ? data : '';
-                    }
+        //DATARANGER- FILTRO POR FECHA DATATABLE
+        $(function FiltroFecha () {
+            var startDate, endDate;
+            startDate = moment().subtract(2, 'days').startOf('day');;
+            endDate = moment().endOf('day');;
+            $('input[name="daterange"]').daterangepicker({
+                opens: 'center',
+                startDate: moment(),
+                endDate: moment(),
 
-                },
-
-                {
-                    data: 'FechaEgreso',
-                    render: function (data) {
-                        console.log('FechaEgreso:', data); // Verifica el valor de data
-                        if (data) {
-                            // Extrae el número de milisegundos del formato /Date(1696181400000)/
-                            const timestamp = parseInt(data.replace(/\/Date\((\d+)\)\//, '$1'), 10);
-                            const fecha = new Date(timestamp);
-                            console.log('Objeto Date:', fecha); // Verifica el objeto Date
-                            if (!isNaN(fecha.getTime())) {
-                                return fecha.toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' }); // Formato de fecha en español
-                            }
-                        }
-                        return 'Fecha no válida'; 
-                    }
-                },
-                { "data": "Observaciones" },
-                { "data": "IdUsuario" },
-                { "data": "CodigoArea" },
-                { "data": "CodigoSector" },
-                {
-                    "defaultContent": '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>',
-                    "orderable": false,
-                    "searchable": false,
-                    "width": "90px"
+                locale: {
+                    format: 'DD-MM-YYYY',
                 }
-
-            ],
-            language: {
-                url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json',
             },
+                function (start, end) {
+                    startDate = start.startOf('day');;
+                    endDate = end.endOf('day');;
+                    tabladata.draw();
+                });
+            $('input[name="daterange"]').val(startDate.format('DD-MM-YYYY') + ' - ' + endDate.format('DD-MM-YYYY'));
+            $.fn.DataTable.ext.search.push(
+                function (setting, data, dataIndex) {
+                    var fechaEgreso = moment(data[4], 'DD/MM/YYYY');
+                    if (!startDate || !endDate) {
+                        return true;
+                    }
+                    return startDate.isSameOrBefore(fechaEgreso) && endDate.isSameOrAfter(fechaEgreso);
+                }
+            );
         });
 
+        $.fn.dataTable.moment('DD/MM/YYYY');
+        $(document).ready(function () {
+            $('#txtcodigoarea').select2({
+                placeholder: "Selecciona una opción",
+                allowClear: true,
+                dropdownParent: $('#FormModal'),
+            });
+            $('#filterRubroSelect').select2({
+                placeholder: "Selecciona un Rubro",
+                allowClear: true,
+            });
+
+            CargarAreas();
+            CargarSectores();
+
+            CargarProductos(permisos.map(p => p.Accesos));
+
+             var urlrubros = '@Url.Action("ListarRubros", "Toner")'
+             CargarRubros(urlrubros, permisos.map(p => p.Accesos));
+
+             var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
+             CargarCodigosID(urlcodigoid, permisos.map(p => p.Accesos));
+
+             tooltips();
+             LimpiarSelects();
+             LimpiarCampos();
+             selects2();
+             cargarApiUrls();
 
 
-            jQuery.ajax({
-            url: '@Url.Action("ListarProductos", "Toner")',
-            type: "GET",
-            data: null,
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
+
+
+            tabladata = $("#tabla").DataTable({
+                responsive: true,
+                ordering: false,
+                //order: [],
+                "ajax": {
+                    url: '@Url.Action("ListarEgresos", "Toner")',
+                    type: "GET",
+                    dataType: "json",
+
+                },
+                "columns": [
+                    {
+                        "data": "oProductos", "render": function (data) {
+                            return data && data.Detalle ? data.Detalle : '';
+                        }
+                    },
+
+                    { "data": "Cantidad" },
+
+                    {
+                        "data": "CodigoId", "render": function (data) {
+                            return data ? data : '';
+                        }
+                    },
+                    {
+                        "data": "TipoSalida",
+                        "render": function (data) {
+                            return data ? data : '';
+                        }
+
+                    },
+
+                    {
+                        data: 'FechaEgreso',
+                    },
+                    {
+                        "data": "Observaciones",
+                        "render": function (data) {
+                            return data ? data : '';
+                        },
+                        searchable: false,
+                    },
+                    {
+                        "data": "NombreyApellido",
+                        "render": function (data) {
+                            return data ? data : '';
+                        },
+                    },
+                    {
+                        "data": "NombreArea",
+                        "render": function (data) {
+                            return data ? data : '';
+                        },
+                    },
+                    {
+                        "data": "NombreSector",
+                        "render": function (data) {
+                            return data ? data : '';
+                        },
+                    },
+                    {
+                        "data": "oProductos.oRubros.Rubro",
+                        visible: false
+                    },
+                    {
+                        "defaultContent": '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>',
+                        "orderable": false,
+                        "searchable": false,
+                        "width": "90px"
+                    }
+
+                ],
+                columnDefs: [
+                    {
+                        targets: [4], render: function (data) {
+                            return moment(data).format('DD/MM/YYYY');
+                        },
+                    },
+                    { width: '6.5%', targets: 1 },
+                    { width: '7%', targets: 3 },
+
+                ],
+                "language": {
+                    "url": "../Language/es-Es.json",
+                },
+                initComplete: function () {
+                    var api = this.api();
+                    api.column(9).data().unique().sort().each(function (valor) {
+                        if (valor) {
+                            $('#filterRubroSelect').append('<option value="' + valor + '">' + valor + '</option>');
+                        }
+                    });
+
+                    $('#filterRubroSelect').on('change', function () {
+                        var selectedVal = $(this).val();
+                        var val = selectedVal ? $.fn.dataTable.util.escapeRegex(selectedVal) : '';
+                        tabladata
+                            .column(9)
+                            .search(val ? '^' + val + '$' : '', true, false)
+                            .draw();
+                    });
+                }
+            });
+          
+        });
+
+        function LimpiarSelects() {
+            $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo ').val('').trigger('change');
+            CargarProductos(permisos.map(p => p.Accesos));
+        }
+
+        function CargarProductos(permisos) {
+            $.ajax({
+                url: '@Url.Action("ListarProductos", "Toner")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    //----DETALLE
-                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbodetalle");
-
+                    $("#cbodetalle").empty();
+                    $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cbodetalle");
+                    var opciones = [];
+                    var tienePermiso24 = permisos.includes(24);
+                    var tienePermiso184 = permisos.includes(184);
                     $.each(data.data, function (index, valor) {
                         if (valor.Activo === true) {
-                            $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
+                            if (tienePermiso24 && valor.oRubros.Rubro !== "Insumos Informaticos") {
+                                opciones.push({
+                                    id: valor.IdProducto,
+                                    text: valor.Detalle
+                                });
+                                stockprod[valor.IdProducto] = valor.StockActual;
+                                codigoidprod[valor.IdProducto] = valor.CodigoId;
+                                rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                                tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                            } else if (tienePermiso184 && valor.oRubros.Rubro === "Insumos Informaticos") {
+                                opciones.push({
+                                    id: valor.IdProducto,
+                                    text: valor.Detalle
+                                });
+                                stockprod[valor.IdProducto] = valor.StockActual;
+                                codigoidprod[valor.IdProducto] = valor.CodigoId;
+                                rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                                tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                            }
                         }
 
-                    });
 
-                    //---STOCKACTUAL
-                    $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cbostockactual");
-
-                    $.each(data.data, function (index, valor) {
-                        if (valor.Activo === true) {
-
-                            $("<option>").attr({ "value": valor.IdProducto }).text( valor.StockActual).appendTo("#cbostockactual");
-                        }
 
                     });
-
+                    $('#cbodetalle').select2({
+                        placeholder: "Selecciona una opción",
+                        data: opciones,
+                        allowClear: true,
+                        dropdownParent: $('#FormModal'),
+                    }).val(null).trigger('change');
                 },
                 error: function (error) {
                     console.log(error)
                 },
             });
+        }
+
+        function CargarAreas(){
+            $.ajax({
+                url: '@Url.Action("ObtenerAreas", "SolicitudPedidos")',
+                type: "GET",
+                data: null,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#txtcodigoarea");
+                    var opciones = [];
+                    $.each(data, function (index, valor) {
+                        opciones.push({
+                            id: valor.CodArea,
+                            text: valor.NombreArea
+                        });
+                    });
+                    $('#txtcodigoarea').select2({
+                        placeholder: "Selecciona un area",
+                        data: opciones,
+                        allowClear: true,
+                        dropdownParent: $('#FormModal'),
+                    })
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+            });
+        }
+
+        function CargarSectores(codArea) {
+              $.ajax({
+                  url: '@Url.Action("ObtenerSectoresPorArea", "SolicitudPedidos")',
+                  type: "GET",
+                  data: null,
+                  dataType: "json",
+                  contentType: "application/json; charset=utf-8",
+                  success: function (data) {
+                      $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#txtcodigosector");
+                      var opciones = [];
+                      $.each(data, function (index, valor) {
+                          opciones.push({
+                              id: valor.CodSector,
+                              text: valor.Nombre
+                          });
+                      });
+                      $('#txtcodigosector').select2({
+                          placeholder: "Selecciona un sector",
+                          data: opciones,
+                          allowClear: true,
+                          dropdownParent: $('#FormModal'),
+                      })
+                  },
+                  error: function (error) {
+                      console.log(error)
+                  },
+              });
+        }
 
         function abrirModal(json) {
+            CargarProductos(permisos.map(p => p.Accesos));
             $("#txtid").val(0);
             $("#cbodetalle").val("");
             $("#txtcantidad").val("");
             $("#cbostockactual").val("");
             $("#txtcodigoid").val("");
             $("#txttipoingreso").val("");
-            $('#txtfechaingreso').datepicker({
+            $('#txtfechaegreso').val(new Date().toLocaleDateString('es-AR'));
+            $('#txtfechaegreso').datepicker({
                 minDate: "-30D",
                 maxDate: 0
             });
@@ -273,20 +483,89 @@
             $("#mensajeError").hide();
 
             if (json != null) {
-                $("#txtid").val(json.IdEgreso);
-                $("#cbodetalle").val(json.oProductos.IdProducto);
-                $("#txtcantidad").val(json.Cantidad);
-                $("#cbostockactual").val(json.oProductos.StockActual); 
-                $("#txtcodigoid").val(json.CodigoId);
-                $("#txttipoingreso").val(json.TipoSalida);
-                const fechaEgreso = new Date(json.FechaEgreso);
-                $('#txtfechaingreso').datepicker('setDate', fechaEgreso); 
-                $("#txtobservaciones").val(json.Observaciones);
-                $("#txtcodigoarea").val(json.CodigoArea);
-                $("#txtcodigosector").val(json.CodigoSector);
-                $("#txtusuario").val(json.IdUsuario);
+
+                var fechaActMatch = json.FechaAct.match(/\/Date\((\d+)\)\//);
+                var timestamp = parseInt(fechaActMatch[1], 10);
+                var fechaRegistro = new Date(timestamp);
+                var fechaActual = new Date();
+                var diferenciaDias = (fechaActual.getTime() - fechaRegistro.getTime()) / (1000 * 3600 * 24);
+
+                if (diferenciaDias >= 1) {
+                    Swal.fire({
+                        title: "Ya no se puede actualizar/ modificar este registro.",
+                        icon: "error",
+                        customClass: {
+                            confirmButton: 'btn btn-primary'
+                        },
+                        confirmButtonText: "Ok",
+                    });
+                } else {
+                    modalTitle('Editar');
+
+                    var fechaActMatch = json.FechaIngreso.match(/\/Date\((\d+)\)\//);
+                    var timestamp = parseInt(fechaActMatch[1], 10);
+                    var fechaegreso = new Date(timestamp);
+                    var dia = fechaegreso.getDate().toString().padStart(2, '0');
+                    var mes = (fechaegreso.getMonth() + 1).toString().padStart(2, '0');
+                    var anio = fechaegreso.getFullYear();
+                    var fechaFormateada = dia + '/' + mes + '/' + anio;
+
+                    $("#txtid").val(json.IdEgreso);
+                    $("#cbodetalle").val(json.oProductos.IdProducto);
+                    $("#txtcantidad").val(json.Cantidad);
+                    $("#cbostockactual").val(json.oProductos.StockActual);
+                    $("#txtcodigoid").val(json.CodigoId);
+                    $("#txttipoingreso").val(json.TipoSalida);
+                    $('#txtfechaegreso').datepicker('setDate', fechaEgreso);
+                    $("#txtobservaciones").val(json.Observaciones);
+                    $("#txtcodigoarea").val(json.CodigoArea);
+                    $("#txtcodigosector").val(json.CodigoSector);
+                    $("#txtusuario").val(json.IdUsuario);
+                }
             }
+
             $("#FormModal").modal("show");
+
+            $("#cbodetalle").change(function () {
+                var idProducto = $(this).val();
+
+                var stockActual = obtenerStockPorId(idProducto);
+                if (stockActual !== undefined) {
+                    $("#cbostockactual").val(stockActual);
+                    $("#cbostockactual").show();
+                }
+
+                var codigoid = obtenerCodigoPorId(idProducto);
+                if (codigoid !== undefined) {
+                    $("#infocodigoid").val(codigoid);
+                    $("#infocodigoid").show();
+                }
+
+                var rubro = obtenerRubroPorId(idProducto);
+                if (rubro !== undefined) {
+                    $("#inforubro").val(rubro);
+                    $("#inforubro").show();
+                }
+
+                var tipo = obtenerTipoPorId(idProducto);
+                if (tipo !== undefined) {
+                    $("#infotipo").val(tipo);
+                    $("#infotipo").show();
+                }
+            });
+
+            function obtenerStockPorId(idProducto) {
+                return stockprod[idProducto];
+            }
+            function obtenerCodigoPorId(idProducto) {
+                return codigoidprod[idProducto];
+            }
+            function obtenerRubroPorId(idProducto) {
+                return rubroprod[idProducto];
+            }
+            function obtenerTipoPorId(idProducto) {
+                return tipoprod[idProducto];
+            }
         }
 
         $("#tabla tbody").on("click", '.btn-editar', function () {
@@ -296,15 +575,6 @@
         });
 
         function Guardar() {
-            //var cantidad = parseInt($("#txtcantidad").val()) || 0;
-            //var idProducto = $("#cbodetalle option:selected").val();
-            //var stockActual = parseInt($("#cbostockactual option:selected").text()) ;
-
-            //// Validar stock suficiente
-            //if (cantidad > stockActual) {
-            //    $("#mensajeError").text("¡Stock insuficiente!").show();
-            //    return;
-            //}
 
             var Egresos = {
                 IdEgreso: $("#txtid").val(),

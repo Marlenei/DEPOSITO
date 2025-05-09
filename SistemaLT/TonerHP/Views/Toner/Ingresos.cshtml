@@ -87,10 +87,6 @@
                         </div>
                     </div>
 
-
-
-
-
                     <div class="col-sm-6">
                         <label class="form-label">Razon social</label>
                         <select id="cboproveedores" class="form-select" style="width: 100%"> </select>
@@ -143,7 +139,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Se limpiaran los campos al salir.">Cerrar</button>
                 <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
             </div>
         </div>
@@ -153,7 +149,6 @@
 @section scripts{
     <script>
         var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
-        console.log(permisos);
         var tabladata;
         var filaSeleccionada;
         var stockprod = {};
@@ -168,7 +163,7 @@
 
 
         //Dataranger - rangos
-        $(function () {
+        $(function FiltrarRangos() {
             var startDate, endDate;
             startDate = moment().subtract(2, 'days').startOf('day');;
             endDate = moment().endOf('day');;
@@ -207,6 +202,7 @@
             var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
             CargarCodigosID(urlcodigoid, permisos.map(p => p.Accesos));
 
+            tooltips();
             LimpiarSelects();
             CargarProductos(permisos.map(p => p.Accesos));
             LimpiarCampos();
@@ -317,15 +313,10 @@
 
             });
 
-
-
-
         });
 
         function LimpiarSelects() {
-
-            $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo ').val(null).trigger('change');
-
+            $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo ').val('').trigger('change');
             CargarProductos(permisos.map(p => p.Accesos));
         }
 
@@ -333,50 +324,50 @@
 
 
         //Informacion del producto
-        $('#StockDatos').on('input', function () {
-            var inputVal = $(this).val();
-            var selectedOption = $('#cbodetalle option').filter(function () {
-                return $(this).text() === inputVal;
-            });
+        //$('#StockDatos').on('input', function () {
+        //    var inputVal = $(this).val();
+        //    var selectedOption = $('#cbodetalle option').filter(function () {
+        //        return $(this).text() === inputVal;
+        //    });
 
-            if (selectedOption.length) {
-                var idProducto = selectedOption.data('id');
+        //    if (selectedOption.length) {
+        //        var idProducto = selectedOption.data('id');
 
-                var stockActual = stockprod[valor.IdProducto];
-                if (stockActual !== undefined) {
-                    $("#cbostockactual").val(stockActual).show();
-                }
-                else {
-                    $("#cbostockactual").val("").hide();
-                }
+        //        var stockActual = stockprod[valor.IdProducto];
+        //        if (stockActual !== undefined) {
+        //            $("#cbostockactual").val(stockActual).show();
+        //        }
+        //        else {
+        //            $("#cbostockactual").val("").hide();
+        //        }
 
-                var codigoid = codigoidprod[valor.IdProducto];
-                if (codigoid !== undefined) {
-                    $("#infocodigoid").val(codigoid).show();
-                }
-                else {
-                    $("#infocodigoid").val("").hide();
-                }
+        //        var codigoid = codigoidprod[valor.IdProducto];
+        //        if (codigoid !== undefined) {
+        //            $("#infocodigoid").val(codigoid).show();
+        //        }
+        //        else {
+        //            $("#infocodigoid").val("").hide();
+        //        }
 
-                var rubro = rubroprod[valor.Rubro];
-                if (rubro !== undefined) {
-                    $("#inforubro").val(rubro).trigger('change').show();
-                }
-                else {
-                    $("#inforubro").val("").hide();
-                }
+        //        var rubro = rubroprod[valor.Rubro];
+        //        if (rubro !== undefined) {
+        //            $("#inforubro").val(rubro).trigger('change').show();
+        //        }
+        //        else {
+        //            $("#inforubro").val("").hide();
+        //        }
 
-                var tipo = tipoprod[valor.Tipo];
-                if (tipo !== undefined) {
-                    $("#infotipo").val(tipo).trigger('change').show();
-                }
-                else {
-                    $("#infotipo").val("").hide();
-                }
-                $("#txtidProducto").val(idProducto);
+        //        var tipo = tipoprod[valor.Tipo];
+        //        if (tipo !== undefined) {
+        //            $("#infotipo").val(tipo).trigger('change').show();
+        //        }
+        //        else {
+        //            $("#infotipo").val("").hide();
+        //        }
+        //        $("#txtidProducto").val(idProducto);
 
-            }
-        });
+        //    }
+        //});
 
 
         //Listado Proveedores
@@ -428,6 +419,7 @@
                     var opciones = [];
                     var tienePermiso24 = permisos.includes(24);
                     var tienePermiso184 = permisos.includes(184);
+                    
                     $.each(data.data, function (index, valor) {
 
                         if (valor.Activo === true) {
@@ -449,6 +441,7 @@
                                 codigoidprod[valor.IdProducto] = valor.CodigoId;
                                 rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
                                 tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+
                             }
                         }
 
@@ -461,17 +454,6 @@
                         allowClear: true,
                         dropdownParent: $('#FormModal'),
                     }).val(null).trigger('change');
-
-                    //$.each(data.data, function (index, valor) {
-
-                    //if (valor.Activo === true) {
-                    //    stockprod[valor.IdProducto] = valor.StockActual;
-                    //    codigoidprod[valor.IdProducto] = valor.CodigoId;
-                    //    rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
-                    //    tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
-                    //    $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
-                    //    }
-                    //});
                 },
                 error: function (error) {
                     console.log(error)
@@ -485,7 +467,6 @@
 
         function abrirModal(json) {
             CargarProductos(permisos.map(p => p.Accesos));
-            //$('#collapseExample').collapse('hide');
             if (json != null) {
                 var fechaActMatch = json.FechaAct.match(/\/Date\((\d+)\)\//);
                 var timestamp = parseInt(fechaActMatch[1], 10);

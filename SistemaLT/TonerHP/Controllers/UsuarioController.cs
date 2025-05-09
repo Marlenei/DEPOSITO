@@ -49,7 +49,6 @@ namespace TonerHP.Controllers
             {
                 return View();
             }
-            // Autenticación del usuario, llamada a API de USUARIOS
             var json = JsonConvert.SerializeObject(acceso);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync("http://10.4.51.49/SI_Apis/api/access/loginuser", content);
@@ -65,7 +64,6 @@ namespace TonerHP.Controllers
                     Session["AccesCode"] = accesoResultado.result;
 
 
-                    //API de PERMISOS
                     var permisoResponse = await _httpClient.GetAsync($"http://10.4.51.49/SI_Apis/home/BuscarPermisosdelUsuario?codigousuario={accesoResultado.result}");
                     if (permisoResponse.IsSuccessStatusCode)
                     {

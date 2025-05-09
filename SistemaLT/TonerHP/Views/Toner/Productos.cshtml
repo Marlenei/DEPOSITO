@@ -110,7 +110,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Se limpiaran los campos al salir.">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
             </div>
         </div>
@@ -123,6 +123,7 @@
 
         $(document).ready(function () {
             LimpiarCampos();
+            tooltips();
             $('#cbotipo').select2({
                 placeholder: "Selecciona una opción",
                 allowClear: true,
@@ -192,6 +193,8 @@
                 }
             })
         })
+
+
 
         //LISTADO PRODUCTOS
                jQuery.ajax({
