@@ -329,23 +329,31 @@
                 },
                 initComplete: function () {
                     var api = this.api();
+                    var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
+                    console.log(permisos)
+                    var tienePermiso25 = permisos.includes(25);
+                    var tienePermiso183 = permisos.includes(183);
+                    $('#filterRubroSelect').append('<option value="">Seleccionar Rubro</option>');
                     api.column(9).data().unique().sort().each(function (valor) {
                         if (valor) {
-                            $('#filterRubroSelect').append('<option value="' + valor + '">' + valor + '</option>');
+                            console.log(valor)
+                            if ((tienePermiso25 && valor !== "Insumos Informaticos") ||
+                                (tienePermiso183 && valor === "Insumos Informaticos")) {
+                                $('#filterRubroSelect').append('<option value="' + valor + '">' + valor + '</option>');
+                            }
                         }
                     });
-
                     $('#filterRubroSelect').on('change', function () {
                         var selectedVal = $(this).val();
                         var val = selectedVal ? $.fn.dataTable.util.escapeRegex(selectedVal) : '';
-                        tabladata
+                        api
                             .column(9)
                             .search(val ? '^' + val + '$' : '', true, false)
                             .draw();
                     });
                 }
             });
-          
+
         });
 
         function LimpiarSelects() {
