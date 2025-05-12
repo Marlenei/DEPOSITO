@@ -164,83 +164,58 @@ namespace TonerHP.Controllers
             }
         }
 
-
         [HttpPost]
-        public JsonResult GuardarPedidos(SolicitudPedidos objeto, CN_SolicitudPedidos _cnSolicitudPedidos)
+        public JsonResult GuardarPedidos(SolicitudPedidos objeto, List<SolicitudPedidos> listaProductos)
         {
             try
             {
-                // Validación básica del objeto
-                if (objeto == null)
+                if (objeto == null || listaProductos == null || listaProductos.Count == 0)
                 {
-                    return Json(new { resultado = false, mensaje = "No se recibieron datos del pedido" });
+                    return Json(new { resultado = false, mensaje = "No se recibieron datos del pedido o la lista de productos está vacía" });
                 }
 
-                //// Validar sesión activa
-                //if (Session["CodigoArea"] == null || Session["CodigoSector"] == null)
-                //{
-                //    return Json(new { resultado = false, mensaje = "Sesión expirada. Vuelva a iniciar sesión" });
-                //}
+                // Validar que la fecha de pedido no esté vacía
+                if (string.IsNullOrEmpty(objeto.FechaPedido))
+                {
+                    return Json(new { resultado = false, mensaje = "La fecha de pedido no puede estar vacía" });
+                }
 
-                // Asignar códigos desde la sesión
+                // Validar que la fecha de pedido tenga el formato correcto (yyyy-MM-dd)
+                if (!DateTime.TryParseExact(objeto.FechaPedido, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None, out DateTime fechaPedido))
+                {
+                    return Json(new { resultado = false, mensaje = "La fecha de pedido no tiene un formato válido. Use yyyy-MM-dd" });
+                }
+
+                // Validar que las cantidades sean correctas
+                foreach (var producto in listaProductos)
+                {
+                    if (producto.CantidadPedida <= 0)
+                    {
+                        return Json(new { resultado = false, mensaje = "La cantidad pedida debe ser mayor a 0" });
+                    }
+                }
+
+                // Asignar códigos del área y sector
                 objeto.CodigoArea = (int)Session["CodArea"];
                 objeto.CodigoSector = (int)Session["CodSector"];
 
-                // Validaciones de negocio
-                if (objeto.CantidadPedida <= 0)
-                {
-                    return Json(new { resultado = false, mensaje = "La cantidad pedida debe ser mayor a 0" });
-                }
-
-                if (objeto.oProductos?.IdProducto == 0)
-                {
-                    return Json(new { resultado = false, mensaje = "Seleccione un producto válido" });
-                }
-
-                // Lógica de fechas
-                if (objeto.IdSolicitud == 0) // Nuevo pedido
-                {
-                    objeto.FechaPedido = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                    if (objeto.CantidadEntregada > 0)
-                    {
-                        objeto.FechaEntrega = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    }
-                }
-
+                // Llamar a la capa de negocio
                 string mensaje = string.Empty;
                 string nroPedidoGenerado = string.Empty;
-                bool resultadoOperacion;
+                int idGenerado = _cnPedidos.Registrar(objeto, listaProductos, out mensaje, out nroPedidoGenerado);
 
-                // Registrar o Editar
-                if (objeto.IdSolicitud == 0)
-                {
-                    System.Diagnostics.Debug.WriteLine("Registrando nuevo pedido...");
-                    int idGenerado = _cnSolicitudPedidos.Registrar(objeto, out mensaje, out nroPedidoGenerado);
-                    resultadoOperacion = idGenerado > 0;
-
-                    if (resultadoOperacion)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Pedido registrado. ID: {idGenerado}, Nro: {nroPedidoGenerado}");
-                        objeto.NroPedido = nroPedidoGenerado; // Asignar número generado
-                    }
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"Editando pedido ID: {objeto.IdSolicitud}");
-                    resultadoOperacion = _cnSolicitudPedidos.Editar(objeto, out mensaje);
-                }
+                bool esExito = idGenerado > 0;
 
                 return Json(new
                 {
-                    resultado = resultadoOperacion,
-                    mensaje = resultadoOperacion ? "Operación exitosa" : mensaje,
-                    nroPedido = nroPedidoGenerado // Devolver número generado
+                    resultado = esExito,
+                    mensaje = esExito ? "Operación exitosa" : mensaje,
+                    nroPedido = nroPedidoGenerado
                 });
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error crítico: {ex.ToString()}");
                 return Json(new
                 {
                     resultado = false,
@@ -248,7 +223,6 @@ namespace TonerHP.Controllers
                 });
             }
         }
-
 
 
 
