@@ -144,9 +144,7 @@ namespace CapaDatos
             return lista;
         }
 
-        public List<SolicitudPedidos> ListarFiltradosNro(
-        string nroPedido = null,
-         bool soloPendientes = false)
+        public List<SolicitudPedidos> ListarFiltradosNro(string nroPedido = null,bool soloPendientes = false)
         {
             List<SolicitudPedidos> lista = new List<SolicitudPedidos>();
 
@@ -767,6 +765,7 @@ namespace CapaDatos
 
         public List<UsuarioDatos> ObtenerSectoresPorArea(int? codArea = null)
         {
+            Console.WriteLine(codArea);
             List<UsuarioDatos> sectores = new List<UsuarioDatos>();
             using (SqlConnection connection = new SqlConnection(Conexion.cn))
             {

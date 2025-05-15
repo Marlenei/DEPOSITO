@@ -656,6 +656,7 @@
     <Content Include="Views\Shared\_LimpiarM.cshtml" />
     <Content Include="Views\Toner\EntregaPedidos.cshtml" />
     <Content Include="Views\Toner\Reportes.cshtml" />
+    <Content Include="Views\Home\Prueba.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -109,8 +109,8 @@
 
                     <div class="col-sm-6">
                         <label class="form-label">Tipo de Ingreso</label>
-                        <select id="txttipoingreso" class="form-select">
-                            <option value="">Seleccionar</option>
+                        <select id="txttipoingreso" class="form-select" placeholder="Seleccionar">
+                            <option value=" ">Seleccionar</option>
                             <option value="C">Compra</option>
                             <option value="D">Devolucion</option>
                             <option value="O">Otro</option>
@@ -305,7 +305,8 @@
                     {
                         targets: [6, 7], render: function (data) {
                             return moment(data).format('DD/MM/YYYY');
-                        }                    }
+                        }
+                    }
                 ],
                 "language": {
                     "url": "../Language/es-Es.json",
@@ -314,14 +315,6 @@
             });
 
         });
-
-        function LimpiarSelects() {
-            $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo ').val('').trigger('change');
-            CargarProductos(permisos.map(p => p.Accesos));
-        }
-
-
-
 
         //Informacion del producto
         //$('#StockDatos').on('input', function () {

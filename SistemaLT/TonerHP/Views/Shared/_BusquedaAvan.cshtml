@@ -1,6 +1,6 @@
 ﻿@{ ViewData["Title"] = "Filtrado de PRoductos"; }
 <div class="container">
-    <div class="row" style="border: 2px solid #000000; padding: 10px; border-radius: 5px;">
+    <div class="row">
         <div class="col-sm-6">
             <label class="form-label">Rubro</label>
             <select id="cborubro" class="form-select" name="idRubro" onchange="CargarTipos(this.value)">
@@ -10,10 +10,8 @@
 
         <div class="col-sm-6">
             <label class="form-label">Tipo</label>
-            <div class="mt-0">
-                <select id="cbotipo" class="form-select" name="idTipo" onchange="CargarProductosporTipo(this.value, document.getElementById('cborubro').value)">
+                <select style="width:100%" id="cbotipo" disabled class="form-select" name="idTipo" onchange="CargarProductosporTipo(this.value, document.getElementById('cborubro').value)">
                 </select>
-            </div>
         </div>
     </div>
     

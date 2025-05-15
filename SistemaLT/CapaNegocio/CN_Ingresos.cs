@@ -47,7 +47,7 @@ namespace CapaNegocio
             {
                 Mensaje = "CodigoId solo pueden contener letras y números";
             }
-            else if (char.IsWhiteSpace(obj.TipoIngreso))
+            else if (obj.TipoIngreso == '\0')
             {
                 Mensaje = "Ingresar el tipo de ingreso";
             }
@@ -55,7 +55,7 @@ namespace CapaNegocio
             {
                 Mensaje = "Observaciones solo pueden contener letras y números.";
             }
-            else if (obj.Cantidad <= 0)
+            else if (obj.Cantidad < 0)
             {
                 Mensaje = "Cantidad debe ser un número positivo.";
             }

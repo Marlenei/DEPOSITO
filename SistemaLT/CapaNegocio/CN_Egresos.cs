@@ -12,10 +12,12 @@ namespace CapaNegocio
     public class CN_Egresos
 
     {
-        // Método para verificar si la cadena es alfanumérica
         private bool IsAlphanumeric(string input)
         {
-            // Expresión regular que permite solo letras y números
+            if(input == null)
+            {
+                return true;
+            }
             return Regex.IsMatch(input, "^[a-zA-Z0-9]*$");
         }
 
@@ -30,21 +32,43 @@ namespace CapaNegocio
         {
             Mensaje = string.Empty;
 
-            
 
-             if (objeto.oProductos.IdProducto == 0)
+
+            if (objeto.oProductos.IdProducto == 0)
             {
                 Mensaje = "Ingresar producto";
             }
 
-            else if (string.IsNullOrEmpty(objeto.CodigoId) || string.IsNullOrWhiteSpace(objeto.CodigoId))
+            else if (!IsAlphanumeric(objeto.CodigoId))
             {
-                Mensaje = "Ingresar codigo";
+                Mensaje = "Codigo solo debe contener numeros o letras";
             }
-            
+
             else if (objeto.IdUsuario == 0)
             {
                 Mensaje = "Ingresar usuario";
+            }
+
+            else if (!IsAlphanumeric(objeto.Observaciones))
+            {
+                Mensaje = "Observaciones solo debe contener numeros o letras";
+            }
+
+            else if (objeto.TipoSalida == '\0')
+            {
+                Mensaje = "Debe elegir un tipo de salida";
+            }
+
+            else if (objeto.CodigoArea == 0)
+            {
+                Mensaje = "Ingresar Area";
+
+            }
+
+            else if (objeto.CodigoSector == 0)
+            {
+                Mensaje = "Ingresar Sector";
+
             }
 
             if (string.IsNullOrEmpty(Mensaje))
