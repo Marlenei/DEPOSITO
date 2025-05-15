@@ -1,0 +1,95 @@
+﻿
+@{
+    ViewBag.Title = "Prueba";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog  modal-xl">*@
+<div class="modal-content">
+    <div class="modal-header bg-dark text-white">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Salida de stock</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body g-2">
+        <input id="txtid" type="hidden" value="" />
+        <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
+        <div class="col-sm-3" style="justify-self: center;">
+                <label for="txtfechaegreso" class="form-label">Fecha de Egreso</label>
+                <input type="text" class="form-control" id="txtfechaegreso" readonly>
+        </div>
+        <div class="row row-cols-2 " id="contenedor">
+            <div id="contenedor" class="col border rounded p-2 bg-light">
+                <p style="text-align:center">Filtros de busqueda</p>
+                @Html.Partial("_BusquedaAvan")
+            </div>
+
+            <div class="col">
+                <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                <input type="text" class="form-control" id="txtcodigoid">
+                <label for="txtcantidad" class="form-label">Cantidad</label>
+                <input type="text" class="form-control" id="txtcantidad">
+                <label for="txtobservaciones" class="form-label">Observaciones</label>
+                <input type="text" class="form-control" id="txtobservaciones">
+            </div>
+
+            <div class="col border rounded p-2 bg-light">
+                <label class="form-label" style="text-align:center;">Producto </label>
+                <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
+                </select>
+                <p style="text-align: center; margin-top:5px">Informacion del producto</p>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Stock Actual</span>
+                    <input id="cbostockactual" type="text" class="form-control" readonly>
+                    <span class="input-group-text">Codigo ID</span>
+                    <input id="infocodigoid" type="text" class="form-control" readonly>
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Rubro</span>
+                    <input id="inforubro" type="text" class="form-control" readonly>
+                    <span class="input-group-text">Tipo</span>
+                    <input id="infotipo" type="text" class="form-control" readonly>
+                </div>
+            </div>
+
+            <div class="col">
+                <label class="form-label">Tipo de Salida</label>
+                <select id="txttipoingreso" class="form-select">
+                    <option value="">Seleccionar</option>
+                    <option value="C">Interna</option>
+                    <option value="D">Externa</option>
+                    <option value="E">Devolucion</option>
+                    <option value="O">Otro</option>
+                </select>
+
+                <label for="txtcodigoarea" class="form-label">Area</label>
+                <select id="txtcodigoarea" class="form-select" style="width: 100%" name="codArea" onchange="CargarSectores(this.value)">
+                </select>
+                <label for="txtcodigosector" class="form-label">Sector</label>
+                <select id="txtcodigosector" class="form-select" style="width: 100%">
+                </select>
+            </div>
+
+
+            @*--------Mensaje de alerta----------*@
+            <div class="row mt-12">
+                <div class="col-12">
+                    <div id="mensajeError" class="alert alert-danger" role="alert">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+@*</div>
+    </div>*@
