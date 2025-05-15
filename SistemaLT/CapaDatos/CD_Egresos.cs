@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CapaEntidad;
+using System.Web;
+
 
 namespace CapaDatos
 {
@@ -23,8 +25,10 @@ namespace CapaDatos
                         CommandType = CommandType.StoredProcedure
                     };
                     oconexion.Open();
+                    Console.WriteLine("Ejecutando el procedimiento almacenado...");
                     using (SqlDataReader rdr = cmd.ExecuteReader())
                     {
+                        Console.WriteLine("Procedimiento almacenado ejecutado correctamente.");
                         while (rdr.Read())
                         {
                             lista.Add(new Egresos()
@@ -65,6 +69,22 @@ namespace CapaDatos
             {
               throw new Exception("Error al listar egresos: " + ex.Message);
             }
+            var permisos = HttpContext.Current.Session["PermissionsCode"] as List<Permiso>; 
+            if (permisos != null)
+            {
+                bool tiene25 = permisos.Any(p => p.Accesos == 25);
+                bool tiene183 = permisos.Any(p => p.Accesos == 183);
+
+
+                if (tiene25)
+                {
+                    lista = lista.Where(e => e.oProductos.oRubros.Rubro != "Insumos Informaticos").ToList();
+                }
+                else if (tiene183)
+                {
+                    lista = lista.Where(e => e.oProductos.oRubros.Rubro == "Insumos Informaticos").ToList();
+                }
+            }
             return lista;
         }
 
@@ -78,19 +98,13 @@ namespace CapaDatos
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@IdProducto", obj.oProductos.IdProducto);
                 cmd.Parameters.AddWithValue("@Cantidad", obj.Cantidad);
-                cmd.Parameters.AddWithValue("@CodigoId", obj.CodigoId);
-                cmd.Parameters.AddWithValue("@Observaciones", obj.Observaciones);
+                cmd.Parameters.AddWithValue("@CodigoId", (object)obj.CodigoId ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Observaciones", (object)obj.Observaciones ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@IdUsuario", obj.IdUsuario);
-                cmd.Parameters.AddWithValue("@StockActual", obj.oProductos.StockActual);
                 cmd.Parameters.AddWithValue("@TipoSalida", obj.TipoSalida);
                 cmd.Parameters.AddWithValue("@CodigoArea", obj.CodigoArea);
                 cmd.Parameters.AddWithValue("@CodigoSector", obj.CodigoSector);
-                DateTime fechaEgresoFinal = fechaEgreso ?? DateTime.Now; 
-                cmd.Parameters.AddWithValue("@FechaEgreso", fechaEgresoFinal);
-
-              
-
-
+                cmd.Parameters.AddWithValue("@FechaEgreso", Convert.ToDateTime(obj.FechaEgreso));         
                 cmd.Parameters.Add("@Resultado", SqlDbType.Int).Direction = ParameterDirection.Output;
 
                 try

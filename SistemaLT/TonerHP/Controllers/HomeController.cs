@@ -27,5 +27,9 @@ namespace TonerHP.Controllers
                 return View();
             }
 
+        public ActionResult Prueba()
+        {
+            return View();
+        }
     }
 }

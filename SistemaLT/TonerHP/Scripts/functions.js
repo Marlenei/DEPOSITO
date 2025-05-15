@@ -23,9 +23,13 @@ function CargarRubros(urlrubros, permisos) {
         success: function (data) {
             $("#cbostockactual").empty();
             $("#cborubro").empty();
+
+
             var opciones = [];
             var notienetoner = permisos.includes(24) || permisos.includes(25);
             var tienetoner = permisos.includes(184) || permisos.includes(183);
+
+
             $.each(data.data, function (index, valor) {
                 if (valor.Activo === true) {
                     if (notienetoner && valor.Rubro !== "Insumos Informaticos") {
@@ -47,6 +51,8 @@ function CargarRubros(urlrubros, permisos) {
                 allowClear: true,
                 dropdownParent: $('#FormModal'),
             }).val(null).trigger('change'); 
+
+
             $("#cbotipo").empty(); 
             $("#cbodetalle").empty(); 
 
@@ -75,6 +81,7 @@ function CargarTipos(idRubro) {
         dataType: "json",
         contentType: "application/json; charset=utf-8",
         success: function (data) {
+            $('#cbotipo').prop('disabled', false)
             $("#cbotipo").empty();
             var opciones = [];
             $.each(data, function (index, valor) {
@@ -86,11 +93,11 @@ function CargarTipos(idRubro) {
                 }
             });
             $('#cbotipo').select2({
-                placeholder: "Selecciona una opción",
+                placeholder: "Selecciona un rubro",
                 data: opciones,
                 allowClear: true,
                 dropdownParent: $('#FormModal'),
-            }).val(null).trigger('change'); 
+            }).val('').trigger('change'); 
             $("#cbodetalle").empty();
 
         },
@@ -248,8 +255,15 @@ function LimpiarCampos() {
     $('.modal').on('hidden.bs.modal', function (e) {
         $(this).find('input, select, textarea').val(''); 
         $(this).find('select').val('').trigger('change');
+        $('#cbotipo').prop('disabled', true)
         $(this).removeData();
     });
+}
+
+function LimpiarSelects() {
+    $('#cbotipo').empty().prop('disabled', true);
+    $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo').val('').trigger('change');
+    CargarProductos(permisos.map(p => p.Accesos));
 }
 
 //INICIALIZADOR DE TOOLTIPS

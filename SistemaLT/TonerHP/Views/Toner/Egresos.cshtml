@@ -22,13 +22,32 @@
             <input type="text" name="daterange" />
         </div>
 
-
-        <div id="filterContainer">
-            <label for="filterRubroSelect">Filtrar por Rubro:</label>
-            <select id="filterRubroSelect" style="width: 20%;">
-                <option value="">Todos</option>
-            </select>
+        <div class="row">
+            <div id="filterContainer"  class="col-5">
+                <label for="filterRubroSelect">Filtrar por Rubro:</label>
+                <select id="filterRubroSelect" style="width: 68%;">
+                    <option value="">Todos</option>
+                </select>
+            </div>
         </div>
+
+        <div class="row">
+            <div id="filterContainer" class="col-5">
+                <label for="filterAreaSelect">Filtrar por Area:</label>
+                <select id="filterAreaSelect" style="width: 70%;">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+
+            <div id="filterContainer" class="col-5">
+                <label for="filterSectorSelect">Filtrar por Sector:</label>
+                <select id="filterSectorSelect" style="width: 70%;">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+
+        </div>
+
 
         <table id="tabla" class="table table-striped-columns table-hover table-bordered" style="width: 100% !important; table-layout: fixed;">
             <thead class="table-dark">
@@ -61,7 +80,7 @@
             </tbody>
         </table>
     </div>
-</div>
+    </div>
 <!-- Modal -->
 <div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog  modal-xl">
@@ -73,19 +92,29 @@
             <div class="modal-body g-2">
                 <input id="txtid" type="hidden" value="" />
                 <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
-                <div class="col-sm-3" style="justify-self: center;">
-                    <label for="txtfechaegreso" class="form-label">Fecha de Egreso</label>
-                    <input type="text" class="form-control" id="txtfechaegreso" readonly>
+                <div class="d-flex align-items-center mb-3" style=" justify-content: center;">
+                    <label for="txtfechaegreso" class="form-label me-2 mb-0">Fecha de Egreso:</label>
+                    <input type="text" class="form-control" id="txtfechaegreso" readonly style="max-width: 200px;">
                 </div>
-                <div class="row g-2" id="contenedor">
-                    <div id="contenedor" class="col-sm-6">
+                <div class="row row-cols-2 " id="contenedor">
+                    <div id="contenedor" class="col border rounded p-2 bg-light">
                         <p style="text-align:center">Filtros de busqueda</p>
                         @Html.Partial("_BusquedaAvan")
                     </div>
 
+                    <div class="col">
+                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                        <input type="text" class="form-control" id="txtcodigoid">
 
-                    <div class="col-sm-6">
-                        <label class="form-label" style="text-align:center;">Producto </label>
+                        <label for="txtcantidad" class="form-label">Cantidad</label>
+                        <input type="text" class="form-control" disabled id="txtcantidad">
+
+                        <label for="txtobservaciones" class="form-label">Observaciones</label>
+                        <input type="text" class="form-control" id="txtobservaciones">
+                    </div>
+
+                    <div class="col border rounded p-2 bg-light">
+                        <p style="text-align: center;">Producto</p>
                         <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
                         </select>
                         <p style="text-align: center; margin-top:5px">Informacion del producto</p>
@@ -104,64 +133,41 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-6">
-                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
-                        <input type="text" class="form-control" id="txtcodigoid">
-                    </div>
-
-                    <div class="col-sm-6">
-                        <label for="txtcantidad" class="form-label">Cantidad</label>
-                        <input type="text" class="form-control" id="txtcantidad">
-                    </div>
-
-
-
-                    <div class="col-sm-6">
-                        <label for="txtobservaciones" class="form-label">Observaciones</label>
-                        <input type="text" class="form-control" id="txtobservaciones">
-                    </div>
-
-                    <div class="col-sm-6">
+                    <div class="col">
                         <label class="form-label">Tipo de Salida</label>
-                        <select id="txttipoingreso" class="form-select">
+                        <select id="txttipoegreso" class="form-select">
                             <option value="">Seleccionar</option>
-                            <option value="C">Interna</option>
-                            <option value="D">Externa</option>
-                            <option value="E">Devolucion</option>
+                            <option value="I">Interna</option>
+                            <option value="E">Externa</option>
+                            <option value="D">Devolucion</option>
                             <option value="O">Otro</option>
                         </select>
-                    </div>
 
-                    <div class="col-sm-6">
                         <label for="txtcodigoarea" class="form-label">Area</label>
-                        <select id="txtcodigoarea" class="form-select" name="codArea" onchange="CargarSectores(this.value)">
+                        <select id="txtcodigoarea" class="form-select" style="width: 100%" name="codArea" onchange="CargarSectores(this.value)">
+                        </select>
+                        <label for="txtcodigosector" class="form-label">Sector</label>
+                        <select id="txtcodigosector" class="form-select" style="width: 100%">
                         </select>
                     </div>
 
-                    <div class="col-sm-6">
-                        <label for="txtcodigosector" class="form-label">Sector</label>
-                        <input type="text" class="form-control" id="txtcodigosector">
-                    </div>
 
+                    @*--------Mensaje de alerta----------*@
+                    <div class="row mt-12">
+                        <div class="col-12">
+                            <div id="mensajeError" class="alert alert-danger" role="alert">
 
-
-
-                </div>
-
-                @*--------Mensaje de alerta----------*@
-                <div class="row mt-12">
-                    <div class="col-12">
-                        <div id="mensajeError" class="alert alert-danger" role="alert">
+                            </div>
 
                         </div>
 
                     </div>
 
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -212,19 +218,20 @@
 
         $.fn.dataTable.moment('DD/MM/YYYY');
         $(document).ready(function () {
-            $('#txtcodigoarea').select2({
+
+
+            $('#txtcodigoarea,#txtcodigosector').select2({
                 placeholder: "Selecciona una opción",
                 allowClear: true,
                 dropdownParent: $('#FormModal'),
             });
-            $('#filterRubroSelect').select2({
-                placeholder: "Selecciona un Rubro",
+
+            $('#filterRubroSelect,#filterAreaSelect,#filterSectorSelect' ).select2({
+                placeholder: "Seleccionar",
                 allowClear: true,
             });
 
             CargarAreas();
-            CargarSectores();
-
             CargarProductos(permisos.map(p => p.Accesos));
 
              var urlrubros = '@Url.Action("ListarRubros", "Toner")'
@@ -304,7 +311,10 @@
                     },
                     {
                         "data": "oProductos.oRubros.Rubro",
-                        visible: false
+                        //visible: false,
+                        "render": function (data) {
+                            return data ? data : '';
+                        },
                     },
                     {
                         "defaultContent": '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>',
@@ -329,18 +339,12 @@
                 },
                 initComplete: function () {
                     var api = this.api();
-                    var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
-                    console.log(permisos)
-                    var tienePermiso25 = permisos.includes(25);
-                    var tienePermiso183 = permisos.includes(183);
+
+                    //FILTRO RUBRO
                     $('#filterRubroSelect').append('<option value="">Seleccionar Rubro</option>');
                     api.column(9).data().unique().sort().each(function (valor) {
                         if (valor) {
-                            console.log(valor)
-                            if ((tienePermiso25 && valor !== "Insumos Informaticos") ||
-                                (tienePermiso183 && valor === "Insumos Informaticos")) {
                                 $('#filterRubroSelect').append('<option value="' + valor + '">' + valor + '</option>');
-                            }
                         }
                     });
                     $('#filterRubroSelect').on('change', function () {
@@ -351,15 +355,42 @@
                             .search(val ? '^' + val + '$' : '', true, false)
                             .draw();
                     });
+
+
+                    //FILTRO AREA
+                    $('#filterAreaSelect').append('<option value="">Seleccionar Area</option>');
+                    api.column(7).data().unique().sort().each(function (valor) {
+                        if (valor) {
+                            $('#filterAreaSelect').append('<option value="' + valor + '">' + valor + '</option>');
+                        }
+                    });
+                    $('#filterAreaSelect').on('change', function () {
+                        var selectedVal = $(this).val();
+                        var val = selectedVal ? $.fn.dataTable.util.escapeRegex(selectedVal) : '';
+                        api
+                            .column(7)
+                            .search(val ? '^' + val + '$' : '', true, false)
+                            .draw();
+
+                        //FILTRO SECTOR
+                        $('#filterSectorSelect').append('<option value="">Seleccionar Sector</option>');
+                        api.column(8).data().unique().sort().each(function (valor) {
+                            if (valor) {
+                                $('#filterSectorSelect').append('<option value="' + valor + '">' + valor + '</option>');
+                            }
+                        });
+                        $('#filterSectorSelect').on('change', function () {
+                            var selectedVal = $(this).val();
+                            var val = selectedVal ? $.fn.dataTable.util.escapeRegex(selectedVal) : '';
+                            api
+                                .column(8)
+                                .search(val ? '^' + val + '$' : '', true, false)
+                                .draw();
+                        });
+                    });
                 }
             });
-
         });
-
-        function LimpiarSelects() {
-            $('#cbodetalle,#cbocodigo,#cborubro,#cbotipo ').val('').trigger('change');
-            CargarProductos(permisos.map(p => p.Accesos));
-        }
 
         function CargarProductos(permisos) {
             $.ajax({
@@ -375,7 +406,8 @@
                     var tienePermiso24 = permisos.includes(24);
                     var tienePermiso184 = permisos.includes(184);
                     $.each(data.data, function (index, valor) {
-                        if (valor.Activo === true) {
+                        console.log(valor.StockActual);
+                        if (valor.Activo === true && valor.StockActual >= 1 ) {
                             if (tienePermiso24 && valor.oRubros.Rubro !== "Insumos Informaticos") {
                                 opciones.push({
                                     id: valor.IdProducto,
@@ -421,7 +453,7 @@
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 success: function (data) {
-                    $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#txtcodigoarea");
+                    $("#txtcodigoarea").empty();
                     var opciones = [];
                     $.each(data, function (index, valor) {
                         opciones.push({
@@ -434,7 +466,8 @@
                         data: opciones,
                         allowClear: true,
                         dropdownParent: $('#FormModal'),
-                    })
+                    }).val(null).trigger('change'); 
+                    $("#txtcodigosector").empty(); 
                 },
                 error: function (error) {
                     console.log(error)
@@ -443,27 +476,40 @@
         }
 
         function CargarSectores(codArea) {
-              $.ajax({
-                  url: '@Url.Action("ObtenerSectoresPorArea", "SolicitudPedidos")',
+            if (!codArea) {
+                $('#txtcodigosector').empty().prop('disabled', true).select2({
+                    placeholder: "Seleccione primero un área",
+                    allowClear: true,
+                    dropdownParent: $('#FormModal'),
+                }).val(null).trigger('change');
+                return;
+            }
+
+            $.ajax({
+                  url: '@Url.Action("ObtenerSectoresPorArea", "SolicitudPedidos")' + '?codArea=' + codArea,
                   type: "GET",
                   data: null,
                   dataType: "json",
                   contentType: "application/json; charset=utf-8",
                   success: function (data) {
-                      $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#txtcodigosector");
+                      $("#txtcodigosector").empty();
+                      $("#txtcodigosector").prop('disabled', false);
                       var opciones = [];
+
                       $.each(data, function (index, valor) {
                           opciones.push({
                               id: valor.CodSector,
                               text: valor.Nombre
                           });
                       });
+
+
                       $('#txtcodigosector').select2({
-                          placeholder: "Selecciona un sector",
+                          placeholder: "Seleccione primero un area",
                           data: opciones,
                           allowClear: true,
                           dropdownParent: $('#FormModal'),
-                      })
+                      }).val(null).trigger('change'); 
                   },
                   error: function (error) {
                       console.log(error)
@@ -475,15 +521,11 @@
             CargarProductos(permisos.map(p => p.Accesos));
             $("#txtid").val(0);
             $("#cbodetalle").val("");
-            $("#txtcantidad").val("");
-            $("#cbostockactual").val("");
+            $("#txtcantidad").val(1);
             $("#txtcodigoid").val("");
-            $("#txttipoingreso").val("");
+            $("#txttipoegreso").val("");
             $('#txtfechaegreso').val(new Date().toLocaleDateString('es-AR'));
-            $('#txtfechaegreso').datepicker({
-                minDate: "-30D",
-                maxDate: 0
-            });
+            //$('#txtfechaegreso').datepicker({});
             $("#txtobservaciones").val("");
             $("#txtcodigoarea").val("");
             $("#txtcodigosector").val("");
@@ -510,7 +552,7 @@
                 } else {
                     modalTitle('Editar');
 
-                    var fechaActMatch = json.FechaIngreso.match(/\/Date\((\d+)\)\//);
+                    var fechaActMatch = json.FechaEgreso.match(/\/Date\((\d+)\)\//);
                     var timestamp = parseInt(fechaActMatch[1], 10);
                     var fechaegreso = new Date(timestamp);
                     var dia = fechaegreso.getDate().toString().padStart(2, '0');
@@ -521,10 +563,10 @@
                     $("#txtid").val(json.IdEgreso);
                     $("#cbodetalle").val(json.oProductos.IdProducto);
                     $("#txtcantidad").val(json.Cantidad);
-                    $("#cbostockactual").val(json.oProductos.StockActual);
                     $("#txtcodigoid").val(json.CodigoId);
-                    $("#txttipoingreso").val(json.TipoSalida);
-                    $('#txtfechaegreso').datepicker('setDate', fechaEgreso);
+                    $("#txttipoegreso").val(json.TipoSalida);
+                    $('#txtfechaegreso').val(fechaFormateada);
+                    //$('#txtfechaegreso').datepicker({});
                     $("#txtobservaciones").val(json.Observaciones);
                     $("#txtcodigoarea").val(json.CodigoArea);
                     $("#txtcodigosector").val(json.CodigoSector);
@@ -592,13 +634,14 @@
                 },
                 Cantidad: $("#txtcantidad").val(),
                 CodigoId: $("#txtcodigoid").val(),
-                TipoSalida: $("#txttipoingreso option:selected").val(),
-                FechaEgreso: $('#txtfechaingreso').val(),
+                TipoSalida: $("#txttipoegreso option:selected").val(),
+                FechaEgreso: $('#txtfechaegreso').val(),
                 Observaciones: $("#txtobservaciones").val(),
                 IdUsuario: $("#txtusuario").val(),
                 CodigoArea: $("#txtcodigoarea").val(),
                 CodigoSector: $("#txtcodigosector").val(),
             };
+            console.log(Egresos);
 
             jQuery.ajax({
                 url: '@Url.Action("GuardarEgresos", "Toner")',
@@ -609,10 +652,19 @@
                 success: function (data) {
                     $(".modal-body").LoadingOverlay("hide");
                     // EGRESO NUEVO
+                    console.log("Ingreso")
+                    console.log(Egresos.IdEgreso);
                     if (Egresos.IdEgreso == 0) {
-                        Egresos.IdEgreso = data.resultado;
-                        tabladata.row.add(Egresos).draw(false);
-                        $("#FormModal").modal("hide");
+                        if (data.resultado != 0) {
+                            Egresos.IdEgreso = data.resultado;
+                            console.log(Egresos.IdEgreso);
+                            console.log(data.resultado);
+                            console.log(data.mensaje);
+                            tabladata.row.add(Egresos).draw(false);
+                            $("#FormModal").modal("hide");
+                        }
+                        $("#mensajeError").text(data.mensaje);
+                        $("#mensajeError").show();
                     }
                     // EGRESO EDITAR
                     else {

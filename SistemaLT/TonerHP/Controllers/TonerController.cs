@@ -394,6 +394,7 @@ namespace TonerHP.Controllers
             return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
         public JsonResult GuardarEgresos(Egresos objeto)
         {
             object resultado;
