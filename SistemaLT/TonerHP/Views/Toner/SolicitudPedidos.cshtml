@@ -21,11 +21,9 @@
                     </div>
                     <div class="col-md-4 mb-2 mb-md-0">
                         <span class="d-block text-success">@Session["NombreArea"]</span>
-                        <small class="text-muted">Código: @Session["CodArea"]</small>
                     </div>
                     <div class="col-md-4">
                         <span class="d-block text-success">@Session["NombreSector"]</span>
-                        <small class="text-muted">Código: @Session["CodSector"]</small>
                     </div>
                 </div>
             </div>
@@ -46,13 +44,15 @@
                     <button class="btn btn-primary"
                             type="button"
                             onclick="buscarPorNumero()">
+
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
             </div>
             <div class="col-md-6">
+
                 <button class="btn btn-warning w-100"
-                        onclick="mostrarPendientes()">
+                        onclick="mostrarMisPedidos()">
                     <i class="fas fa-clipboard-list me-2"></i>
                     Ver Pedidos Realizados Por Mi
                 </button>
@@ -60,10 +60,13 @@
         </div>
 
         <!-- NUEVA SECCIÓN PARA EL TÍTULO -->
+        <!-- Título dinámico -->
         <div class="row mb-3">
-            <!- mb-3 para un pequeño margen inferior antes de la tabla -->
             <div class="col-12 text-center">
-                <h4 id="tituloTablaPedidos" class="text-primary">PEDIDOS DE MI ÁREA</h4> <!-- O el texto que prefieras -->
+                <!-- Añade un ID si aún no lo tiene y quizás una clase para estilo -->
+                <h4 id="tituloTablaPedidos" class="text-primary titulo-dinamico">
+                    PEDIDOS DE MI ÁREA
+                </h4>
             </div>
         </div>
         <!-- FIN DE LA NUEVA SECCIÓN PARA EL TÍTULO -->
@@ -128,14 +131,17 @@
                     </div>
                 </fieldset>
 
-                <!-- SECCIÓN 2: Agregar Productos y Lista -->
+                <!-- SECCIÓN 2: Agregar/Editar Productos -->
                 <div class="row g-3">
-                    <!-- Columna Izquierda: Selección y Detalles del Producto a Agregar -->
-                    <div class="col-lg-5">
+                    <!-- Columna Izquierda: Selección y Detalles del Producto (para Nuevo y Editar) -->
+                    <!-- LE DAMOS UN ID AL FIELDSET -->
+                    <div class="col-lg-5" id="columnaProductoIndividual">
                         <fieldset class="border p-2 h-100">
-                            <legend class="w-auto px-2" style="font-size: 0.9rem; font-weight: 600;">Agregar Producto</legend>
+                            <!-- Cambiamos la leyenda dinámicamente -->
+                            <legend id="leyendaProductoIndividual" class="w-auto px-2" style="font-size: 0.9rem; font-weight: 600;">Agregar Producto</legend>
 
-                            <div class="mb-2">
+                            <!-- DAMOS ID a la sección de búsqueda para ocultarla al editar -->
+                            <div class="mb-2" id="seccionBusquedaAvanzada">
                                 <label class="form-label-sm fw-bold d-block">Buscar Producto (Opcional)</label>
                                 <div class="border rounded p-2 bg-light">
                                     @Html.Partial("_BusquedaAvan")
@@ -144,6 +150,7 @@
 
                             <div class="mb-2">
                                 <label for="cbodetalle" class="form-label-sm">Producto:</label>
+                                <!-- El select se poblará y se seleccionará/deshabilitará en JS -->
                                 <select id="cbodetalle" class="form-select form-select-sm ProductosS" style="width: 100%"></select>
                             </div>
 
@@ -152,10 +159,7 @@
                                     <label for="txtcantidad" class="form-label-sm">Cantidad:</label>
                                     <input type="number" class="form-control form-control-sm" id="txtcantidad" min="1" value="1" required>
                                 </div>
-                                @*<div class="col-6">
-                                    <label class="form-label-sm">Stock Actual:</label>
-                                    <input id="cbostockactual" type="text" class="form-control form-control-sm" readonly>
-                                </div>*@
+                                @* Quitamos el stock de aquí, ya está abajo en info adicional *@
                             </div>
 
                             <div class="mb-2">
@@ -177,34 +181,31 @@
                                     <label class="form-label-sm">Tipo:</label>
                                     <input id="infotipo" type="text" class="form-control form-control-sm" readonly>
                                 </div>
+                                @* Agregamos el Stock aquí si quieres mostrarlo siempre *@
+                                <!--<div class="col-sm-4">
+                                    <label class="form-label-sm">Stock Actual:</label>
+                                    <input id="cbostockactual" type="text" class="form-control form-control-sm" readonly>
+                                </div>-->
                             </div>
 
-                            <button type="button" id="btnAgregar" class="btn btn-primary btn-sm w-100">
+                            <!-- OCULTAREMOS ESTE BOTÓN AL EDITAR -->
+                            <button type="button" id="btnAgregar" class="btn btn-primary btn-sm w-100 mt-2">
                                 <i class="fas fa-plus-circle me-1"></i> AGREGAR PRODUCTO
                             </button>
                         </fieldset>
                     </div>
 
-                    <!-- Columna Derecha: Lista de Productos Agregados -->
-                    <div class="col-lg-7">
+                    <!-- Columna Derecha: Lista de Productos Agregados (SOLO PARA NUEVO) -->
+                    <!-- LE DAMOS UN ID PARA OCULTARLA AL EDITAR -->
+                    <div class="col-lg-7" id="columnaListaProductos">
                         <fieldset class="border p-2 h-100">
                             <legend class="w-auto px-2" style="font-size: 0.9rem; font-weight: 600;">Productos en este Pedido</legend>
                             <span id="contadorProductos" class="form-text d-block mb-1">Productos agregados: 0</span>
 
                             <div id="seccionProductos" class="mt-1">
-                                <!-- No se aplica max-height ni overflow -->
                                 <table class="table table-bordered table-sm" id="tablaProductos">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Producto</th>
-                                            <th style="width: 15%;">Cant.</th>
-                                            <th>Observ.</th>
-                                            <th style="width: 20%;">Acción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Filas dinámicas aquí -->
-                                    </tbody>
+                                    <!-- ... thead ... -->
+                                    <tbody></tbody>
                                 </table>
                             </div>
                             <div id="mensajeVacioProductos" class="alert alert-secondary alert-sm mt-2 py-1" role="alert" style="display: block;">
@@ -270,6 +271,20 @@
     .select2-dropdown {
         z-index: 1061 !important; /* Bootstrap modal z-index es 1050/1055, backdrop 1060 si es static */
     }
+
+    .titulo-dinamico {
+        transition: color 0.2s ease-in-out; /* Suaviza el cambio de color */
+    }
+
+        .titulo-dinamico.clickable {
+            cursor: pointer;
+            color: #0d6efd; /* Azul primario de Bootstrap, o el que prefieras */
+        }
+
+            .titulo-dinamico.clickable:hover {
+                text-decoration: underline;
+                color: #0a58ca; /* Azul más oscuro al pasar el mouse */
+            }
 </style>
 
 @section scripts{
@@ -278,7 +293,11 @@
         // Configuración Inicial
         var tabladata;
         var filaSeleccionada;
-        /*var productos = {};*/
+        var urlPedidosArea = '@Url.Action("ListarPendientesPorArea", "SolicitudPedidos")';
+        var urlMisPedidos = '@Url.Action("Listar", "SolicitudPedidos")'; // URL para tus pedidos
+        var tituloArea = "PEDIDOS DE MI ÁREA";
+        var tituloMisPedidos = "MIS PEDIDOS REALIZADOS";
+        var tituloBusqueda = "RESULTADOS DE BÚSQUEDA";
         var codigoidprod = {};
         var stockprod = {};
         var rubroprod = {};
@@ -306,8 +325,18 @@
             cargarApiUrls();
             $('#btnGuardar').click(Guardar);
             editar();
+
             $('#btnAgregar').click(function () {
                 agregarProducto();
+
+
+            });
+
+            $('#tituloTablaPedidos').on('click', function () {
+                // Solo actúa si NO está mostrando los pedidos del área (es decir, si es clickable)
+                if ($(this).hasClass('clickable')) {
+                    mostrarPedidosArea();
+                }
             });
 
         });
@@ -493,157 +522,190 @@
             }
         });
 
-         function CargarProductos(permisos) {
-          $.ajax({
-              url: '@Url.Action("ListarProductos", "Toner")',
-              type: "GET",
-              data: null,
-              dataType: "json",
-              contentType: "application/json; charset=utf-8",
-              success: function (data) {
-                  $("#cbodetalle").empty();
-                  $("<option>").attr({ "value": "" }).text("Seleccionar").appendTo("#cbodetalle");
-                  var opciones = [];
-                  var tienePermiso24 = permisos.includes(24);
-                  var tienePermiso184 = permisos.includes(184);
-                  $.each(data.data, function (index, valor) {
+        function CargarProductos(permisos) {
+    // Devolver una promesa para poder usar await
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: '@Url.Action("ListarProductos", "Toner")',
+                    type: "GET",
+                    data: null, // No necesitas enviar permisos si el backend los obtiene de la sesión/rol
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        $("#cbodetalle").empty(); // Limpiar opciones existentes
+                        // Añadir opción placeholder/default si Select2 no la añade automáticamente
+                         $("<option>").attr({ "value": "" }).text("Seleccione un producto").appendTo("#cbodetalle");
 
-                      if (valor.Activo === true) {
-                          if (tienePermiso24 && valor.oRubros.Rubro !== "Insumos Informaticos") {
-                              opciones.push({
-                                  id: valor.IdProducto,
-                                  text: valor.Detalle
-                              });
-                              stockprod[valor.IdProducto] = valor.StockActual;
-                              codigoidprod[valor.IdProducto] = valor.CodigoId;
-                              rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
-                              tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
-                          } else if (tienePermiso184 && valor.oRubros.Rubro === "Insumos Informaticos") {
-                              opciones.push({
-                                  id: valor.IdProducto,
-                                  text: valor.Detalle
-                              });
-                              stockprod[valor.IdProducto] = valor.StockActual;
-                              codigoidprod[valor.IdProducto] = valor.CodigoId;
-                              rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
-                              tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
-                          }
-                      }
+                        var opciones = [];
+                        var tienePermiso24 = permisos.includes(24);
+                        var tienePermiso184 = permisos.includes(184);
+
+                        stockprod = {}; // Resetear objetos de datos
+                        codigoidprod = {};
+                        rubroprod = {};
+                        tipoprod = {};
+
+                        $.each(data.data, function (index, valor) {
+                            if (valor.Activo === true) {
+                                let añadir = false;
+                                if (tienePermiso24 && valor.oRubros.Rubro !== "Insumos Informaticos") {
+                                     añadir = true;
+                                } else if (tienePermiso184 && valor.oRubros.Rubro === "Insumos Informaticos") {
+                                     añadir = true;
+                                } else if (!tienePermiso24 && !tienePermiso184) {
+                                     // Si no hay permisos específicos, ¿mostrar todos? Ajusta según tu lógica.
+                                     // añadir = true; // Descomenta si quieres mostrar todos si no hay permisos específicos
+                                }
 
 
+                                if (añadir) {
+                                     // Guardar datos asociados al ID
+                                    stockprod[valor.IdProducto] = valor.StockActual;
+                                    codigoidprod[valor.IdProducto] = valor.CodigoId;
+                                    rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                                    tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                                    // Agregar opción al array para Select2
+                                    opciones.push({
+                                        id: valor.IdProducto,
+                                        text: valor.Detalle
+                                    });
+                                }
+                            }
+                        });
 
-                  });
-                  $('#cbodetalle').select2({
-                      placeholder: "Selecciona una opción",
-                      data: opciones,
-                      allowClear: true,
-                      dropdownParent: $('#FormModal'),
-                  }).val(null).trigger('change');
+                        // Inicializar o actualizar Select2 con los nuevos datos
+                        $('#cbodetalle').select2({
+                            placeholder: "Seleccione un producto",
+                            data: opciones, // Pasar los datos aquí
+                            allowClear: true,
+                            dropdownParent: $('#FormModal'), // Asegúrate que esto sigue siendo necesario
+                        }).val(null).trigger('change'); // Resetear selección inicial
 
-                  //$.each(data.data, function (index, valor) {
-
-                  //if (valor.Activo === true) {
-                  //    stockprod[valor.IdProducto] = valor.StockActual;
-                  //    codigoidprod[valor.IdProducto] = valor.CodigoId;
-                  //    rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
-                  //    tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
-                  //    $("<option>").attr({ "value": valor.IdProducto }).text(valor.Detalle).appendTo("#cbodetalle");
-                  //    }
-                  //});
-              },
-              error: function (error) {
-                  console.log(error)
-              },
-          });
-      }
+                        resolve(); // Indicar que la carga fue exitosa
+                    },
+                    error: function (error) {
+                        console.log("Error cargando productos:", error);
+                        reject(error); // Indicar que hubo un error
+                    },
+                });
+            });
+        }
 
         function modalTitle(title) {
             document.getElementById('titulodinamico').innerText = title;
         }
 
 
+        async function abrirModal(data) {
+            try {
+                const accesos = permisos.map(p => p.Accesos);
+                // Asegurarse de que los productos estén cargados ANTES de continuar
+                await CargarProductos(accesos); // Asumiendo que CargarProductos devuelve una Promesa o es síncrono
 
-            async function abrirModal(data) {
-    try {
-        // Extraer los accesos del usuario
-        const accesos = permisos.map(p => p.Accesos);
+                // --- Reset Común para Nuevo y Editar ---
+                $("#txtid").val(0);
+                $('#txtArea').val('@Session["NombreArea"]');
+                $('#txtSector').val('@Session["NombreSector"]');
+                // Usar el ID del usuario de la sesión directamente
+                //$('#txtusuario').val('@Session["AccesCode"]'); // No parece haber un campo txtusuario, usar txtusuarioId
+                // txtusuarioNombre ya se llena desde Razor
+                $("#mensajeError").hide();
+                $('#cbodetalle').val(null).trigger('change').prop("disabled", false); // Resetear y habilitar select
+                $("#txtcantidad").val(1); // Valor por defecto
+                $("#txtobservaciones").val("");
+                $("#infocodigoid").val("");
+                $("#inforubro").val("");
+                $("#infotipo").val("");
+                $("#cbostockactual").val(""); // Limpiar stock
+                $("#txtpedido").val("").prop("readonly", true); // Limpiar Nro Pedido (Autogenerado)
+                const fechaActual = new Date();
+                // IMPORTANTE: Usar formato 'dd/mm/yy' para visualización si usas datepicker en ese formato,
+                // pero asegúrate que al *guardar* uses 'yy-mm-dd' si el backend lo espera así.
+                // $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaActual)).prop("disabled", false);
+                // O si prefieres ISO y tu datepicker lo maneja:
+                $("#txtfechapedido").val($.datepicker.formatDate('yy-mm-dd', fechaActual)).prop("disabled", false);
 
-        // Esperar a que se carguen los productos antes de continuar
-        await CargarProductos(accesos);
-        productosAgregados = []; // Resetear productos
-        mostrarProductosAgregados();
-        // Configuración inicial de campos
-        $('#txtArea').val('@Session["NombreArea"]');
-        $('#txtSector').val('@Session["NombreSector"]');
-        $("#txtid").val(0);
-        $("#txtcantidad").val("");
-        $("#txtobservaciones").val("");
-        $("#txtusuario").val('@Session["AccesCode"]');
-        $("#mensajeError").hide();
 
-        // Resetear campos dinámicos
-        $("#cbodetalle").val("").prop("disabled", false);
-        $("#txtfechapedido").prop("disabled", false);
+                // --- Lógica Específica ---
+                if (data) {
+                    // ***** MODO EDICIÓN *****
+                    modalTitle('Editar Producto del Pedido');
+                    $("#leyendaProductoIndividual").text("Editar Producto"); // Cambiar leyenda
+                    $("#btnGuardar").text("Actualizar Producto").data("modo", "editar"); // Cambiar texto y añadir info de modo
+                    $("#btnImprimir").prop("disabled", !(data.NroPedido && data.NroPedido !== "0"));
 
-        // Configurar fecha actual en el formato correcto
-        const fechaActual = new Date();
-        $("#txtfechapedido").val($.datepicker.formatDate('yy-mm-dd', fechaActual));
-        console.log("Fecha de pedido:", $("#txtfechapedido").val());
+                    // Ocultar elementos de "Agregar Múltiples"
+                    $("#columnaListaProductos").hide();       // Ocultar columna derecha
+                    $("#seccionBusquedaAvanzada").hide();     // Ocultar búsqueda avanzada
+                    $("#btnAgregar").hide();                  // Ocultar botón "AGREGAR PRODUCTO"
 
-        // Siempre hacer el campo de solo lectura
-        $("#txtpedido").prop("readonly", true);
+                    // Mostrar elementos de edición individual (ya visibles por defecto, pero aseguramos)
+                    $("#columnaProductoIndividual").removeClass().addClass("col-lg-12"); // Hacer que ocupe todo el ancho
+                     $("#columnaProductoIndividual").show();
 
-        // Manejo específico de edición
-        if (data) {
-            modalTitle('Editar');
 
-            $("#txtid").val(data.IdSolicitud);
-            $("#txtcantidad").val(data.CantidadPedida);
-            $("#txtobservaciones").val(data.Observaciones);
+                    // Poblar datos del registro específico
+                    $("#txtid").val(data.IdSolicitud);
+                    $("#txtpedido").val(data.NroPedido).prop("readonly", true); // Mostrar Nro Pedido
 
-            // Configurar producto seleccionado
-            $("#cbodetalle")
-                .val(data.oProductos.IdProducto)
-                .prop("disabled", true)
-                .trigger('change');
+                    // Formatear y deshabilitar fecha si ya existe
+                    if (data.FechaPedido) {
+                        const fechaPedido = new Date(data.FechaPedido);
+                         if (!isNaN(fechaPedido.getTime())) {
+                             // Usar el mismo formato que al crear
+                             $("#txtfechapedido").val($.datepicker.formatDate('yy-mm-dd', fechaPedido)).prop("disabled", true);
+                         }
+                    }
 
-            // Configurar fecha del pedido
-            const fechaPedido = new Date(data.FechaPedido);
-            if (!isNaN(fechaPedido.getTime())) {
-                $("#txtfechapedido").val($.datepicker.formatDate('dd/mm/yy', fechaPedido));
+                    // Seleccionar el producto EN EL DROPDOWN
+                    // IMPORTANTE: Asegúrate que CargarProductos ya terminó y el option existe
+                    $('#cbodetalle').val(data.oProductos.IdProducto).trigger('change').prop("disabled", true); // Seleccionar y deshabilitar
+
+                     // Esperar un instante mínimo para que el evento 'change' de select2 actualice los campos info
+                    await new Promise(resolve => setTimeout(resolve, 50)); // Pequeña demora
+
+                    // Poblar cantidad y observaciones DESPUÉS de seleccionar el producto
+                    $("#txtcantidad").val(data.CantidadPedida);
+                    $("#txtobservaciones").val(data.Observaciones);
+
+                     // Poblar campos de info adicional (aunque el 'change' debería hacerlo, es bueno asegurar)
+                    $("#infocodigoid").val(obtenerCodigoPorId(data.oProductos.IdProducto));
+                    $("#inforubro").val(obtenerRubroPorId(data.oProductos.IdProducto));
+                    $("#infotipo").val(obtenerTipoPorId(data.oProductos.IdProducto));
+                    $("#cbostockactual").val(obtenerStockPorId(data.oProductos.IdProducto));
+
+
+                } else {
+                    // ***** MODO NUEVO PEDIDO *****
+                    modalTitle('Crear Nuevo Pedido');
+                    $("#leyendaProductoIndividual").text("Agregar Producto"); // Restaurar leyenda
+                    $("#btnGuardar").text("Guardar Pedido").data("modo", "nuevo"); // Cambiar texto y añadir info de modo
+                    $("#btnImprimir").prop("disabled", true);
+
+                    // Mostrar elementos de "Agregar Múltiples"
+                    $("#columnaListaProductos").show();         // Mostrar columna derecha
+                    $("#seccionBusquedaAvanzada").show();       // Mostrar búsqueda avanzada
+                    $("#btnAgregar").show();                    // Mostrar botón "AGREGAR PRODUCTO"
+
+                    // Asegurar layout correcto
+                     $("#columnaProductoIndividual").removeClass().addClass("col-lg-5"); // Restaurar ancho original
+                     $("#columnaProductoIndividual").show();
+
+
+                    // Limpiar lista de productos agregados
+                    productosAgregados = [];
+                    mostrarProductosAgregados(); // Actualizar tabla de productos agregados (vacía)
+
+                    // Campos ya reseteados al inicio
+                }
+
+                $("#FormModal").modal("show");
+
+            } catch (error) {
+                console.error("Error en abrirModal:", error);
+                mostrarError("Error al preparar el modal. Verifique la consola.");
             }
-            $("#txtfechapedido").prop("disabled", true);
-
-            // Configurar botones
-            if (data.NroPedido && data.NroPedido !== "0") {
-                $("#btnGuardar").text("Actualizar");
-                $("#exampleModalLabel").text("Modificar Pedido");
-                $("#btnImprimir").prop("disabled", false);
-            }
-        } else {
-            // Configuración específica de creación
-            modalTitle('Crear nuevo');
-
-            $("#btnGuardar").text("Guardar");
-            $("#txtid").val(0);
-            $("#txtcantidad").val(1);
-            // Resetear otros campos según necesidad
-            $("#cbostockactual").val("");
-            $("#infocodigoid").val("");
-            $("#inforubro").val("");
-            $("#infotipo").val("");
-            $("#cbostockactual").val("");
-            productosAgregados = []; // Limpiar la lista de productos
-            mostrarProductosAgregados(); // Actualizar la tabla (debería mostrarla vacía y el mensaje)
-            LimpiarCampos();
         }
-
-        $("#FormModal").modal("show");
-
-    } catch (error) {
-        console.error("Error en abrirModal:", error);
-    }
-}
 
         $("#cbodetalle").change(function () {
             var idProducto = $(this).val();
@@ -690,10 +752,23 @@
             $("#mensajeError").text(mensaje).show().delay(5000).fadeOut();
         }
 
-                   function inicializarDataTable() {
+
+
+        function inicializarDataTable() {
+
+            $('#tituloTablaPedidos').text(tituloArea)
+                .removeClass('clickable')
+                .css('cursor', 'default'); // Asegurar cursor normal
+
+
+
+            if ($.fn.DataTable.isDataTable('#tabla')) {
+                tabladata.destroy(); // Destruir si ya existe para reinicializar
+            }
+
                 tabladata = $('#tabla').DataTable({
                     ajax: {
-                        url: '@Url.Action("ListarPendientesPorArea", "SolicitudPedidos")',
+                        url:  urlPedidosArea,
                         dataSrc: 'data'
                     },
                     columns: [
@@ -755,8 +830,8 @@
                     ],
 
                     order: [
-                        [5, 'desc'], // Ordena por la 6ª columna (índice 5, "Fecha Pedido") en orden descendente
-                        [0, 'desc']  // Opcional: Luego por la 1ª columna (índice 0, "IdSolicitud") descendente
+                        [4, 'asc'], // Ordena por la 6ª columna (índice 5, "Fecha Pedido") en orden descendente
+                        // Opcional: Luego por la 1ª columna (índice 0, "IdSolicitud") descendente
                         // Ajusta el índice de la columna 'IdSolicitud' si no es la primera visible/invisible.
                         // Si IdSolicitud está visible y es la primera, sería [0, 'desc']
                         // Si está invisible como en tu ejemplo, y quieres usarla, asegúrate que esté en `columns`.
@@ -798,85 +873,179 @@
 
 
 
-         function buscarPorNumero() {
-                const nroPedido = $("#txtBuscarPedido").val().trim(); // Obtener valor del input
-                tabladata.ajax.url('@Url.Action("ListarFiltradosNro", "SolicitudPedidos")' +
-                    '?nroPedido=' + encodeURIComponent(nroPedido) +
-                    '&soloPendientes=false').load(function(data) {
-                        if (data.data.length === 0) {
-                            Swal.fire('¡Atención!', 'No se encontraron pedidos con ese número.', 'info');
+               function buscarPorNumero() {
+                    const nroPedido = $("#txtBuscarPedido").val().trim();
+                    if (!nroPedido) {
+                        Swal.fire('Atención', 'Ingrese un número de pedido para buscar.', 'warning');
+                        // Quizás volver a la vista de área si la búsqueda está vacía?
+                        // mostrarPedidosArea();
+                        return;
+                    }
+
+                    if (tabladata) {
+                        // Actualizar título para reflejar la búsqueda y hacerlo clickable para volver al área
+                        $('#tituloTablaPedidos').text(tituloBusqueda + " N°: " + nroPedido)
+                                               .addClass('clickable')
+                                               .css('cursor', 'pointer');
+
+                        var urlBusqueda = '@Url.Action("ListarFiltradosNro", "SolicitudPedidos")' +
+                            '?nroPedido=' + encodeURIComponent(nroPedido) +
+                            '&soloPendientes=false'; // O ajusta soloPendientes según necesites
+
+                        tabladata.ajax.url(urlBusqueda).load(function(json) {
+                            // json contiene la respuesta del servidor
+                            if (!json || !json.data || json.data.length === 0) {
+                                Swal.fire('Sin Resultados', 'No se encontraron pedidos con ese número.', 'info');
+                                // Opcional: si no hay resultados, podrías querer volver al título de área
+                                // $('#tituloTablaPedidos').text(tituloArea).removeClass('clickable').css('cursor', 'default');
+                            }
+                             // Limpiar campo de búsqueda después de buscar?
+                             // $("#txtBuscarPedido").val('');
+                        });
+                    } else {
+                        console.error("DataTable no inicializada.");
+                    }
                         }
-                    });
-            }
 
-function mostrarPendientes() {
-    if (typeof tabladata !== 'undefined' && tabladata !== null) {
-        // 1. Establece la URL
-        tabladata.ajax.url('@Url.Action("Listar", "SolicitudPedidos")');
-
-        // 2. Recarga los datos
-        tabladata.ajax.reload(null, false);
-    } else {
-        console.error("La instancia de DataTable 'tabladata' no está definida o es nula.");
-    }
-}
-
-
-
-
- function Guardar() {
-    if (productosAgregados.length === 0) {
-        mostrarError("¡Agregue al menos un producto!");
-        return;
-    }
-
-    const solicitud = {
-        IdSolicitud: $("#txtid").val(),
-        NroPedido: $("#txtpedido").val(),
-        FechaPedido: $("#txtfechapedido").val(),
-        IdUsuarioPedido: $("#txtusuario").val(),
-        CodigoArea: $("#txtArea").val(),
-        CodigoSector: $("#txtSector").val()
-    };
-
-    const listaProductos = productosAgregados.map(producto => ({
-        IdSolicitud: solicitud.IdSolicitud,
-        oProductos: {
-            IdProducto: producto.oProductos.IdProducto,
-            Detalle: producto.oProductos.Detalle
-        },
-        CantidadPedida: producto.CantidadPedida,
-        Observaciones: producto.Observaciones
-    }));
-
-    const url = solicitud.IdSolicitud === "0"
-        ? '@Url.Action("GuardarPedidos", "SolicitudPedidos")'
-        : '@Url.Action("Actualizar", "SolicitudPedidos")';
-
-    $.ajax({
-        url: url,
-        type: "POST",
-        data: JSON.stringify({
-            objeto: solicitud,
-            listaProductos: listaProductos
-        }),
-        contentType: "application/json",
-        success: function (response) {
-            if (response.resultado) {
-                $("#txtpedido").val(response.nroPedido);
-                Swal.fire("¡Éxito!", response.mensaje, "success");
-                $("#FormModal").modal("hide");
-                tabladata.ajax.reload();
-                productosAgregados = [];
+        // Función para mostrar "Mis Pedidos"
+        function mostrarMisPedidos() {
+            if (tabladata) {
+                $('#tituloTablaPedidos').text(tituloMisPedidos)
+                    .addClass('clickable') // Hacer clickable
+                    .css('cursor', 'pointer');
+                // Cambiar URL y recargar
+                tabladata.ajax.url(urlMisPedidos).load();
             } else {
-                mostrarError(response.mensaje);
+                console.error("DataTable no inicializada.");
             }
-        },
-        error: function (xhr, status, error) {
-            mostrarError("Error en la solicitud: " + error);
         }
-    });
-}
+
+
+        // Función para mostrar "Pedidos del Área" (llamada desde el click del título)
+        function mostrarPedidosArea() {
+            if (tabladata) {
+                $('#tituloTablaPedidos').text(tituloArea)
+                                       .removeClass('clickable') // Quitar clase clickable
+                                       .css('cursor', 'default'); // Cursor normal
+                // Cambiar URL y recargar
+                tabladata.ajax.url(urlPedidosArea).load();
+            } else {
+                console.error("DataTable no inicializada.");
+            }
+        }
+
+
+
+
+        function Guardar() {
+            const modo = $("#btnGuardar").data("modo"); // Obtener 'nuevo' o 'editar'
+
+            if (modo === "nuevo") {
+                // --- Lógica para GUARDAR NUEVO PEDIDO (con múltiples productos) ---
+                if (productosAgregados.length === 0) {
+                    mostrarError("¡Debe agregar al menos un producto al pedido!");
+                    return;
+                }
+
+                const solicitud = {
+                    IdSolicitud: "0", // Siempre 0 para nuevo
+                    NroPedido: $("#txtpedido").val(), // Debería estar vacío o ser generado por backend
+                    FechaPedido: $("#txtfechapedido").val(), // Asegúrate que el formato sea YYYY-MM-DD
+                    IdUsuarioPedido: $("#txtusuarioId").val(), // Usar el ID del usuario de la sesión
+                    CodigoArea: '@Session["CodArea"]',       // Obtener de la sesión
+                    CodigoSector: '@Session["CodSector"]'    // Obtener de la sesión
+                    // NombreArea y NombreSector no suelen enviarse, se obtienen por Código en backend
+                };
+
+                // Mapear solo los datos necesarios de productosAgregados
+                const listaProductos = productosAgregados.map(producto => ({
+                     // IdSolicitudDetalle: 0, // El backend lo asignará si es necesario
+                     // IdSolicitud: 0, // El backend lo asignará al guardar la cabecera
+                    oProductos: {
+                        IdProducto: producto.oProductos.IdProducto
+                        // No enviar Detalle, el backend lo obtiene del IdProducto
+                    },
+                    CantidadPedida: producto.CantidadPedida,
+                    Observaciones: producto.Observaciones
+                    // No enviar CantidadEntregada, FechaEntrega, IdUsuarioEntrega, Visado, etc.
+                }));
+
+                $.ajax({
+                    url: '@Url.Action("GuardarPedidos", "SolicitudPedidos")', // Endpoint para guardar nuevo
+                    type: "POST",
+                    // Enviar la cabecera (solicitud) y la lista de detalles
+                    data: JSON.stringify({
+                        objeto: solicitud,
+                        listaProductos: listaProductos
+                    }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.resultado) {
+                             // Podrías mostrar el NroPedido asignado en el mensaje
+                            Swal.fire("¡Éxito!", response.mensaje + (response.nroPedido ? ` (N° Pedido: ${response.nroPedido})` : ''), "success");
+                            $("#FormModal").modal("hide");
+                            tabladata.ajax.reload(null, false); // Recargar sin resetear paginación
+                            productosAgregados = []; // Limpiar por si acaso
+                        } else {
+                            mostrarError("Error al guardar: " + response.mensaje);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error AJAX en Guardar (Nuevo):", error);
+                        mostrarError("Error de conexión al intentar guardar el pedido.");
+                    }
+                });
+
+            } else if (modo === "editar") {
+                // --- Lógica para ACTUALIZAR UN PRODUCTO EXISTENTE ---
+                const idProductoSeleccionado = $("#cbodetalle").val();
+                const cantidad = parseInt($("#txtcantidad").val());
+
+                if (!idProductoSeleccionado || cantidad <= 0) {
+                     mostrarError("El producto y la cantidad son requeridos.");
+                     return;
+                }
+
+                // Crear el objeto que representa la LÍNEA específica a actualizar
+                const solicitudActualizada = {
+                    IdSolicitud: $("#txtid").val(), // El ID de la línea específica (viene de la tabla)
+                    oProductos: {
+                        IdProducto: idProductoSeleccionado // Aunque esté deshabilitado, el valor está presente
+                    },
+                    CantidadPedida: cantidad,
+                    Observaciones: $("#txtobservaciones").val(),
+                    // Incluir otros campos si tu endpoint de Actualizar los necesita para identificar/validar
+                    NroPedido: $("#txtpedido").val(), // Podría ser útil en el backend
+                    // No se suele actualizar FechaPedido, Usuario, Area, Sector desde aquí
+                };
+
+                 $.ajax({
+                    url: '@Url.Action("Actualizar", "SolicitudPedidos")', // Endpoint para actualizar existente
+                    type: "POST", // O "PUT" si usas RESTful
+                    data: JSON.stringify(solicitudActualizada), // Enviar solo el objeto de la línea actualizada
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.resultado) {
+                            Swal.fire("¡Éxito!", response.mensaje, "success");
+                            $("#FormModal").modal("hide");
+                            tabladata.ajax.reload(null, false); // Recargar sin resetear paginación
+                        } else {
+                            mostrarError("Error al actualizar: " + response.mensaje);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error AJAX en Guardar (Editar):", error);
+                        mostrarError("Error de conexión al intentar actualizar el producto.");
+                    }
+                });
+
+            } else {
+                console.error("Modo de guardado desconocido:", modo);
+                mostrarError("Error interno: No se pudo determinar la acción a realizar.");
+            }
+        }
 
 
 
@@ -894,10 +1063,16 @@ function mostrarPendientes() {
             const pedido = {
                 nroPedido: $("#txtpedido").val(),
                 fechaPedido: $("#txtfechapedido").val(),
-                usuario: $("#txtusuario").val(),
+                usuario: $("#txtusuarioNombre").val(),
                 area: $("#txtArea").val(),
                 sector: $("#txtSector").val(),
-                productos: productosAgregados ,
+                producto: {
+                    // Obtener el texto del producto del select (aunque esté deshabilitado)
+                    Detalle: $("#cbodetalle option:selected").text(),
+                    CantidadPedida: $("#txtcantidad").val()
+                    // Podrías incluir observaciones si la plantilla de impresión las contemplara:
+                    // Observaciones: $("#txtobservaciones").val()
+                },
                 cantidad: $("#txtcantidad").val(),
                 observaciones: $("#txtobservaciones").val()
             };
@@ -965,7 +1140,7 @@ function mostrarPendientes() {
                             <p>Fecha: ${pedido.fechaPedido}</p>
                             <p>N° de Pedido: ${pedido.nroPedido}</p>
                         </div>
-                        <img src="Content/images/04.png" class="logo" alt="Logo">
+                         <img src="/Content/images/04.png" class="logo" alt="Logo">
                     </div>
 
                     <div class="datos-usuario">
@@ -974,24 +1149,24 @@ function mostrarPendientes() {
                         <p>Sector: ${pedido.sector}</p>
                     </div>
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Descripción</th>
-                                <th>Cantidad Solicitada</th>
-                                <th>Cantidad Entregada</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                              ${pedido.productos.map(p => `
-                    <tr>
-                        <td>${p.Detalle}</td>
-                        <td>${p.Cantidad}</td>
-                        <td style="height: 30px;">&nbsp;</td>
-                    </tr>
-                `).join('')}
-                        </tbody>
-                    </table>
+                  <table>
+                    <thead>
+                        <tr>
+                            <th>Descripción del Producto</th>
+                            <th style="width: 18%;" class="cantidad">Cant. Solicitada</th>
+                            <th style="width: 18%;" class="cantidad">Cant. Entregada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>${pedido.producto.Detalle}</td>
+                            <td class="cantidad">${pedido.producto.CantidadPedida}</td>
+                            <td class="cantidad vacio"> </td> <!-- Espacio vacío para completar a mano -->
+                        </tr>
+                        <!-- Si necesitaras más filas vacías -->
+                        <!-- <tr><td> </td><td class="cantidad"> </td><td class="cantidad vacio"> </td></tr> -->
+                    </tbody>
+                </table>
 
                     <div class="firmas">
                         <div class="firma">

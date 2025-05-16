@@ -22,11 +22,11 @@
                     </div>
                     <div class="col-md-4 mb-2 mb-md-0">
                         <span class="d-block text-success">@Session["NombreArea"]</span>
-                        <small class="text-muted">Código: @Session["CodArea"]</small>
+                        <small class="text-muted">Area</small>
                     </div>
                     <div class="col-md-4">
                         <span class="d-block text-success">@Session["NombreSector"]</span>
-                        <small class="text-muted">Código: @Session["CodSector"]</small>
+                        <small class="text-muted">Sector</small>
                     </div>
                 </div>
             </div>
@@ -294,146 +294,175 @@
 
             tabladata.ajax.url('@Url.Action("ListarFiltrados", "SolicitudPedidos")?' + $.param(filtros)).load();
         }
-               function inicializarDataTable() {
-             tabladata = $('#tabla').DataTable({
-                 ajax: {
-                     url: '@Url.Action("ListarFiltrados", "SolicitudPedidos")',
-                     data: function (d) {
-                         // Tus parámetros de filtro existentes
-                         d.codArea = $('#cboArea').val();
-                         d.codSector = $('#cboSector').val();
-                         d.fechaInicio = $('#txtFechaInicio').val();
-                         d.fechaFin = $('#txtFechaFin').val();
-                         d.nroPedido = $('#txtBuscarPedido').val();
-                         d.soloPendientes = false; // Asegúrate de que el SP maneje esto correctamente
-                     },
-                     // Es buena práctica añadir manejo de errores AJAX
-                     error: function (jqXHR, textStatus, errorThrown) {
-                         console.error("Error al cargar datos para DataTable:", textStatus, errorThrown);
-                         // Podrías mostrar un mensaje al usuario aquí
-                         alert("Error al cargar la lista de pedidos. Verifique la conexión o contacte al administrador.");
-                     }
-                 },
-                 columns: [
-                     { data: "IdSolicitud", visible: false },
-                     // Añadir columna IdProducto (puede ser invisible, ayuda a DataTables a mapear)
-                     { data: "oProductos.IdProducto", visible: false }, // <-- AÑADIDO (opcional pero recomendado)
-                     { data: "oProductos.Detalle", title: "Producto" },
-                     { data: "NombreArea" },
-                     { data: "NombreSector" },
-                     { data: "CantidadPedida", title: "Cant. Pedida" },
-                     {
-                         data: "CantidadEntregada",
-                         title: "Cant. Entregada",
-                         render: function (data, type, row) {
-                             // Acceder al IdProducto desde el objeto anidado 'oProductos'
-                             // Se añade una comprobación por si oProductos fuera null inesperadamente
-                             const idProducto = row.oProductos ? row.oProductos.IdProducto : '';
-
-                             return `<input type="number" class="form-control input-entregado"
-                                            data-id="${row.IdSolicitud}"
-                                            data-idproducto="${idProducto}"  // <-- MODIFICADO: Añadido data-idproducto
-                                            value="${data || 0}"
-                                            min="0"
-                                            max="${row.CantidadPedida}"
-                                            ${row.Visado ? 'disabled' : ''}>`; // Se asume 'Visado' viene como booleano
-                         }
-                     },
-                     {
-                         data: "FechaPedido",
-                         title: "Fecha Pedido",
-                         render: function (data) {
-                             // Tu formato de fecha en C# es "yyyy-MM-dd HH:mm:ss" que new Date() puede parsear.
-                             // toLocaleDateString() lo mostrará en formato local.
-                             return data ? new Date(data).toLocaleDateString() : '';
-                         }
-                     },
-                     {
-                         data: "FechaEntrega",
-                         title: "Fecha Entrega",
-                         render: function (data) {
-                             // Tu formato de fecha en C# es "yyyy-MM-dd HH:mm:ss" que new Date() puede parsear.
-                             // toLocaleDateString() lo mostrará en formato local.
-                             return data ? new Date(data).toLocaleDateString() : 'Pendiente';
-                         }
-                     },
-                     { data: "NroPedido", title: "N° Pedido" },
-                     {
-                         data: "Visado",
-                         title: "Visado",
-                         render: function (data) {
-                             // Renderizar ícono basado en el valor booleano de Visado
-                             return data ? '<i class="fas fa-check-circle text-success"></i>' :
-                                            '<i class="fas fa-times-circle text-danger"></i>';
-                         }
-                     },
-                     {
-                         data: null, // Columna para botones de acción
-                         render: function (data, type, row) {
-                             // Solo mostrar botón editar si NO está visado (opcional)
-                              if (row.Visado) {
-                                  return ''; // O un botón deshabilitado
-                              }
-                             return '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>';
-                         },
-                         orderable: false,
-                         searchable: false,
-                         width: "90px" // Ajusta según necesidad
-                     }
-                 ],
-                 language: {
-                     // URL para internacionalización en español
-                     url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json'
-                 },
-                 // Otras opciones útiles de DataTables (opcional)
-                  responsive: true, // Para adaptar a pantallas pequeñas
-                  processing: true, // Muestra indicador de carga
-                  serverSide: false // Asumiendo que ListarFiltrados devuelve toda la lista (client-side processing)
-                                   // Si usas paginación/filtrado del lado del servidor, esto debe ser true y ajustar ajax.data
-             });
-            // Evento para actualizar cantidad entregada
-                $('#tabla tbody').on('change', '.input-entregado', function () {
-                    const idSolicitud = $(this).data('id');
-                    const idProducto = $(this).data('idproducto'); // <-- OBTENER IdProducto
-                    const cantidadEntregadaNueva = $(this).val();
-                    const filaActual = $(this).closest('tr'); // Guardar referencia a la fila
-                    const datosFila = tabladata.row(filaActual).data(); // Obtener datos originales de la fila
-
-                    // --- Validación básica opcional en cliente (Buena UX) ---
-                    if (parseInt(cantidadEntregadaNueva) < 0) {
-                         Swal.fire('Error', 'La cantidad entregada no puede ser negativa.', 'warning');
-                         $(this).val(datosFila.CantidadEntregada || 0); // Revertir al valor original
-                         return;
+           function inicializarDataTable() {
+    tabladata = $('#tabla').DataTable({
+        ajax: {
+            url: '@Url.Action("ListarFiltrados", "SolicitudPedidos")',
+            data: function (d) {
+                d.codArea = $('#cboArea').val();
+                d.codSector = $('#cboSector').val();
+                d.fechaInicio = $('#txtFechaInicio').val();
+                d.fechaFin = $('#txtFechaFin').val();
+                d.nroPedido = $('#txtBuscarPedido').val();
+                d.soloPendientes = false;
+            },
+            dataSrc: 'data', // Asegúrate de que esto esté si tu JSON tiene una propiedad raíz "data"
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Error al cargar datos para DataTable:", textStatus, errorThrown);
+                alert("Error al cargar la lista de pedidos. Verifique la conexión o contacte al administrador.");
+            }
+        },
+        columns: [
+            { data: "IdSolicitud", visible: false },                         // Índice 0
+            { data: "NroPedido", title: "N° Pedido" },                       // Índice 1
+            { data: "oProductos.IdProducto", visible: false },               // Índice 2
+            { data: "oProductos.Detalle", title: "Producto" },               // Índice 3
+            { data: "NombreArea", title: "Área" },                            // Índice 4 (Añadí title para consistencia)
+            { data: "NombreSector", title: "Sector" },                         // Índice 5 (Añadí title para consistencia)
+            { data: "CantidadPedida", title: "Cant. Pedida" },               // Índice 6
+            {                                                                 // Índice 7
+                data: "CantidadEntregada",
+                title: "Cant. Entregada",
+                render: function (data, type, row) {
+                    const idProducto = row.oProductos ? row.oProductos.IdProducto : '';
+                    return `<input type="number" class="form-control input-entregado"
+                                   data-id="${row.IdSolicitud}"
+                                   data-idproducto="${idProducto}"
+                                   value="${data || 0}"
+                                   min="0"
+                                   max="${row.CantidadPedida}"
+                                   ${row.Visado ? 'disabled' : ''}>`;
+                }
+            },
+            {                                                                 // Índice 8
+                data: "FechaPedido", // Viene como "yyyy-MM-dd HH:mm:ss"
+                title: "Fecha Pedido",
+                render: function (data, type, row) {
+                    if (!data) {
+                        return (type === 'sort') ? 0 : ''; // Maneja nulos/vacíos
                     }
-                    if (parseInt(cantidadEntregadaNueva) > parseInt(datosFila.CantidadPedida)) {
-                         Swal.fire('Error', 'La cantidad entregada no puede superar la cantidad pedida.', 'warning');
-                         $(this).val(datosFila.CantidadEntregada || 0); // Revertir al valor original
-                         return;
+                    let dateObj = new Date(data); // Parsea "yyyy-MM-dd HH:mm:ss"
+                    if (isNaN(dateObj.getTime())) {
+                        return (type === 'sort') ? 0 : data; // Fecha inválida
                     }
-                    // --- Fin Validación Cliente ---
 
+                    if (type === 'sort') {
+                        return dateObj.getTime(); // Para ordenación, usa el timestamp
+                    }
+                    if (type === 'display' || type === 'filter') {
+                        // Para mostrar, formato D/M/YYYY
+                        const d = dateObj.getDate();
+                        const m = dateObj.getMonth() + 1; // getMonth() es 0-indexado
+                        const y = dateObj.getFullYear();
+                        return `${d}/${m}/${y}`; // ej: "13/5/2025"
+                    }
+                    return data; // Para otros tipos
+                }
+            },
+            {                                                                 // Índice 9
+                data: "FechaEntrega", // Viene como "yyyy-MM-dd HH:mm:ss" o null
+                title: "Fecha Entrega",
+                render: function (data, type, row) {
+                    if (!data) {
+                        if (type === 'sort') return 0;
+                        return 'Pendiente';
+                    }
+                    let dateObj = new Date(data);
+                    if (isNaN(dateObj.getTime())) {
+                        if (type === 'sort') return 0;
+                        return 'Pendiente'; // O mostrar 'data'
+                    }
 
-                    $.post('@Url.Action("ActualizarEntrega", "EntregaPedidos")', {
-                        IdSolicitud: idSolicitud,
-                        CantidadEntregada: cantidadEntregadaNueva,
-                        IdProducto: idProducto // <-- ENVIAR IdProducto
-                    }).done(function (response) {
-                        if (response.resultado) {
-                            Swal.fire('¡Éxito!', response.mensaje || 'Cantidad entregada actualizada.', 'success');
-                            // Recargar la tabla o solo la fila para reflejar los cambios
-                            tabladata.ajax.reload(null, false); // Recarga sin resetear paginación
-                        } else {
-                            Swal.fire('Error', response.mensaje, 'error');
-                            // Revertir el valor en el input al original si hubo error en el servidor
-                             $(this).val(datosFila.CantidadEntregada || 0);
-                        }
-                    }).fail(function (xhr) {
-                        Swal.fire('Error', 'Ocurrió un error de conexión al actualizar.', 'error');
-                         // Revertir el valor en el input al original si hubo error de conexión
-                         $(this).val(datosFila.CantidadEntregada || 0);
-                    });
-                });
-         }
+                    if (type === 'sort') {
+                        return dateObj.getTime();
+                    }
+                    if (type === 'display' || type === 'filter') {
+                        const d = dateObj.getDate();
+                        const m = dateObj.getMonth() + 1;
+                        const y = dateObj.getFullYear();
+                        return `${d}/${m}/${y}`;
+                    }
+                    return data;
+                }
+            },
+            {                                                                 // Índice 10
+                data: "Visado",
+                title: "Visado",
+                render: function (data) {
+                    return data ? '<i class="fas fa-check-circle text-success"></i>' :
+                                   '<i class="fas fa-times-circle text-danger"></i>';
+                }
+            },
+            {                                                                 // Índice 11
+                data: null,
+                title: "Acciones", // Buena práctica añadir un título
+                render: function (data, type, row) {
+                     if (row.Visado) {
+                         return '';
+                     }
+                    return '<button type="button" class="btn btn-primary btn-sm ms-2 btn-editar"> <i class="fas fa-edit"></i></button>';
+                },
+                orderable: false,
+                searchable: false,
+                width: "90px"
+            }
+        ],
+
+        order: [
+            [8, 'asc'] // Ordena por la columna "Fecha Pedido" (índice 8) descendente
+        ],
+
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json'
+        },
+        responsive: true,
+        processing: true,
+        serverSide: false // Confirmado que es false, la ordenación inicial es del SP.
+    });
+
+   // Evento para actualizar cantidad entregada (tu código existente, parece correcto)
+   $('#tabla tbody').on('change', '.input-entregado', function () {
+       const idSolicitud = $(this).data('id');
+       const idProducto = $(this).data('idproducto');
+       const cantidadEntregadaNueva = $(this).val();
+       const filaActual = $(this).closest('tr');
+       const datosFila = tabladata.row(filaActual).data();
+
+       // Validación básica
+       if (parseInt(cantidadEntregadaNueva) < 0) {
+            Swal.fire('Error', 'La cantidad entregada no puede ser negativa.', 'warning');
+            $(this).val(datosFila.CantidadEntregada || 0);
+            return;
+       }
+       if (parseInt(cantidadEntregadaNueva) > parseInt(datosFila.CantidadPedida)) {
+            Swal.fire('Error', 'La cantidad entregada no puede superar la cantidad pedida.', 'warning');
+            $(this).val(datosFila.CantidadEntregada || 0);
+            return;
+       }
+
+       $.post('@Url.Action("ActualizarEntrega", "EntregaPedidos")', {
+           IdSolicitud: idSolicitud,
+           CantidadEntregada: cantidadEntregadaNueva,
+           IdProducto: idProducto
+       }).done(function (response) {
+           if (response.resultado) {
+               Swal.fire('¡Éxito!', response.mensaje || 'Cantidad entregada actualizada.', 'success');
+               tabladata.ajax.reload(null, false);
+           } else {
+               Swal.fire('Error', response.mensaje, 'error');
+               // En caso de error del servidor, revertir el valor.
+               // Necesitas acceder al input correcto, no $(this) dentro de este .done() anidado
+               // Una forma es buscarlo de nuevo o usar la referencia de la fila
+               const inputOriginal = filaActual.find(`.input-entregado[data-id="${idSolicitud}"]`);
+               inputOriginal.val(datosFila.CantidadEntregada || 0);
+           }
+       }).fail(function (xhr) {
+           Swal.fire('Error', 'Ocurrió un error de conexión al actualizar.', 'error');
+           const inputOriginal = filaActual.find(`.input-entregado[data-id="${idSolicitud}"]`);
+           inputOriginal.val(datosFila.CantidadEntregada || 0);
+       });
+   });
+}
 
 
 

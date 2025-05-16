@@ -37,20 +37,20 @@
                         <div style="padding-bottom:15px">
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                         </div>
-                        <a class="nav-link link-light" href="@Url.Action("Egresos","Toner")" >
+                        <a class="nav-link link-light" href="@Url.Action("Egresos","Toner")">
                             <div class="sb-nav-link-icon"><i class="fas fa-circle-arrow-up"></i></div>
                             Egresos/Salidas
                         </a>
-                        <a class="nav-link link-light" href="@Url.Action("Ingresos","Toner")" >
+                        <a class="nav-link link-light" href="@Url.Action("Ingresos","Toner")">
                             <div class="sb-nav-link-icon"><i class="fas fa-circle-arrow-down"></i></div>
                             Ingresos/Entradas
                         </a>
-                        <a class="nav-link link-light" href="@Url.Action("SolicitudPedidos","Toner")" >
+                        <a class="nav-link link-light" href="@Url.Action("SolicitudPedidos","Toner")">
                             <div class="sb-nav-link-icon"><i class="fas fa-box-open"></i></div>
                             Solicitud/Pedidos
                         </a>
 
-                        <a class="nav-link link-light" href="@Url.Action("EntregaPedidos","Toner")" >
+                        <a class="nav-link link-light" href="@Url.Action("EntregaPedidos","Toner")">
                             <div class="sb-nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
                             Entrega/Pedidos
                         </a>
@@ -59,30 +59,30 @@
 
 
                 @*--------------------------ADMINISTRACION----------------------*@
-            <div class="col">
-                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#canvaadministracion" aria-controls="offcanvasScrolling">ADMINISTRACION</button>
-                <div style="background-color:black; padding-top:50px" class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="canvaadministracion" aria-labelledby="offcanvasScrollingLabel">
-                    <div style="padding-bottom:15px">
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <div class="col">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#canvaadministracion" aria-controls="offcanvasScrolling">ADMINISTRACION</button>
+                    <div style="background-color:black; padding-top:50px" class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="canvaadministracion" aria-labelledby="offcanvasScrollingLabel">
+                        <div style="padding-bottom:15px">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <a class="nav-link  link-light" href="@Url.Action("Productos","Toner")">
+                            <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
+                            Productos
+                        </a>
+                        <a class="nav-link  link-light" href=" @Url.Action("Proveedores", "Toner")">
+                            <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
+                            Proveedores
+                        </a>
+                        <a class="nav-link  link-light" href=" @Url.Action("Rubros", "Toner")">
+                            <div class="sb-nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                            Rubros
+                        </a>
+                        <a class="nav-link  link-light" href=" @Url.Action("Tipos", "Toner")">
+                            <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
+                            Tipos
+                        </a>
                     </div>
-                    <a class="nav-link  link-light" href="@Url.Action("Productos","Toner")">
-                        <div class="sb-nav-link-icon"><i class="fas fa-cube"></i></div>
-                        Productos
-                    </a>
-                    <a class="nav-link  link-light" href=" @Url.Action("Proveedores", "Toner")">
-                        <div class="sb-nav-link-icon"><i class="fas fa-truck"></i></div>
-                        Proveedores
-                    </a>
-                    <a class="nav-link  link-light" href=" @Url.Action("Rubros", "Toner")">
-                        <div class="sb-nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
-                        Rubros
-                    </a>
-                    <a class="nav-link  link-light" href=" @Url.Action("Tipos", "Toner")">
-                        <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
-                        Tipos
-                    </a>
                 </div>
-            </div>
                 @*--------------------------REPORTES----------------------*@
 
                 <div class="col">
@@ -121,6 +121,7 @@
     @Scripts.Render("~/bundles/complementos")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+    @RenderSection("Styles", required: false)
 </body>
 </html>
 <script src="~/Scripts/fontawesome-v6/all.min.js"></script>
