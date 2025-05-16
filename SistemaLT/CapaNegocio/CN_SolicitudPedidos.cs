@@ -141,11 +141,7 @@ namespace CapaNegocio
                     return false;
                 }
 
-                if ((DateTime.Now - fechaPedido).TotalHours > 24)
-                {
-                    mensaje = "El periodo de modificación ha expirado (24 horas)";
-                    return false;
-                }
+              
 
                 // Actualizar la fecha de la última modificación
                 pedidoExistente.FechaHoraActualizacion = DateTime.Now;
@@ -177,11 +173,7 @@ namespace CapaNegocio
                     return false;
                 }
 
-                if (pedido.IdUsuarioPedido != idUsuario)
-                {
-                    mensaje = "Solo el solicitante puede visar el pedido";
-                    return false;
-                }
+              
 
                 if (pedido.CantidadEntregada <= 0)
                 {
