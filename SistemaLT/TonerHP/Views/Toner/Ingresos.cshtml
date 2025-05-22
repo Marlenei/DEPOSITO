@@ -58,17 +58,23 @@
             <div class="modal-body g-2">
                 <input id="txtid" type="hidden" value="" />
                 <input type="hidden" class="form-control" id="txtusuario" value="@Session["AccesCode"]" readonly>
-                <div class="row g-2" id="contenedor">
-
-
-                    <div id="contenedor" class="col-sm-6">
+                <div class="row row-cols-2 " id="contenedor">
+                    <div id="contenedor" class="col border rounded p-2 bg-light">
                         <p style="text-align:center">Filtros de busqueda</p>
                         @Html.Partial("_BusquedaAvan")
                     </div>
 
+                    <div class="col">
+                        <label for="txtfechaingreso" class="form-label">Fecha de Ingreso</label>
+                        <input type="text" class="form-control" id="txtfechaingreso" readonly style="background-color:white">
+                        <label for="txtcantidad" class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" id="txtcantidad" min="1" max="999" required placeholder="Coloque una cantidad" oninput="this.value.replace(/[^0-9]/g, '');">
+                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                        <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
+                    </div>
 
-                    <div class="col-sm-6">
-                        <label class="form-label" style="text-align:center;">Producto </label>
+                    <div class="col border rounded p-2 bg-light">
+                        <p style="text-align: center;">Producto</p>
                         <select id="cbodetalle" class="form-select ProductosS" style="width: 100%">
                         </select>
                         <p style="text-align: center; margin-top:5px">Informacion del producto</p>
@@ -87,60 +93,39 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-6">
+                    <div class="col">
                         <label class="form-label">Razon social</label>
                         <select id="cboproveedores" class="form-select" style="width: 100%"> </select>
-                    </div>
 
-                    <div class="col-sm-6">
-                        <label for="txtcantidad" class="form-label">Cantidad</label>
-                        <input type="number" class="form-control" id="txtcantidad" min="1" max="999" required placeholder="Coloque una cantidad" oninput="this.value.replace(/[^0-9]/g, '');">
-                    </div>
-
-                    <div class="col-sm-6">
-                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
-                        <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
-                    </div>
-
-                    <div class="col-sm-6">
                         <label for="txtexpediente" class="form-label">N° de Expediente</label>
                         <input type="text" class="form-control" id="txtexpediente" maxlength="15">
-                    </div>
 
-                    <div class="col-sm-6">
                         <label class="form-label">Tipo de Ingreso</label>
                         <select id="txttipoingreso" class="form-select" placeholder="Seleccionar">
-                            <option value=" ">Seleccionar</option>
+                            <option value=" " disabled selected>Seleccionar</option>
                             <option value="C">Compra</option>
                             <option value="D">Devolucion</option>
                             <option value="O">Otro</option>
                         </select>
-                    </div>
 
-                    <div class="col-sm-6">
-                        <label for="txtfechaingreso" class="form-label">Fecha de Ingreso</label>
-                        <input type="text" class="form-control" id="txtfechaingreso" readonly>
-                    </div>
-
-                    <div class="col-sm-6">
                         <label for="txtobservaciones" class="form-label">Observaciones</label>
                         <input type="text" class="form-control" id="txtobservaciones" maxlength="50">
                     </div>
-                </div>
-                @*-------------------------Mensaje de alerta-------------------------*@
-                <div class="row mt-12">
-                    <div class="col-12">
-                        <div id="mensajeError" class="alert alert-danger" role="alert">
+                    @*-------------------------Mensaje de alerta-------------------------*@
+                    <div class="row mt-12">
+                        <div class="col-12">
+                            <div id="mensajeError" class="alert alert-danger" role="alert">
+
+                            </div>
 
                         </div>
 
                     </div>
-
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Se limpiaran los campos al salir.">Cerrar</button>
-                <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip" data-bs-title="Se limpiaran los campos al salir.">Cerrar</button>
+                    <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -316,52 +301,6 @@
 
         });
 
-        //Informacion del producto
-        //$('#StockDatos').on('input', function () {
-        //    var inputVal = $(this).val();
-        //    var selectedOption = $('#cbodetalle option').filter(function () {
-        //        return $(this).text() === inputVal;
-        //    });
-
-        //    if (selectedOption.length) {
-        //        var idProducto = selectedOption.data('id');
-
-        //        var stockActual = stockprod[valor.IdProducto];
-        //        if (stockActual !== undefined) {
-        //            $("#cbostockactual").val(stockActual).show();
-        //        }
-        //        else {
-        //            $("#cbostockactual").val("").hide();
-        //        }
-
-        //        var codigoid = codigoidprod[valor.IdProducto];
-        //        if (codigoid !== undefined) {
-        //            $("#infocodigoid").val(codigoid).show();
-        //        }
-        //        else {
-        //            $("#infocodigoid").val("").hide();
-        //        }
-
-        //        var rubro = rubroprod[valor.Rubro];
-        //        if (rubro !== undefined) {
-        //            $("#inforubro").val(rubro).trigger('change').show();
-        //        }
-        //        else {
-        //            $("#inforubro").val("").hide();
-        //        }
-
-        //        var tipo = tipoprod[valor.Tipo];
-        //        if (tipo !== undefined) {
-        //            $("#infotipo").val(tipo).trigger('change').show();
-        //        }
-        //        else {
-        //            $("#infotipo").val("").hide();
-        //        }
-        //        $("#txtidProducto").val(idProducto);
-
-        //    }
-        //});
-
 
         //Listado Proveedores
             jQuery.ajax({
@@ -399,7 +338,7 @@
 
 
         //Listado Productos
-        function CargarProductos(permisos) {
+        function CargarProductos(permisos, idSeleccionado = null) {
             $.ajax({
                 url: '@Url.Action("ListarProductos", "Toner")',
                 type: "GET",
@@ -413,40 +352,36 @@
                     var tienePermiso24 = permisos.includes(24);
                     var tienePermiso184 = permisos.includes(184);
                     
+                    function MostrarInfoyProducto(valor) {
+                        opciones.push({
+                            id: valor.IdProducto,
+                            text: valor.Detalle
+                        });
+                        stockprod[valor.IdProducto] = valor.StockActual;
+                        codigoidprod[valor.IdProducto] = valor.CodigoId;
+                        rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                        tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                    }
                     $.each(data.data, function (index, valor) {
-
                         if (valor.Activo === true) {
-                            if (tienePermiso24 && valor.oRubros.Rubro !== "Insumos Informaticos") {
-                                opciones.push({
-                                    id: valor.IdProducto,
-                                    text: valor.Detalle
-                                });
-                                stockprod[valor.IdProducto] = valor.StockActual;
-                                codigoidprod[valor.IdProducto] = valor.CodigoId;
-                                rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
-                                tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
-                            } else if (tienePermiso184 && valor.oRubros.Rubro === "Insumos Informaticos") {
-                                opciones.push({
-                                    id: valor.IdProducto,
-                                    text: valor.Detalle
-                                });
-                                stockprod[valor.IdProducto] = valor.StockActual;
-                                codigoidprod[valor.IdProducto] = valor.CodigoId;
-                                rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
-                                tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
-
+                            if ((tienePermiso24 && valor.oRubros.Rubro !== "Insumos Informaticos") ||
+                                (tienePermiso184 && valor.oRubros.Rubro === "Insumos Informaticos")) {
+                                MostrarInfoyProducto(valor);
                             }
                         }
-
-
-
                     });
                     $('#cbodetalle').select2({
                         placeholder: "Selecciona una opción",
                         data: opciones,
                         allowClear: true,
                         dropdownParent: $('#FormModal'),
-                    }).val(null).trigger('change');
+                    });
+
+                    if (idSeleccionado) {
+                        $('#cbodetalle').val(idSeleccionado).trigger('change');
+                    } else {
+                        $('#cbodetalle').val(null).trigger('change');
+                    }
                 },
                 error: function (error) {
                     console.log(error)
@@ -478,7 +413,6 @@
                     });
                 } else {
                     modalTitle('Editar');
-
                     var fechaActMatch = json.FechaIngreso.match(/\/Date\((\d+)\)\//);
                     var timestamp = parseInt(fechaActMatch[1], 10);
                     var fechaingreso = new Date(timestamp);
@@ -488,7 +422,7 @@
                     var fechaFormateada = dia + '/' + mes + '/' + anio;
 
                     $("#txtid").val(json.IdIngreso);
-                    $("#cbodetalle").val(json.oProductos.IdProducto).trigger('change');
+                    CargarProductos(permisos.map(p => p.Accesos), json.oProductos.IdProducto);
                     $("#cboproveedores").val(json.oProveedores.IdProveedor).trigger('change');
                     $("#txtcantidad").val(json.Cantidad);
                     $("#cbostockactual").val(json.oProductos.StockActual).show();
@@ -539,45 +473,22 @@
             $("#cbodetalle").change(function () {
                 var idProducto = $(this).val();
 
-                var stockActual = obtenerStockPorId(idProducto);
-                if (stockActual !== undefined) {
-                    $("#cbostockactual").val(stockActual);
-                    $("#cbostockactual").show();
+                if (stockprod[idProducto] !== undefined) {
+                    $("#cbostockactual").show().val(stockprod[idProducto]);
                 }
 
-                var codigoid = obtenerCodigoPorId(idProducto);
-                if (codigoid !== undefined) {
-                    $("#infocodigoid").val(codigoid);
-                    $("#infocodigoid").show();
+                if (codigoidprod[idProducto] !== undefined) {
+                    $("#infocodigoid").show().val(codigoidprod[idProducto]);
                 }
 
-                var rubro = obtenerRubroPorId(idProducto);
-                if (rubro !== undefined) {
-                    $("#inforubro").val(rubro);
-                    $("#inforubro").show();
+                if (rubroprod[idProducto] !== undefined) {
+                    $("#inforubro").show().val(rubroprod[idProducto]);
                 }
 
-                var tipo = obtenerTipoPorId(idProducto);
-                if (tipo !== undefined) {
-                    $("#infotipo").val(tipo);
-                    $("#infotipo").show();
+                if (tipoprod[idProducto] !== undefined) {
+                    $("#infotipo").show().val(tipoprod[idProducto]).show();
                 }
             });
-
-            function obtenerStockPorId(idProducto) {
-                return stockprod[idProducto];
-            }
-            function obtenerCodigoPorId(idProducto) {
-                return codigoidprod[idProducto];
-            }
-            function obtenerRubroPorId(idProducto) {
-                return rubroprod[idProducto];
-            }
-            function obtenerTipoPorId(idProducto) {
-                return tipoprod[idProducto];
-            }
-
-
         }
 
         $("#tabla tbody").on("click", '.btn-editar', function () {

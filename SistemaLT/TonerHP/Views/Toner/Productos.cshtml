@@ -313,10 +313,12 @@
 
                      $("#txtid").val(data.IdProducto);
                      $("#cbodetalle").val(data.IdProducto).prop('disabled', true).trigger('change');
-                     $("#cborubro").val(data.oRubros.IdRubro).prop('disabled', true).trigger('change');
+                    $("#cborubro").val(data.oRubros.IdRubro).prop('disabled', true).trigger('change');
+
                      CargarTiposPorRubro(data.oRubros.IdRubro, function () {
                          $("#cbotipo").val(data.oTipos.IdTipo).prop('disabled', true).trigger('change');
                      });
+                     
                      $("#txtstockminimo").val(data.StockMinimo).prop('disabled', true);
                      $("#txtcodigoid").val(data.CodigoId).prop('disabled', true);
                      $("#cboactivo").val(data.Activo == true ? 1 : 0);

@@ -23,7 +23,7 @@ namespace CapaEntidad
         public string NombreSector { get; set; }
         public char TipoSalida { get; set; }
         public string NombreyApellido { get; set; }
-        public DateTime FechaAct { get; set; }
+        public DateTime? FechaAct { get; set; }
 
     }
 }
