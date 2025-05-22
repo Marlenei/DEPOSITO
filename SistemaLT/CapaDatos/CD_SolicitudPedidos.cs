@@ -18,6 +18,7 @@ namespace CapaDatos
 {
     public class CD_SolicitudPedidos
     {
+        // En CapaDatos/CD_SolicitudPedidos.cs
         public List<SolicitudPedidos> ListarFiltrados(int? codArea, int? codSector, string nroPedido, DateTime? fechaInicio, DateTime? fechaFin, bool soloPendientes)
         {
             List<SolicitudPedidos> lista = new List<SolicitudPedidos>();
@@ -27,28 +28,13 @@ namespace CapaDatos
                 SqlCommand cmd = new SqlCommand("usp_ObtenerPedidosFiltrados", oconexion);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                // Parámetros con manejo de valores nulos
+                // ... (tus parámetros permanecen iguales) ...
                 cmd.Parameters.AddWithValue("@CodArea", codArea.HasValue ? (object)codArea.Value : DBNull.Value);
-                cmd.Parameters.AddWithValue("@CodSector", codSector.HasValue ? (object)codSector.Value : DBNull.Value);
+                cmd.Parameters.AddWithValue("@CodSector", (codSector.HasValue && codSector.Value == 0) ? DBNull.Value : (codSector.HasValue ? (object)codSector.Value : DBNull.Value));
                 cmd.Parameters.AddWithValue("@NroPedido", string.IsNullOrEmpty(nroPedido) ? (object)DBNull.Value : nroPedido);
                 cmd.Parameters.AddWithValue("@SoloPendientes", soloPendientes);
-
-                // Manejo de fechas
-                if (fechaInicio.HasValue && fechaFin.HasValue)
-                {
-                    cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio.Value);
-                    cmd.Parameters.AddWithValue("@FechaFin", fechaFin.Value);
-                }
-                else
-                {
-                    // Si no se proporcionan fechas, establecerlas para el mes actual
-                    DateTime fechaActual = DateTime.Now;
-                    DateTime primerDiaDelMes = new DateTime(fechaActual.Year, fechaActual.Month, 1);
-                    DateTime ultimoDiaDelMes = primerDiaDelMes.AddMonths(1).AddDays(-1);
-
-                    cmd.Parameters.AddWithValue("@FechaInicio", primerDiaDelMes);
-                    cmd.Parameters.AddWithValue("@FechaFin", ultimoDiaDelMes);
-                }
+                cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio.HasValue ? (object)fechaInicio.Value : DBNull.Value);
+                cmd.Parameters.AddWithValue("@FechaFin", fechaFin.HasValue ? (object)fechaFin.Value : DBNull.Value);
 
                 oconexion.Open();
                 using (SqlDataReader reader = cmd.ExecuteReader())
@@ -61,25 +47,28 @@ namespace CapaDatos
                             oProductos = new Productos()
                             {
                                 IdProducto = Convert.ToInt32(reader["IdProducto"]),
-                                Detalle = reader["Producto"].ToString()
+                                Detalle = reader["Producto"].ToString(),
+                                StockActual = Convert.ToInt32(reader["StockActual"])
                             },
                             CantidadPedida = Convert.ToInt32(reader["CantidadPedida"]),
                             CantidadEntregada = reader["CantidadEntregada"] != DBNull.Value ? Convert.ToInt32(reader["CantidadEntregada"]) : 0,
-                            FechaEntrega = reader["FechaEntrega"] != DBNull.Value ? Convert.ToDateTime(reader["FechaEntrega"]).ToString("yyyy-MM-dd HH:mm:ss") : null,
+                            FechaEntrega = reader["FechaEntrega"] != DBNull.Value ? Convert.ToDateTime(reader["FechaEntrega"]).ToString("yyyy-MM-dd") : null,
                             NroPedido = reader["NroPedido"].ToString(),
                             Visado = Convert.ToBoolean(reader["Visado"]),
                             FechaPedido = Convert.ToDateTime(reader["FechaPedido"]).ToString("yyyy-MM-dd HH:mm:ss"),
                             CodigoArea = Convert.ToInt32(reader["CodigoArea"]),
                             CodigoSector = Convert.ToInt32(reader["CodigoSector"]),
                             NombreArea = reader["NombreArea"].ToString(),
-                            NombreSector = reader["NombreSector"].ToString()
+                            NombreSector = reader["NombreSector"].ToString(),
+                            // --- MAPEANDO LOS NUEVOS CAMPOS ---
+                            NombreUsuarioPedido = reader["NombreUsuarioPedido"] != DBNull.Value ? reader["NombreUsuarioPedido"].ToString() : "N/A", // O string.Empty
+                            IdUsuarioPedido = Convert.ToInt32(reader["IdUsuarioPedido"]), // Asegúrate que el tipo coincida con tu modelo
                         });
                     }
                 }
             }
             return lista;
         }
-
 
         public List<SolicitudPedidos> Listar(int idUsuario)
         {
@@ -168,7 +157,8 @@ namespace CapaDatos
                             oProductos = new Productos()
                             {
                                 IdProducto = Convert.ToInt32(reader["IdProducto"]),
-                                Detalle = reader["Producto"].ToString()
+                                Detalle = reader["Producto"].ToString(),
+                                StockActual = Convert.ToInt32(reader["StockActual"])
                             },
                             CantidadPedida = Convert.ToInt32(reader["CantidadPedida"]),
                             CantidadEntregada = reader["CantidadEntregada"] != DBNull.Value ? Convert.ToInt32(reader["CantidadEntregada"]) : 0,
@@ -300,7 +290,7 @@ namespace CapaDatos
             {
                 string query = @"SELECT 
             p.IdSolicitud,
-            p.IdProducto,       
+            p.IdProducto,
             p.CantidadPedida,
             p.CantidadEntregada,
             p.FechaPedido,
@@ -316,7 +306,7 @@ namespace CapaDatos
             a.NombreArea,
             s.Nombre AS NombreSector
         FROM Tonner_Pedidos p
-        INNER JOIN Tonner_Productos pr ON pr.IdProducto = p.IdProducto      
+        INNER JOIN Tonner_Productos pr ON pr.IdProducto = p.IdProducto 
         INNER JOIN AHS.dbo.Mio_Areas a ON a.CodigoArea = p.CodigoArea
         INNER JOIN AHS.dbo.Mio_Sectores s ON s.CodigoSector = p.CodigoSector
         WHERE p.IdSolicitud = @IdSolicitud";
@@ -337,7 +327,7 @@ namespace CapaDatos
                                 oProductos = new Productos
                                 {
                                     IdProducto = Convert.ToInt32(reader["IdProducto"]),
-                                    Detalle = reader["Producto"].ToString()
+                                    Detalle = reader["Producto"].ToString(),
                                 },
                                 CantidadPedida = Convert.ToInt32(reader["CantidadPedida"]),
                                 CantidadEntregada = reader["CantidadEntregada"] != DBNull.Value
