@@ -29,43 +29,48 @@
             </div>
         }
 
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
-            <button type="button" class="btn btn-success" onclick="abrirModal(null)">
-                <i class="fas fa-plus-circle me-1"></i> Nuevo Pedido
-            </button>
-        </div>
+       <!-- Contenedor principal para los tres elementos -->
+        <div class="row g-2 g-md-3 mb-4 align-items-stretch">
 
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="input-group">
+            <!-- Elemento 1: Botón Nuevo Pedido -->
+            <div class="col-12 col-md">
+                <button type="button" class="btn btn-success w-100 h-100" onclick="abrirModal(null)">
+                    <i class="fas fa-plus-circle me-1"></i> Nuevo Pedido
+                </button>
+            </div>
+
+            <!-- Elemento 2: Buscador de Pedidos -->
+            <div class="col-12 col-md">
+                <div class="input-group h-100">
                     <input type="text" class="form-control"
                            id="txtBuscarPedido"
                            placeholder="Buscar por N° de Pedido">
                     <button class="btn btn-primary"
                             type="button"
                             onclick="buscarPorNumero()">
-
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
             </div>
-            <div class="col-md-6">
 
-                <button class="btn btn-warning w-100"
+            <!-- Elemento 3: Botón Ver Mis Pedidos -->
+            <div class="col-12 col-md">
+                <button class="btn btn-warning w-100 h-100"
                         onclick="mostrarMisPedidos()">
                     <i class="fas fa-clipboard-list me-2"></i>
                     Ver Pedidos Realizados Por Mi
                 </button>
             </div>
+
         </div>
 
         <!-- NUEVA SECCIÓN PARA EL TÍTULO -->
         <!-- Título dinámico -->
-        <div class="row mb-3">
+        <div class="row mb-0">
             <div class="col-12 text-center">
-                <!-- Añade un ID si aún no lo tiene y quizás una clase para estilo -->
-                <h4 id="tituloTablaPedidos" class="text-primary titulo-dinamico">
-                    PEDIDOS DE MI ÁREA
+                <h4 id="tituloTablaPedidos" class="titulo-dinamico-mejorado" title="Viendo pedidos de mi área">
+                    <i id="iconoTitulo" class="fas fa-users me-2"></i> 
+                    <span id="textoTitulo">PEDIDOS DE MI ÁREA</span>
                 </h4>
             </div>
         </div>
@@ -112,10 +117,12 @@
                             <label class="form-label-sm">Usuario:</label>
                             <input type="text" class="form-control form-control-sm" id="txtusuarioNombre" value="@User.Identity.Name" readonly>
                         </div>
-                        <div class="col-md-3">
+
+                        @*<div class="col-md-3">
                             <label for="txtpedido" class="form-label-sm">N° de Pedido:</label>
                             <input type="text" class="form-control form-control-sm" id="txtpedido" placeholder="Autogenerado" readonly>
-                        </div>
+                        </div>*@
+
                         <div class="col-md-3">
                             <label for="txtfechapedido" class="form-label-sm">Fecha Pedido:</label>
                             <input type="text" class="form-control form-control-sm" id="txtfechapedido" readonly>
@@ -159,7 +166,7 @@
                                     <label for="txtcantidad" class="form-label-sm">Cantidad:</label>
                                     <input type="number" class="form-control form-control-sm" id="txtcantidad" min="1" value="1" required>
                                 </div>
-                                @* Quitamos el stock de aquí, ya está abajo en info adicional *@
+                               
                             </div>
 
                             <div class="mb-2">
@@ -236,9 +243,9 @@
 </div>
 <style>
 
-    /* --- Estilos para Modal Compacto --- */
+    /* --- Estilos para Modal  --- */
 
-    /* Si la clase form-label-sm de Bootstrap no es suficiente o no existe */
+    
     #FormModal .form-label,
     #FormModal .form-label-sm { /* Asegurar que se aplique si usas la clase */
         font-size: 0.875em;
@@ -272,19 +279,44 @@
         z-index: 1061 !important; /* Bootstrap modal z-index es 1050/1055, backdrop 1060 si es static */
     }
 
-    .titulo-dinamico {
-        transition: color 0.2s ease-in-out; /* Suaviza el cambio de color */
+    .titulo-dinamico-mejorado {
+        display: inline-flex; /* Para alinear icono y texto, y permitir padding */
+        align-items: center; /* Centra verticalmente el icono y el texto */
+        padding: 10px 20px; 
+        border-radius: 25px; 
+        font-weight: bold;
+        transition: all 0.3s ease-in-out; /* Transición suave para todos los cambios */
+        color: #0d6efd; /* Color primario de Bootstrap por defecto */
+        border: 2px solid transparent; /* Borde inicial transparente, se activará cuando sea clickable */
+        background-color: #e7f0fe; /* Un fondo azul muy suave para el estado base (cuando NO es clickable) */
+        cursor: default; /* Cursor por defecto cuando no es clickable */
     }
 
-        .titulo-dinamico.clickable {
+        /* Estilo cuando el título ES clickable (es decir, no está mostrando "PEDIDOS DE MI ÁREA") */
+        .titulo-dinamico-mejorado.clickable {
             cursor: pointer;
-            color: #0d6efd; /* Azul primario de Bootstrap, o el que prefieras */
+            border-color: #0d6efd; /* Borde del color primario */
+            background-color: #fff; /* Fondo blanco para destacar que es accionable */
+            color: #0d6efd; /* Mantenemos el color del texto primario */
         }
 
-            .titulo-dinamico.clickable:hover {
-                text-decoration: underline;
-                color: #0a58ca; /* Azul más oscuro al pasar el mouse */
+            .titulo-dinamico-mejorado.clickable:hover {
+                background-color: #0d6efd; /* Fondo primario al pasar el mouse */
+                color: white; /* Texto blanco para contraste */
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para efecto de elevación */
+                transform: translateY(-2px); /* Efecto ligero de elevación */
+                /* text-decoration: none; No es necesario si no lo tenía antes */
             }
+
+                /* Asegura que el ícono también cambie de color con el hover cuando es clickable */
+                .titulo-dinamico-mejorado.clickable:hover i {
+                    color: white;
+                }
+
+        .titulo-dinamico-mejorado i {
+            transition: color 0.3s ease-in-out; /* Para que el color del icono también transicione */
+            font-size: 1.1em; /* Un poco más grande el ícono */
+        }
 </style>
 
 @section scripts{
@@ -308,9 +340,43 @@
         let productoSeleccionado = null;
         var productosAgregados = [];
 
+        // --- Variables para el Título Dinámico Mejorado ---
+        var iconoArea = "fas fa-users";
+        var iconoMisPedidos = "fas fa-user-check";
+        var iconoBusqueda = "fas fa-search";
+
+        var $tituloContainer, $textoTituloEl, $iconoTituloEl;
+
+
+
+        // --- Función para actualizar el estilo del Título Dinámico ---
+        function actualizarEstiloTitulo(texto, iconoClase, esClickable) {
+            if (!$textoTituloEl || !$iconoTituloEl || !$tituloContainer) {
+                console.error("Elementos del DOM para el título no están disponibles. Asegúrate de que $tituloContainer, $textoTituloEl, y $iconoTituloEl están definidos y cacheados.");
+                // Fallback para el texto si solo el contenedor principal está disponible.
+                if ($tituloContainer) $tituloContainer.text(texto); // Comportamiento antiguo si los hijos no están.
+                return;
+            }
+
+            $textoTituloEl.text(texto);
+            $iconoTituloEl.removeClass().addClass(iconoClase + ' me-2'); // Actualiza clase del ícono
+
+            if (esClickable) {
+                $tituloContainer.addClass('clickable');
+                $tituloContainer.attr('title', 'Volver a Pedidos de mi Área');
+            } else {
+                $tituloContainer.removeClass('clickable');
+                // Actualizar el title para reflejar el estado actual
+                $tituloContainer.attr('title', 'Viendo ' + texto.toLowerCase());
+            }
+        }
 
 
         $(document).ready(function () {
+
+            $tituloContainer = $('#tituloTablaPedidos');
+            $textoTituloEl = $('#textoTitulo'); // Asegúrate que tu HTML tiene <span id="textoTitulo">
+            $iconoTituloEl = $('#iconoTitulo');
             inicializarDataTable();
 
              var urlrubros = '@Url.Action("ListarRubros", "Toner")'
@@ -332,10 +398,9 @@
 
             });
 
-            $('#tituloTablaPedidos').on('click', function () {
-                // Solo actúa si NO está mostrando los pedidos del área (es decir, si es clickable)
+            $tituloContainer.on('click', function () {
                 if ($(this).hasClass('clickable')) {
-                    mostrarPedidosArea();
+                    mostrarPedidosArea(); // mostrarPedidosArea se encargará de actualizar el título
                 }
             });
 
@@ -366,7 +431,7 @@
 
 
 
-        function agregarProducto() {
+               function agregarProducto() {
             var idProducto = $("#cbodetalle").val();
             var productoTexto = $("#cbodetalle option:selected").text();
             var cantidad = parseInt($("#txtcantidad").val());
@@ -377,25 +442,43 @@
                 return;
             }
 
+            // --- INICIO DE LA VERIFICACIÓN DE PRODUCTO DUPLICADO ---
+            const productoYaAgregado = productosAgregados.find(p => p.oProductos.IdProducto === idProducto);
+
+            if (productoYaAgregado) {
+                mostrarError(`El producto "${productoTexto}" ya ha sido agregado al pedido.`);
+                // Opcional: podrías ofrecer actualizar la cantidad del producto existente
+                // if (confirm(`El producto "${productoTexto}" ya está en el pedido. ¿Desea actualizar la cantidad a ${cantidad}?`)) {
+                //     productoYaAgregado.CantidadPedida = cantidad;
+                //     productoYaAgregado.Observaciones = observaciones; // También podrías actualizar observaciones
+                //     mostrarProductosAgregados();
+                //     LimpiarCampos();
+                // }
+                return; // No agregar si ya existe y no se actualiza
+            }
+            // --- FIN DE LA VERIFICACIÓN DE PRODUCTO DUPLICADO ---
+
             productosAgregados.push({
-                IdSolicitud: 0,
+                IdSolicitud: 0, // Este ID usualmente se refiere al IdSolicitudDetalle para un nuevo ítem
                 oProductos: {
                     IdProducto: idProducto,
-                    Detalle: productoTexto
+                    Detalle: productoTexto // Guardar el texto es útil para mostrar en la tabla temporal
                 },
                 CantidadPedida: cantidad,
-                CantidadEntregada: 0,
-                FechaPedido: $("#txtfechapedido").val(),
+                CantidadEntregada: 0, // Siempre 0 al crear
+                FechaPedido: $("#txtfechapedido").val(), // Tomar de la cabecera del pedido
                 FechaEntrega: null,
-                IdUsuarioPedido: $("#txtusuario").val(),
-                CodigoArea: $("#txtArea").val(),
-                CodigoSector: $("#txtSector").val(),
+                IdUsuarioPedido: $("#txtusuarioId").val(), // Asegúrate que este ID existe y es correcto
+                CodigoArea: '@Session["CodArea"]',       // Usar el código de la sesión
+                CodigoSector: '@Session["CodSector"]',    // Usar el código de la sesión
                 IdUsuarioEntrega: null,
                 Observaciones: observaciones,
-                NroPedido: $("#txtpedido").val(),
+                NroPedido: $("#txtpedido").val(), // El Nro de Pedido de la cabecera, puede estar vacío al agregar
                 Visado: false,
-                NombreArea: $("#txtArea").val(),
-                NombreSector: $("#txtSector").val()
+                // NombreArea y NombreSector no son estrictamente necesarios aquí si usas los códigos,
+                // pero pueden ser útiles si los muestras en la tabla temporal.
+                NombreArea: '@Session["NombreArea"]',
+                NombreSector: '@Session["NombreSector"]'
             });
 
             LimpiarCampos();
@@ -783,6 +866,7 @@
                                 return data || '0';
                             }
                         },
+                        { data: "NombreUsuarioPedido", title: "Solicitado por" },
                         {
                             data: "FechaPedido",
                             title: "Fecha Pedido",

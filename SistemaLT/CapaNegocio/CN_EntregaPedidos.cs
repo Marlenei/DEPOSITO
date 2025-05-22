@@ -32,11 +32,7 @@ namespace CapaNegocio
                     return false;
                 }
 
-                if ((DateTime.Now - pedidoExistente.FechaHoraActualizacion).TotalHours > 24)
-                {
-                    mensaje = "El periodo de modificación ha expirado (24 horas)";
-                    return false;
-                }
+               
 
                 return objCapaDato.ActualizarEntrega(pedido,  out mensaje);
             }
