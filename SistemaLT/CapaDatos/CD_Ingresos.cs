@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace CapaDatos
 {
@@ -59,18 +60,36 @@ namespace CapaDatos
                                 TipoIngreso = Convert.ToChar(rdr["TipoIngreso"]),
                                 FechaIngreso = Convert.ToDateTime(rdr["FechaIngreso"]),
                                 NombreyApellido = rdr["NombreyApellido"].ToString(),
-                                FechaAct1 = rdr["FechayHoraAct"].ToString(),
+                                //FechaAct1 = rdr["FechayHoraAct"].ToString(),
                                 FechaAct = Convert.ToDateTime(rdr["FechayHoraAct"]),
                             });
                         }
                     }
                 }
-            }catch
+            }
+            catch (Exception ex)
             {
-                lista = new List<Ingresos>();
+                throw new Exception("Error al listar ingresos: " + ex.Message);
+            }
+            var permisos = HttpContext.Current.Session["PermissionsCode"] as List<Permiso>;
+            if (permisos != null)
+            {
+                bool tiene24 = permisos.Any(p => p.Accesos == 24);
+                bool tiene184 = permisos.Any(p => p.Accesos == 184);
+
+
+                if (tiene24)
+                {
+                    lista = lista.Where(e => e.oProductos.oRubros.Rubro != "Insumos Informaticos").ToList();
+                }
+                else if (tiene184)
+                {
+                    lista = lista.Where(e => e.oProductos.oRubros.Rubro == "Insumos Informaticos").ToList();
+                }
             }
             return lista;
         }
+
 
 
         public int Registrar(Ingresos obj)
