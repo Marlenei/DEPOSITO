@@ -1,12 +1,16 @@
 ﻿
 function cargarApiUrls() {
+    var isDevelopment = window.location.hostname === "localhost";
+    var getApiUrl = isDevelopment ? "/Toner/GetApiUrls" : "/SistemaLT/TonerHP/Toner/GetApiUrls";
     $.ajax({
-        url: '/Toner/GetApiUrls', 
+        url: getApiUrl, 
         type: "GET",
         dataType: "json",
         success: function (data) {
             appSettings.ApiUrlDev = data.ApiUrlDev;
             appSettings.ApiUrlProd = data.ApiUrlProd;
+            console.log(appSettings.ApiUrlDev);
+            console.log(appSettings.ApiUrlProd);
         },
         error: function (error) {
             console.error("Error al cargar las URLs de la API:", error);
@@ -37,7 +41,8 @@ function CargarRubros(urlrubros, permisos) {
                             id: valor.IdRubro,
                             text: valor.Rubro
                         });
-                    } else if (tienetoner && valor.Rubro === "Insumos Informaticos") {
+                    }
+                    else if (tienetoner && valor.Rubro === "Insumos Informaticos") {
                         opciones.push({
                             id: valor.IdRubro,
                             text: valor.Rubro
@@ -50,29 +55,33 @@ function CargarRubros(urlrubros, permisos) {
                 data: opciones,
                 allowClear: true,
                 dropdownParent: $('#FormModal'),
-            }).val(null).trigger('change'); 
+            }).val(null).trigger('change');
 
 
-            $("#cbotipo").empty(); 
-            $("#cbodetalle").empty(); 
+            $("#cbotipo").empty();
+            $("#cbodetalle").empty();
 
         },
         error: function (error) {
             console.log(error)
         },
-
     });
 }
 
 
 
 function CargarTipos(idRubro) {
-    var isDevelopment = window.location.hostname === "localhost";
-    var baseUrl = isDevelopment ? appSettings.ApiUrlDev : appSettings.ApiUrlProd;
-    var urltipos = baseUrl + '/ListarTiposPorRubro?idRubro=' + idRubro;
     if (!idRubro) {
         return;
     }
+    console.log(window.location.hostname)
+    var isDevelopment = window.location.hostname === "localhost";
+    console.log(isDevelopment)
+    var baseUrl = isDevelopment ? appSettings.ApiUrlDev : appSettings.ApiUrlProd;
+    console.log("Esto es la base", baseUrl)
+    var urltipos = baseUrl + '/ListarTiposPorRubro?idRubro=' + idRubro;
+    console.log("Esto es la url", urltipos)
+
 
     $.ajax({
         url: urltipos,
@@ -93,7 +102,7 @@ function CargarTipos(idRubro) {
                 }
             });
             $('#cbotipo').select2({
-                placeholder: "Selecciona un rubro",
+                placeholder: "Selecciona una opcion",
                 data: opciones,
                 allowClear: true,
                 dropdownParent: $('#FormModal'),
@@ -126,11 +135,21 @@ function CargarProductosporTipo(idTipo, idRubro) {
             $("#cbodetalle").empty();
             var opciones = [];
             $.each(data, function (index, valor) {
-                if (valor.Activo === true) {
-                    opciones.push({
-                        id: valor.IdProducto,
-                        text: valor.Detalle
-                    });
+                if (filtrarStockEnProducto) {
+                    if (valor.Activo === true && valor.StockActual >= 1) {
+                        opciones.push({
+                            id: valor.IdProducto,
+                            text: valor.Detalle
+                        });
+                    }
+                }
+                else if (!filtrarStockEnProducto) {
+                    if (valor.Activo === true) {
+                        opciones.push({
+                            id: valor.IdProducto,
+                            text: valor.Detalle
+                        });
+                    }
                 }
             });
             $('#cbodetalle').select2({

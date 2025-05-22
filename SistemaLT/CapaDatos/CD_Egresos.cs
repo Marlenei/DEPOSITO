@@ -55,11 +55,14 @@ namespace CapaDatos
                                 CodigoId = rdr["CodigoId"].ToString(),
                                 Cantidad = Convert.ToInt32(rdr["Cantidad"]),
                                 NombreArea = rdr["NombreArea"].ToString(),
+                                CodigoArea = Convert.ToInt32(rdr["CodigoArea"]),
                                 NombreSector = rdr["NombreSector"].ToString(),
+                                CodigoSector = Convert.ToInt32(rdr["CodigoSector"]),
                                 Observaciones = rdr["Observaciones"].ToString(),
                                 TipoSalida = Convert.ToChar(rdr["TipoSalida"]),
                                 NombreyApellido = rdr["NombreyApellido"].ToString(),
-                                FechaEgreso = Convert.ToDateTime(rdr["FechaEgreso"]), 
+                                FechaEgreso = Convert.ToDateTime(rdr["FechaEgreso"]),
+                                FechaAct = Convert.ToDateTime(rdr["FechayHoraAct"]),
                             });
                         }
                     }
@@ -142,13 +145,13 @@ namespace CapaDatos
                     cmd.Parameters.AddWithValue("CodigoSector", obj.CodigoSector);
                     cmd.Parameters.Add("FechayHoraAct", SqlDbType.SmallDateTime).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add("Resultado", SqlDbType.Bit).Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
+                    //cmd.Parameters.Add("Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     oconexion.Open();
                     cmd.ExecuteNonQuery();
                     resultado = Convert.ToBoolean(cmd.Parameters["Resultado"].Value);
-                    Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
+                    //Mensaje = cmd.Parameters["Mensaje"].Value.ToString();
                 }
             }
             catch (Exception ex)
@@ -157,6 +160,70 @@ namespace CapaDatos
                 Mensaje = ex.Message;
             }
             return resultado;
+        }
+
+        public void ActualizarStock(int idProducto, int diferencia)
+        {
+            try
+            {
+                using (SqlConnection conexion = new SqlConnection(Conexion.cn))
+                {
+                    string sql = "UPDATE Tonner_Productos SET StockActual = StockActual + @Diferencia, FechaUltModificacion = GETDATE() WHERE IdProducto = @IdProducto";
+                    SqlCommand cmd = new SqlCommand(sql, conexion);
+                    cmd.Parameters.AddWithValue("@Diferencia", diferencia);
+                    cmd.Parameters.AddWithValue("@IdProducto", idProducto);
+
+                    conexion.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error actualizando stock: " + ex.Message);
+            }
+        }
+
+        public Egresos ObtenerEgresoPorId(int idEgreso)
+        {
+            Egresos egreso = null;
+            try
+            {
+                using (SqlConnection conexion = new SqlConnection(Conexion.cn))
+                {
+                    string sql = "SELECT * FROM Tonner_Egresos WHERE IdEgreso = @IdEgreso";
+                    SqlCommand cmd = new SqlCommand(sql, conexion);
+                    cmd.Parameters.AddWithValue("@IdEgreso", idEgreso);
+
+                    conexion.Open();
+                    using (SqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        if (rdr.Read())
+                        {
+                            egreso = new Egresos();
+                            egreso.IdEgreso = Convert.ToInt32(rdr["IdEgreso"]);
+                            egreso.IdUsuario = Convert.ToInt32(rdr["IdUsuario"]);
+                            egreso.oProductos = new Productos()
+                            {
+                                IdProducto = Convert.ToInt32(rdr["IdProducto"]),
+                                StockActual = Convert.ToInt32(rdr["StockActual"]),
+                            };
+                            egreso.CodigoId = rdr["CodigoId"].ToString();
+                            egreso.Cantidad = Convert.ToInt32(rdr["Cantidad"]);
+                            egreso.CodigoArea = Convert.ToInt32(rdr["CodigoArea"]);
+                            egreso.CodigoSector = Convert.ToInt32(rdr["CodigoSector"]);
+                            egreso.Observaciones = rdr["Observaciones"].ToString();
+                            egreso.TipoSalida = Convert.ToChar(rdr["TipoSalida"]);
+                            egreso.FechaEgreso = Convert.ToDateTime(rdr["FechaEgreso"]);
+                            egreso.FechaAct = Convert.ToDateTime(rdr["FechayHoraAct"]);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error obteniendo ingreso: " + ex.Message);
+            }
+            return egreso;
         }
     }
 }
