@@ -1,4 +1,9 @@
-﻿
+﻿//VARIABLES GLOBALES A DECLARAR CADA VEZ QUE SE USE ESTE ARCHIVO
+
+//var permisos = @Html.Raw(Json.Encode(Session["#viarable#"]));
+//var appSettings = {};
+//var filtrarStockEnProducto = (TRUE O FALSE);
+
 function cargarApiUrls() {
     var isDevelopment = window.location.hostname === "localhost";
     var getApiUrl = isDevelopment ? "/Toner/GetApiUrls" : "/SistemaLT/TonerHP/Toner/GetApiUrls";
@@ -226,13 +231,24 @@ function CargarProductosporCI(selectElement) {
         contentType: "application/json; charset=utf-8",
         success: function (data) {
             $("#cbodetalle").empty();
-            let opciones = [];
+            var opciones = [];
             $.each(data, function (index, valor) {
-                if (valor.Activo === true) {
-                    opciones.push({
-                        id: valor.IdProducto,
-                        text: valor.Detalle
-                    });
+                if (filtrarStockEnProducto) {
+                    if (valor.Activo === true && valor.StockActual > 0) {
+                        opciones.push({
+                            id: valor.IdProducto,
+                            text: valor.Detalle
+                        });
+                        console.log(opciones)
+                    }
+                }
+                else if (!filtrarStockEnProducto) {
+                    if (valor.Activo === true) {
+                        opciones.push({
+                            id: valor.IdProducto,
+                            text: valor.Detalle
+                        });
+                    }
                 }
             });
             $('#cbodetalle').select2({

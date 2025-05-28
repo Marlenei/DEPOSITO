@@ -61,14 +61,14 @@
                         <label for="txtnombres" class="form-label">Tipo</label>
                         <div class="mt-0">
 
-                            <select id="cbotipo" class="form-select"> </select>
+                            <select id="cbotipo" class="form-select" style="width:100%"> </select>
                         </div>
 
                     </div>
 
                         <div class="col-sm-6">
                             <label class="form-label">Rubro</label>
-                            <select id="cborubro" class="form-select"> </select>
+                            <select id="cborubro" class="form-select" style="width:100%"> </select>
                         </div>
 
                         <div class="col-sm-6">
@@ -226,7 +226,7 @@
         }
             function abrirModal(json) {
                 $("#txtid").val(0);
-                $("#cbotipo").val(null).trigger('change');
+                $("#cbotipo").prop('disabled', false).val(null).trigger('change');
                 $("#cborubro").val(null).trigger('change');
                 $("#txtusuario").val(@Session["AccesCode"]);
                 $("#cboactivo").val(1);
@@ -236,7 +236,7 @@
                     if (json != null) {
                         modalTitle('Editar');
                     $("#txtid").val(json.IdTipo);
-                    $("#cbotipo").val(json.IdTipo).trigger('change');
+                    $("#cbotipo").prop('disabled', false).val(json.IdTipo).trigger('change');
                     $("#cborubro").val(json.oRubros.IdRubro).trigger('change');
                     $("#txtusuario").val(json.IdUsuario);
                     $("#cboactivo").val(json.Activo == true ? 1:0 );
