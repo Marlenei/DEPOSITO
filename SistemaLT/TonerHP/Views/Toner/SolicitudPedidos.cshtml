@@ -29,7 +29,7 @@
             </div>
         }
 
-       <!-- Contenedor principal para los tres elementos -->
+        <!-- Contenedor principal para los tres elementos -->
         <div class="row g-2 g-md-3 mb-4 align-items-stretch">
 
             <!-- Elemento 1: Botón Nuevo Pedido -->
@@ -69,7 +69,7 @@
         <div class="row mb-0">
             <div class="col-12 text-center">
                 <h4 id="tituloTablaPedidos" class="titulo-dinamico-mejorado" title="Viendo pedidos de mi área">
-                    <i id="iconoTitulo" class="fas fa-users me-2"></i> 
+                    <i id="iconoTitulo" class="fas fa-users me-2"></i>
                     <span id="textoTitulo">PEDIDOS DE MI ÁREA</span>
                 </h4>
             </div>
@@ -119,9 +119,9 @@
                         </div>
 
                         @*<div class="col-md-3">
-                            <label for="txtpedido" class="form-label-sm">N° de Pedido:</label>
-                            <input type="text" class="form-control form-control-sm" id="txtpedido" placeholder="Autogenerado" readonly>
-                        </div>*@
+                                <label for="txtpedido" class="form-label-sm">N° de Pedido:</label>
+                                <input type="text" class="form-control form-control-sm" id="txtpedido" placeholder="Autogenerado" readonly>
+                            </div>*@
 
                         <div class="col-md-3">
                             <label for="txtfechapedido" class="form-label-sm">Fecha Pedido:</label>
@@ -166,7 +166,7 @@
                                     <label for="txtcantidad" class="form-label-sm">Cantidad:</label>
                                     <input type="number" class="form-control form-control-sm" id="txtcantidad" min="1" value="1" required>
                                 </div>
-                               
+
                             </div>
 
                             <div class="mb-2">
@@ -245,7 +245,7 @@
 
     /* --- Estilos para Modal  --- */
 
-    
+
     #FormModal .form-label,
     #FormModal .form-label-sm { /* Asegurar que se aplique si usas la clase */
         font-size: 0.875em;
@@ -282,8 +282,8 @@
     .titulo-dinamico-mejorado {
         display: inline-flex; /* Para alinear icono y texto, y permitir padding */
         align-items: center; /* Centra verticalmente el icono y el texto */
-        padding: 10px 20px; 
-        border-radius: 25px; 
+        padding: 10px 20px;
+        border-radius: 25px;
         font-weight: bold;
         transition: all 0.3s ease-in-out; /* Transición suave para todos los cambios */
         color: #0d6efd; /* Color primario de Bootstrap por defecto */
@@ -336,7 +336,7 @@
         var tipoprod = {};
         var appSettings = {};
         var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
-
+        var filtrarStockEnProducto = true;
         let productoSeleccionado = null;
         var productosAgregados = [];
 
@@ -386,6 +386,13 @@
             CargarCodigosID(urlcodigoid, permisos.map(p => p.Accesos));
             LimpiarSelects();
             CargarProductos(permisos.map(p => p.Accesos));
+
+            $('#filterRubroSelect,#filterAreaSelect,#filterSectorSelect').select2({
+                placeholder: "Seleccionar",
+                allowClear: true,
+            });
+
+            tooltips();
             LimpiarCampos();
             selects2();
             cargarApiUrls();

@@ -175,7 +175,7 @@
                     <!-- Fila para Observaciones (podría ocupar más ancho si lo deseas) -->
                     <div class="row justify-content-center g-3 mb-3">
                         <div class="col-12">
-                            
+
                             <label for="txtobservaciones" class="form-label">Observaciones (Opcional)</label>
                             <input type="text" class="form-control" id="txtobservaciones" maxlength="50" placeholder="Notas adicionales sobre el pedido">
                         </div>
@@ -213,6 +213,7 @@
         var tipoprod = {};
         var appSettings = {};
         var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
+        var filtrarStockEnProducto = true;
 
 
 
@@ -227,7 +228,13 @@
               var urlcodigoid = '@Url.Action("ListarProductos", "Toner")'
             CargarCodigosID(urlcodigoid, permisos.map(p => p.Accesos));
             LimpiarSelects();
-            CargarProductos();
+            CargarProductos(permisos.map(p => p.Accesos));
+
+            $('#filterRubroSelect,#filterAreaSelect,#filterSectorSelect').select2({
+                placeholder: "Seleccionar",
+                allowClear: true,
+            });
+            tooltips();
             LimpiarCampos();
             selects2();
             cargarApiUrls();
@@ -412,7 +419,7 @@
                 ],
 
                 order: [
-                    [9, 'asc'] // Ordena por la columna "Fecha Pedido" (índice 8) descendente
+                    [8, 'asc'] // Ordena por la columna "Fecha Pedido" (índice 8) descendente
                 ],
 
                 language: {
@@ -697,5 +704,4 @@
 
 
 }
-
 
