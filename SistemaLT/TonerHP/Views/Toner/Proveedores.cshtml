@@ -120,7 +120,6 @@
                dataType: "json",
                contentType: "application/json; charset=utf-8",
                success: function(data) {
-                   $("<option>").attr({ "value": "" }).text("Seleccione un Proveedor").appendTo("#cborazonsocial");
                    var opciones = [];
                    $.each(data.data, function(index, valor) {
                        opciones.push({

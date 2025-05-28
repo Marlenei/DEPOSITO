@@ -164,9 +164,14 @@ namespace CapaNegocio
                 }
                 else if (productoCambiado)
                 {
-                    ActualizarStockProducto(productoActual, cantidadActual);
-                    ActualizarStockProducto(objeto.oProductos.IdProducto, -objeto.Cantidad);
-                    return ActualizarEgresoSimple(objeto, out Mensaje);
+                    bool resultado =  ActualizarEgresoSimple(objeto, out Mensaje);
+                    if (resultado)
+                    {
+                        ActualizarStockProducto(productoActual, cantidadActual);
+                        ActualizarStockProducto(objeto.oProductos.IdProducto, -objeto.Cantidad);
+                    }
+                    return resultado;
+                    //return ActualizarEgresoSimple(objeto, out Mensaje);
                 }
                 else
                 {
