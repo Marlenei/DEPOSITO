@@ -44,7 +44,7 @@ namespace TonerHP.Controllers
             {
                 return RedirectToAction("Login", "Usuario");
             }
-            var tieneAcceso = permisos.Any(p => p.Accesos == 182);
+            var tieneAcceso = permisos.Any(p => p.Accesos == 182 || p.Accesos == 186);
             if (!tieneAcceso)
             {
                 return RedirectToAction("Error", "Home");
@@ -78,7 +78,7 @@ namespace TonerHP.Controllers
             {
                 return RedirectToAction("Login", "Usuario");
             }
-            var tieneAcceso = permisos.Any(p => p.Accesos == 182);
+            var tieneAcceso = permisos.Any(p => p.Accesos == 182 || p.Accesos == 186);
             if (!tieneAcceso)
             {
                 return RedirectToAction("Error", "Home");

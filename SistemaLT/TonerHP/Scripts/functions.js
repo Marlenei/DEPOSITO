@@ -79,13 +79,9 @@ function CargarTipos(idRubro) {
     if (!idRubro) {
         return;
     }
-    console.log(window.location.hostname)
     var isDevelopment = window.location.hostname === "localhost";
-    console.log(isDevelopment)
     var baseUrl = isDevelopment ? appSettings.ApiUrlDev : appSettings.ApiUrlProd;
-    console.log("Esto es la base", baseUrl)
     var urltipos = baseUrl + '/ListarTiposPorRubro?idRubro=' + idRubro;
-    console.log("Esto es la url", urltipos)
 
 
     $.ajax({

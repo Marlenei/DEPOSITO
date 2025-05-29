@@ -3,9 +3,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
-        <h5 class="card-title mb-0">
-            <i class="fas fa-circle-arrow-down me-2"></i>Ingresos
+    <div style="background-image: url('/Content/images/fondohospi4.png'); background-size:cover;  background-position: center; background-repeat: no-repeat; width:auto; height:auto">
+        <h5 class="card-title mb-0 text-white" style="padding-bottom: 5px; padding-top: 5px">
+            <i class="fas fa-circle-arrow-down me-2 "></i>Ingresos
         </h5>
     </div>
     <div class="card-body">
@@ -69,7 +69,7 @@
                         <input type="text" class="form-control" id="txtfechaingreso" readonly style="background-color:white">
                         <label for="txtcantidad" class="form-label">Cantidad</label>
                         <input type="number" class="form-control" id="txtcantidad" min="1" max="999" required placeholder="Coloque una cantidad" oninput="this.value.replace(/[^0-9]/g, '');">
-                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                        <label for="txtcodigoid" class="form-label">Codigo ingreso</label>
                         <input type="text" class="form-control" id="txtcodigoid" maxlength="30">
                     </div>
 
@@ -81,7 +81,7 @@
                         <div class="input-group mb-3">
                             <span class="input-group-text">Stock Actual</span>
                             <input id="cbostockactual" type="text" class="form-control" readonly>
-                            <span class="input-group-text">Codigo ID</span>
+                            <span class="input-group-text">Codigo de barra</span>
                             <input id="infocodigoid" type="text" class="form-control" readonly>
                         </div>
 

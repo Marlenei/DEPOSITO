@@ -4,8 +4,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
-        <h5 class="card-title mb-0">
+    <div style="background-image: url('/Content/images/fondohospi4.png'); background-size:cover;  background-position: center; background-repeat: no-repeat; width:auto; height:auto">
+        <h5 class="card-title mb-0 text-white" style="padding-bottom: 5px; padding-top: 5px">
             <i class="fas fa-circle-arrow-up me-2"></i>Egresos
         </h5>
     </div>
@@ -23,7 +23,7 @@
         </div>
 
         <div class="row">
-            <div id="filterContainer"  class="col-5">
+            <div id="filterContainer" class="col-5">
                 <label for="filterRubroSelect">Filtrar por Rubro:</label>
                 <select id="filterRubroSelect" style="width: 68%;">
                     <option value="">Todos</option>
@@ -80,7 +80,7 @@
             </tbody>
         </table>
     </div>
-    </div>
+</div>
 <!-- Modal -->
 <div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog  modal-xl">
@@ -103,7 +103,7 @@
                     </div>
 
                     <div class="col">
-                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                        <label for="txtcodigoid" class="form-label">Codigo egreso</label>
                         <input type="text" class="form-control" id="txtcodigoid">
 
                         <label for="txtcantidad" class="form-label">Cantidad</label>
@@ -121,7 +121,7 @@
                         <div class="input-group mb-3">
                             <span class="input-group-text">Stock Actual</span>
                             <input id="cbostockactual" type="text" class="form-control" readonly>
-                            <span class="input-group-text">Codigo ID</span>
+                            <span class="input-group-text">Codigo de barra</span>
                             <input id="infocodigoid" type="text" class="form-control" readonly>
                         </div>
 
