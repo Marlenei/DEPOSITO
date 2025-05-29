@@ -397,10 +397,15 @@
     <Content Include="Content\fontawesome.css" />
     <Content Include="Content\fontawesome.min.css" />
     <Content Include="Content\images\04.png" />
+    <Content Include="Content\images\barra02.png" />
+    <Content Include="Content\images\barra03.png" />
+    <Content Include="Content\images\barra1470.png" />
+    <Content Include="Content\images\barraheader.png" />
     <Content Include="Content\images\fondohospi.png" />
     <Content Include="Content\images\fondohospi1.png" />
     <Content Include="Content\images\fondohospi2.png" />
     <Content Include="Content\images\fondohospi3.png" />
+    <Content Include="Content\images\fondohospi4.png" />
     <Content Include="Content\images\imagen index.png" />
     <Content Include="Content\images\stock.png" />
     <Content Include="Content\images\ui-bg_diagonals-thick_15_0b3e6f_40x40.png" />
