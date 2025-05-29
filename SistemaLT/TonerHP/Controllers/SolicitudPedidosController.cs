@@ -171,7 +171,7 @@ namespace TonerHP.Controllers
             {
                 if (objeto == null || listaProductos == null || listaProductos.Count == 0)
                 {
-                    return Json(new { resultado = false, mensaje = "No se recibieron datos del pedido o la lista de productos está vacía" });
+                    return Json(new { resultado = false, mensaje = "Producto sin stock" });
                 }
 
                 // Validar que la fecha de pedido no esté vacía
