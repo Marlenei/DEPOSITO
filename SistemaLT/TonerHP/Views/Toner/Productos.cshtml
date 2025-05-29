@@ -3,52 +3,52 @@
     ViewBag.Title = "Productos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h5 class="card-title mb-0">
-                <i class="fas fa-cube me-2"></i>Productos
-            </h5>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-12">
-                    <button type="button" class="btn btn-success" onclick="abrirModal(null)"> Nuevo producto </button>
-                </div>
-            </div>
-
-            <hr />
-            <table id="tabla" class="table table-striped-columns table-hover table-bordered table" style="width: 100% !important; table-layout: fixed;">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Detalle</th>
-                        <th>Rubro</th>
-                        <th>Tipo</th>
-                        <th>Stock Minimo</th>
-                        <th>Stock Actual</th>
-                        <th>Codigo ID</th>
-                        <th>Activo</th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <th><input type="text" placeholder="Buscar detalle" class="form-control form-control-sm" /></th>
-                        <th><input type="text" placeholder="Buscar rubro" class="form-control form-control-sm" /></th>
-                        <th><input type="text" placeholder="Buscar tipo" class="form-control form-control-sm" /></th>
-                        <th><input type="text" placeholder="Mínimo" class="form-control form-control-sm" /></th>
-                        <th><input type="text" placeholder="Actual" class="form-control form-control-sm" /></th>
-                        <th><input type="text" placeholder="Código" class="form-control form-control-sm" /></th>
-                        <th><input type="text" placeholder="Sí / No" class="form-control form-control-sm" /></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<div class="card shadow-sm">
+    <div style="background-image: url('/Content/images/fondohospi4.png'); background-size:cover;  background-position: center; background-repeat: no-repeat; width:auto; height:auto">
+        <h5 class="card-title mb-0 text-white" style="padding-bottom: 5px; padding-top: 5px" >
+            <i class="fas fa-cube me-2"></i>Productos
+        </h5>
     </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-success" onclick="abrirModal(null)"> Nuevo producto </button>
+            </div>
+        </div>
+
+        <hr />
+        <table id="tabla" class="table table-striped-columns table-hover table-bordered table" style="width: 100% !important; table-layout: fixed;">
+            <thead class="table-dark">
+                <tr>
+                    <th>Detalle</th>
+                    <th>Rubro</th>
+                    <th>Tipo</th>
+                    <th>Stock Minimo</th>
+                    <th>Stock Actual</th>
+                    <th>Codigo ID</th>
+                    <th>Activo</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th><input type="text" placeholder="Buscar detalle" class="form-control form-control-sm" /></th>
+                    <th><input type="text" placeholder="Buscar rubro" class="form-control form-control-sm" /></th>
+                    <th><input type="text" placeholder="Buscar tipo" class="form-control form-control-sm" /></th>
+                    <th><input type="text" placeholder="Mínimo" class="form-control form-control-sm" /></th>
+                    <th><input type="text" placeholder="Actual" class="form-control form-control-sm" /></th>
+                    <th><input type="text" placeholder="Código" class="form-control form-control-sm" /></th>
+                    <th><input type="text" placeholder="Sí / No" class="form-control form-control-sm" /></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
@@ -76,7 +76,7 @@
 
                     <div class="col-sm-6">
                         <label class="form-label">Tipo</label>
-                        <select id="cbotipo" class="form-control" style="width:100%"> </select>
+                        <select id="cbotipo" disabled class="form-control" style="width:100%"> </select>
                     </div>
 
                     <div class="col-sm-6">
@@ -85,7 +85,7 @@
                     </div>
 
                     <div class="col-sm-6">
-                        <label for="txtcodigoid" class="form-label">Codigo ID</label>
+                        <label for="txtcodigoid" class="form-label">Codigo ID/barra</label>
                         <input type="text" class="form-control" id="txtcodigoid">
                     </div>
                     <div class="col-sm-6">
@@ -124,7 +124,7 @@
             LimpiarCampos();
             tooltips();
             $('#cbotipo').select2({
-                placeholder: "Selecciona una opción",
+                placeholder: "Seleccionar un rubro",
                 allowClear: true,
                 dropdownParent: $('#FormModal'),
 
@@ -240,7 +240,6 @@
                 success: function (data) {
                     $("<option>").attr({ "value": "0", "disabled": "true" }).text("Seleccionar").appendTo("#cborubro");
                     $("#cborubro").empty();
-
                     var opciones = [];
                     $.each(data.data, function (index, valor) {
                         if (valor.Activo === true) {
@@ -250,11 +249,9 @@
                             });
                         }
                     });
-
-
                     $('#cborubro').select2({
-                        data: opciones,
                         placeholder: "Selecciona una opción",
+                        data: opciones,
                         allowClear: true,
                         dropdownParent: $('#FormModal'),
 
@@ -268,7 +265,7 @@
             });
 
         //LISTADO TIPOS
-        function CargarTiposPorRubro(idRubro, callback) {
+        function CargarTiposPorRubro(idRubro, rubroSeleccionado) {
             if (!idRubro) {
                 return;
             }
@@ -278,15 +275,23 @@
                   dataType: "json",
                   contentType: "application/json; charset=utf-8",
                   success: function (data) {
+                      $('#cbotipo').prop('disabled', false)
                       $("#cbotipo").empty();
-
+                      var opciones = [];
                       $.each(data, function (index, valor) {
-                          if (valor.Activo === true) {
-                              $("<option>").attr({ "value": valor.IdTipo }).text(valor.Tipo).appendTo("#cbotipo");
-                          }
+                          opciones.push({
+                              id: valor.IdTipo,
+                              text: valor.Tipo
+                          });
                       });
-                      if (callback) {
-                          callback();
+                      $('#cbotipo').select2({
+                          placeholder: "Selecciona un rubro",
+                          data: opciones,
+                          allowClear: true,
+                          dropdownParent: $('#FormModal'),
+                      });
+                      if (rubroSeleccionado) {
+                          $('#cbotipo').val(rubroSeleccionado).trigger('change');
                       }
                   },
                   error: function (error) {
@@ -327,17 +332,15 @@
                 } else {
                     modalTitle('Editar');
 
-                       $("#txtid").val(data.IdProducto);
-                        $("#cbodetalle").val(data.IdProducto).trigger('change');
-                        $("#cborubro").val(data.oRubros.IdRubro).trigger('change');
-                        CargarTiposPorRubro(data.oRubros.IdRubro, function () {
-                            $("#cbotipo").val(data.oTipos.IdTipo).trigger('change');
-                        });
-                      $("#txtstockminimo").val(data.StockMinimo);
-                      $("#txtcodigoid").val(data.CodigoId);
-                      $("#txtusuario").val(data.IdUsuario);
-                      $("#cboactivo").val(data.Activo == true ? 1 : 0);
-                      $("#mensajeError").hide();
+                    $("#txtid").val(data.IdProducto);
+                    $("#cbodetalle").val(data.IdProducto).trigger('change');
+                    $("#cborubro").val(data.oRubros.IdRubro).trigger('change');
+                    CargarTiposPorRubro(data.oRubros.IdRubro, data.oTipos.IdTipo);
+                    $("#txtstockminimo").val(data.StockMinimo);
+                    $("#txtcodigoid").val(data.CodigoId);
+                    $("#txtusuario").val(data.IdUsuario);
+                    $("#cboactivo").val(data.Activo == true ? 1 : 0);
+                    $("#mensajeError").hide();
 
                      $("#FormModal").modal("show");
                  }
@@ -345,7 +348,7 @@
                 modalTitle('Crear nuevo');
                 $("#txtid").val(0);
                 $("#cbodetalle").val(null).prop('disabled', false).trigger('change');
-                $("#cbotipo").val(null).prop('disabled', false).trigger('change');
+                $("#cbotipo").val(null).trigger('change');
                 $("#cborubro").val(null).prop('disabled', false).trigger('change');
                 $("#txtstockminimo").val("").prop('disabled', false);
                 $("#txtcodigoid").val("").prop('disabled', false);
