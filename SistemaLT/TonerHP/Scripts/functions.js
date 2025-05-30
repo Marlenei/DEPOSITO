@@ -3,6 +3,7 @@
 //var permisos = @Html.Raw(Json.Encode(Session["#viarable#"]));
 //var appSettings = {};
 //var filtrarStockEnProducto = (TRUE O FALSE);
+//var pedidosproductos = (TRUE O FALSE);
 
 function cargarApiUrls() {
     var isDevelopment = window.location.hostname === "localhost";
@@ -32,28 +33,34 @@ function CargarRubros(urlrubros, permisos) {
         success: function (data) {
             $("#cbostockactual").empty();
             $("#cborubro").empty();
-
+            console.log(permisos);
 
             var opciones = [];
             var notienetoner = permisos.includes(24) || permisos.includes(25);
             var tienetoner = permisos.includes(184) || permisos.includes(183);
 
-
             $.each(data.data, function (index, valor) {
-                if (valor.Activo === true) {
-                    if (notienetoner && valor.Rubro !== "Insumos Informaticos") {
+                if (pedidosproductos) {
+                    if (valor.Rubro !== "Insumos Informaticos" && valor.Activo === true) {
                         opciones.push({
                             id: valor.IdRubro,
                             text: valor.Rubro
                         });
                     }
-                    else if (tienetoner && valor.Rubro === "Insumos Informaticos") {
+                } else if (!pedidosproductos) {
+                    if (notienetoner && valor.Rubro !== "Insumos Informaticos" && valor.Activo === true) {
+                        opciones.push({
+                            id: valor.IdRubro,
+                            text: valor.Rubro
+                        });
+                    } else if (tienetoner && valor.Rubro === "Insumos Informaticos" && valor.Activo === true) {
                         opciones.push({
                             id: valor.IdRubro,
                             text: valor.Rubro
                         });
                     }
                 }
+
             });
             $('#cborubro').select2({
                 placeholder: "Selecciona una opción",
