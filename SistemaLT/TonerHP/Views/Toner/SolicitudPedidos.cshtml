@@ -336,7 +336,7 @@
         var tipoprod = {};
         var appSettings = {};
         var permisos = @Html.Raw(Json.Encode(Session["PermissionsCode"]));
-        var filtrarStockEnProducto = true;
+        var filtrarStockEnProducto = false;
         let productoSeleccionado = null;
         var productosAgregados = [];
 
@@ -612,7 +612,7 @@
             }
         });
 
-        function CargarProductos(permisos) {
+        function CargarProductos(permisos, idSeleccionado = null) {
     // Devolver una promesa para poder usar await
             return new Promise((resolve, reject) => {
                 $.ajax({
@@ -671,8 +671,15 @@
                             dropdownParent: $('#FormModal'), // Asegúrate que esto sigue siendo necesario
                         }).val(null).trigger('change'); // Resetear selección inicial
 
-                        resolve(); // Indicar que la carga fue exitosa
+                        if (idSeleccionado) {
+                            $('#cbodetalle').val(idSeleccionado).trigger('change');
+                        } else {
+                            $('#cbodetalle').val(null).trigger('change');
+                        }
+                        resolve();
                     },
+                    //    // Indicar que la carga fue exitosa
+                    //},
                     error: function (error) {
                         console.log("Error cargando productos:", error);
                         reject(error); // Indicar que hubo un error
