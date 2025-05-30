@@ -52,7 +52,7 @@ namespace CapaDatos
                             },
                             CantidadPedida = Convert.ToInt32(reader["CantidadPedida"]),
                             CantidadEntregada = reader["CantidadEntregada"] != DBNull.Value ? Convert.ToInt32(reader["CantidadEntregada"]) : 0,
-                            FechaEntrega = reader["FechaEntrega"] != DBNull.Value ? Convert.ToDateTime(reader["FechaEntrega"]).ToString("yyyy-MM-dd") : null,
+                            FechaEntrega = reader["FechaEntrega"] != DBNull.Value ? Convert.ToDateTime(reader["FechaEntrega"]).ToString("yyyy-MM-dd HH:mm:ss") : null,
                             NroPedido = reader["NroPedido"].ToString(),
                             Visado = Convert.ToBoolean(reader["Visado"]),
                             FechaPedido = Convert.ToDateTime(reader["FechaPedido"]).ToString("yyyy-MM-dd HH:mm:ss"),
