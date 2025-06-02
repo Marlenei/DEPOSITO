@@ -339,7 +339,7 @@
         var filtrarStockEnProducto = false;
         let productoSeleccionado = null;
         var productosAgregados = [];
-
+        var pedidosproductos = true;
         // --- Variables para el Título Dinámico Mejorado ---
         var iconoArea = "fas fa-users";
         var iconoMisPedidos = "fas fa-user-check";
@@ -612,81 +612,81 @@
             }
         });
 
-        function CargarProductos(permisos, idSeleccionado = null) {
-    // Devolver una promesa para poder usar await
-            return new Promise((resolve, reject) => {
-                $.ajax({
-                    url: '@Url.Action("ListarProductos", "Toner")',
-                    type: "GET",
-                    data: null, // No necesitas enviar permisos si el backend los obtiene de la sesión/rol
-                    dataType: "json",
-                    contentType: "application/json; charset=utf-8",
-                    success: function (data) {
-                        $("#cbodetalle").empty(); // Limpiar opciones existentes
-                        // Añadir opción placeholder/default si Select2 no la añade automáticamente
-                         $("<option>").attr({ "value": "" }).text("Seleccione un producto").appendTo("#cbodetalle");
+          function CargarProductos(permisos, idSeleccionado = null) {
+// Devolver una promesa para poder usar await
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: '@Url.Action("ListarProductos", "Toner")',
+                type: "GET",
+                data: null, // No necesitas enviar permisos si el backend los obtiene de la sesión/rol
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#cbodetalle").empty(); // Limpiar opciones existentes
+                    // Añadir opción placeholder/default si Select2 no la añade automáticamente
+                     $("<option>").attr({ "value": "" }).text("Seleccione un producto").appendTo("#cbodetalle");
 
-                        var opciones = [];
-                        var tienePermiso24 = permisos.includes(24);
-                        var tienePermiso184 = permisos.includes(184);
+                    var opciones = [];
+                    var tienePermiso24 = permisos.includes(24);
+                    var tienePermiso184 = permisos.includes(184);
 
-                        stockprod = {}; // Resetear objetos de datos
-                        codigoidprod = {};
-                        rubroprod = {};
-                        tipoprod = {};
+                    stockprod = {}; // Resetear objetos de datos
+                    codigoidprod = {};
+                    rubroprod = {};
+                    tipoprod = {};
 
-                        $.each(data.data, function (index, valor) {
-                            if (valor.Activo === true) {
-                                let añadir = false;
-                                if (tienePermiso24 && valor.oRubros.Rubro !== "Insumos Informaticos") {
-                                     añadir = true;
-                                } else if (tienePermiso184 && valor.oRubros.Rubro === "Insumos Informaticos") {
-                                     añadir = true;
-                                } else if (!tienePermiso24 && !tienePermiso184) {
-                                     // Si no hay permisos específicos, ¿mostrar todos? Ajusta según tu lógica.
-                                     // añadir = true; // Descomenta si quieres mostrar todos si no hay permisos específicos
-                                }
+                    $.each(data.data, function (index, valor) {
+                        if (valor.Activo === true) {
+                            let añadir = false;
+                            if (tienePermiso24 && valor.oRubros.Rubro !== "Insumos Informaticos") {
+                                 añadir = true;
+                            } /*else if (tienePermiso184 && valor.oRubros.Rubro === "Insumos Informaticos") {*/
+                            //     añadir = true;
+                            //} else if (!tienePermiso24 && !tienePermiso184) {
+                            //     // Si no hay permisos específicos, ¿mostrar todos? Ajusta según tu lógica.
+                            //     // añadir = true; // Descomenta si quieres mostrar todos si no hay permisos específicos
+                            //}
 
 
-                                if (añadir) {
-                                     // Guardar datos asociados al ID
-                                    stockprod[valor.IdProducto] = valor.StockActual;
-                                    codigoidprod[valor.IdProducto] = valor.CodigoId;
-                                    rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
-                                    tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
-                                    // Agregar opción al array para Select2
-                                    opciones.push({
-                                        id: valor.IdProducto,
-                                        text: valor.Detalle
-                                    });
-                                }
+                            if (añadir) {
+                                 // Guardar datos asociados al ID
+                                stockprod[valor.IdProducto] = valor.StockActual;
+                                codigoidprod[valor.IdProducto] = valor.CodigoId;
+                                rubroprod[valor.IdProducto] = valor.oRubros.Rubro;
+                                tipoprod[valor.IdProducto] = valor.oTipos.Tipo;
+                                // Agregar opción al array para Select2
+                                opciones.push({
+                                    id: valor.IdProducto,
+                                    text: valor.Detalle
+                                });
                             }
-                        });
-
-                        // Inicializar o actualizar Select2 con los nuevos datos
-                        $('#cbodetalle').select2({
-                            placeholder: "Seleccione un producto",
-                            data: opciones, // Pasar los datos aquí
-                            allowClear: true,
-                            dropdownParent: $('#FormModal'), // Asegúrate que esto sigue siendo necesario
-                        }).val(null).trigger('change'); // Resetear selección inicial
-
-                        if (idSeleccionado) {
-                            $('#cbodetalle').val(idSeleccionado).trigger('change');
-                        } else {
-                            $('#cbodetalle').val(null).trigger('change');
                         }
-                        resolve();
-                    },
-                    //    // Indicar que la carga fue exitosa
-                    //},
-                    error: function (error) {
-                        console.log("Error cargando productos:", error);
-                        reject(error); // Indicar que hubo un error
-                    },
-                });
+                    });
+
+                    // Inicializar o actualizar Select2 con los nuevos datos
+                    $('#cbodetalle').select2({
+                        placeholder: "Seleccione un producto",
+                        data: opciones, // Pasar los datos aquí
+                        allowClear: true,
+                        dropdownParent: $('#FormModal'), // Asegúrate que esto sigue siendo necesario
+                    }).val(null).trigger('change'); // Resetear selección inicial
+
+                    if (idSeleccionado) {
+                        $('#cbodetalle').val(idSeleccionado).trigger('change');
+                    } else {
+                        $('#cbodetalle').val(null).trigger('change');
+                    }
+                    resolve();
+                },
+                //    // Indicar que la carga fue exitosa
+                //},
+                error: function (error) {
+                    console.log("Error cargando productos:", error);
+                    reject(error); // Indicar que hubo un error
+                },
             });
-        }
+        });
+    }
 
         function modalTitle(title) {
             document.getElementById('titulodinamico').innerText = title;
